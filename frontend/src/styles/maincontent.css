@@ -1,0 +1,77 @@
+.aim-testimonials {
+  background: linear-gradient(
+    135deg,
+    #e6f7ff,
+    #b3d9ff,
+    #99c2ff,
+    #80b3ff,
+    #66a3ff
+  );
+  padding: 40px 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.aim-testimonials h2 {
+  font-size: 2rem;
+  color: #002244;
+  margin-bottom: 20px;
+}
+
+.aim-testimonials p,
+.aim-testimonials ul {
+  font-size: 1.2rem;
+  color: #003366;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  font-style: italic;
+}
+
+.testimonial {
+  color: #003366;
+  font-style: italic;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.section-divider {
+  border: 0;
+  height: 2px;
+  background: #002244;
+  margin: 50px auto;
+  width: 70%;
+}
+
+.bulb-icon {
+  background-image: url("/images/light-bulb.png");
+  width: 60px;
+  height: auto;
+  margin-top: 15px;
+}
+
+.participation-icon {
+  background-image: url("/images/participation.png");
+  width: 60px;
+  height: auto;
+  margin-top: 15px;
+}
+
+.book-icon {
+  background-image: url("/images/book.png");
+  width: 60px;
+  height: auto;
+  margin-top: 15px;
+}
+
+.feedback-icon {
+  background-image: url("/images/feedback.png");
+  width: 60px;
+  height: auto;
+  margin-top: 15px;
+}
+
+li {
+  list-style: none;
+}

@@ -1,0 +1,22 @@
+button {
+  padding: 6px 10px;
+  border: 1px solid #003366;
+  background-color: white;
+  color: #003366;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #003366;
+  color: white;
+}
+
+.rankButton:disabled {
+  background-color: #545151;
+  cursor: not-allowed;
+}
+.rankButton:disabled:hover {
+  background-color: #545151;
+  color: #003366;
+}

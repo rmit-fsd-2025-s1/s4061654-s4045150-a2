@@ -1,0 +1,91 @@
+body {
+    background-image: url('/images/LoginPageBackground.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.signup-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.signup-form {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;  
+    align-items: center;     
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.signup-form h2 {
+    color: black;
+}
+
+.signup-form label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+    color: black;
+}
+
+.signup-form input[type="text"],
+.signup-form input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.signup-form input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0d1e31;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.signup-form input[type="submit"]:hover {
+    background-color: #142d4c;
+}
+
+
+.whoami button{
+    background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+.whoami button:hover {
+    background-color: #ddd;
+  }
+  
+.whoami{
+    overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+ .whoami button.active {
+    background-color: #ccc;
+  }

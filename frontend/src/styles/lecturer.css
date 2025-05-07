@@ -1,0 +1,261 @@
+.pageHeader {
+  background: #66a3ff;
+  padding: 10px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #002244;
+  margin-bottom: 20px;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 24px;
+  background: #66a3ff;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterItem p {
+  margin: 0;
+  font-weight: bold;
+  color: #003366;
+}
+
+.filterItem select {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 160px;
+}
+
+.filterItem input[type="text"] {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.filterItem label {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dropdown summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.dropdownContent {
+  display: flex;
+  flex-direction: column;
+  background-color: #66a3ff;
+  border: 2px solid #002244;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 8px;
+  color: #003366;
+}
+
+.dashboardContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+  gap: 20px;
+}
+
+.pageContentCenter {
+  width: 60%;
+  background: linear-gradient(135deg, #59a2d0, #2f4058);
+  border-radius: 10px;
+}
+
+.pageContentRight {
+  width: 40%;
+  padding: 10px;
+  text-align: center;
+  background-color: #0f0f0f;
+  border-left: 1px solid #002244;
+  max-height: 525px;
+  min-height: 500px;
+  overflow: auto;
+  word-wrap: break-word;
+  word-break: break-word;
+  border-radius: 10px;
+}
+
+.tutorApplications {
+  padding: 5px;
+  min-height: 500px;
+  max-height: 500px;
+  overflow: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+}
+
+.tutorCard {
+  border: 1px solid #002244;
+  border-radius: 10px;
+  min-width: 444px;
+  box-shadow: 5px 5px 5px hsla(0, 0%, 0%, 0.1);
+  padding: 10px;
+  margin: 5px;
+  display: inline-block;
+  box-sizing: border-box;
+  /* background: linear-gradient(135deg, #080d10, #142127); */
+  background-color: #1e293b;
+}
+
+.selectedCandidates {
+  padding: 10px;
+  margin-top: 20px;
+}
+
+.credSkills {
+  background-color: hsla(207, 67%, 49%, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.inline-name {
+  display: inline-block;
+  padding: 10px;
+}
+
+.availabilityLabel {
+  color: #003366;
+  font-weight: bold;
+}
+
+.availabilityLabel input {
+  margin-right: 6px;
+  margin-left: 6px;
+}
+
+.candidate-stats-container {
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  background-color: #b9e2e9;
+}
+
+.candidate-box {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #bda5a5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.candidate-box h3 {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.candidate-box p {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+}
+
+.candidate-box ol {
+  list-style-type: decimal;
+  list-style-position: inside;
+  padding-left: 20px;
+  text-align: center;
+  color: #666;
+  padding-left: 37;
+  margin-left: 0;
+}
+
+.candidate-box li {
+  list-style-position: inside;
+  padding-left: 20px;
+  text-align: center;
+  color: #666;
+  padding-right: 70;
+  margin-left: 0;
+}
+
+.ranking {
+  background-color: #e1f5fe;
+  min-height: 120px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.most-selected {
+  background-color: #c8e6c9;
+  min-height: 120px;
+  max-height: 120px;
+  color: #666;
+}
+
+.least-selected {
+  background-color: #ffecb3;
+  min-height: 120px;
+  max-height: 120px;
+  color: #666;
+}
+
+.not-chosen {
+  background-color: #f0f4c3;
+  min-height: 120px;
+  max-height: 120px;
+  color: #666;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.sortButtons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-radius: 8px;
+}
+
+.sortButton {
+  padding: 6px 10px;
+  border: 1px solid #003366;
+  background-color: white;
+  color: #003366;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.sortButton:hover {
+  background-color: #003366;
+  color: white;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}

@@ -1,0 +1,232 @@
+details {
+  display: inline-block;
+  border: solid 2px #002244;
+  border-radius: 25px;
+  padding: 10px;
+  transition: 0.5s ease;
+  cursor: pointer;
+  background: #66a3ff;
+  color: #003366;
+}
+
+details:hover {
+  border: solid 2px rgb(221, 109, 24);
+}
+
+.section-divider {
+  border: 0;
+  height: 2px;
+  background: #002244;
+  margin: 50px auto;
+  width: 70%;
+}
+
+.center-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 110vh;
+  background-image: url("/images/TutorPageBackground.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tutorFormBox {
+  background: linear-gradient(
+    135deg,
+    #e6f7ff,
+    #b3d9ff,
+    #99c2ff,
+    #80b3ff,
+    #66a3ff
+  );
+  padding: 40px 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.applicantInformation {
+  background-color: #f0f8ff;
+  border: 1px solid #b3d9ff;
+  box-shadow: 0 2px 8px rgba(102, 163, 255, 0.2);
+  text-align: center;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  border: 8px;
+  border-color: #002244;
+  border-radius: 10px;
+  width: 50%;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  font-size: 2rem;
+  color: #002244;
+  margin-bottom: 20px;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+h2 {
+  color: #003366;
+}
+
+.p1 {
+  font-size: 1.2rem;
+  color: #003366;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  font-style: italic;
+}
+.p2 {
+  font-size: 1.2rem;
+  color: #003366;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  text-align: center;
+}
+
+.applyButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #004080;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.applyButton:hover {
+  background-color: #0059b3;
+}
+
+.applyButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.inputBox {
+  width: 80%;
+  max-width: 350px;
+  padding: 10px 10px;
+  margin: 10px auto;
+  font-size: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: block;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.inputBox:focus {
+  border-color: #004080;
+  box-shadow: 0 0 5px rgba(0, 64, 128, 0.2);
+  outline: none;
+}
+
+.addButton {
+  background-color: #004080;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.addButton:hover {
+  background-color: #0059b3;
+}
+
+.addButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.fieldsPopulated {
+  color: green;
+}
+
+.fieldsNotPopulated {
+  color: red;
+}
+
+.form-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  background: linear-gradient(
+    135deg,
+    #e6f7ff,
+    #b3d9ff,
+    #99c2ff,
+    #80b3ff,
+    #66a3ff
+  );
+  padding-bottom: 20px;
+}
+
+.applicantBox {
+  width: 50%;
+  border-radius: 8px;
+  height: auto;
+  border: 1px solid #b3d9ff;
+  box-shadow: 0 2px 8px rgba(102, 163, 255, 0.2);
+  text-align: center;
+}
+
+ul {
+  list-style-type: none;
+}
+.listItem {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #003366;
+  border: solid 3px #00f7a5;
+  border-radius: 20px;
+  background-color: #8ef4d2;
+  display: inline-block;
+  padding: 10px;
+}
+
+.courseName-green {
+  font-size: 1.2rem;
+  color: #003366;
+  max-width: 40%;
+  margin: 5px 0;
+  text-align: center;
+  display: inline-block;
+  border: solid 3px #00f7a5;
+  border-radius: 20px;
+  background-color: #8ef4d2;
+}
+
+.avail-green {
+  font-size: 1.2rem;
+  color: #003366;
+  max-width: 10%;
+  margin: 5px 0;
+  text-align: center;
+  display: inline-block;
+  border: solid 3px #00f7a5;
+  border-radius: 20px;
+  background-color: #8ef4d2;
+}

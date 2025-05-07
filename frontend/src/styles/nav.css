@@ -1,0 +1,68 @@
+.navbar {
+  background-color: #0d1e31;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.leftLinks,
+.rightLinks {
+  list-style: none;
+  display: flex;
+  gap: 16px;
+  font-size: 1.2rem;
+}
+
+.leftLinks a,
+.rightLinks a {
+  color: white;
+  text-decoration: none;
+}
+
+.leftLinks a:hover,
+.rightLinks a:hover {
+  text-decoration: underline;
+}
+
+.authLinks {
+  display: flex;
+  gap: 16px;
+}
+
+.authList {
+  list-style: none;
+  display: flex;
+  gap: 16px;
+}
+
+.authList li {
+  display: inline;
+}
+
+.signupBox {
+  padding: 8px 16px;
+  background-color: red;
+  border: 2px solid red;
+  border-radius: 5px;
+  color: white;
+  text-decoration: none;
+}
+
+.signupBox:hover {
+  background-color: darkred;
+}
+
+.userWelcome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+}

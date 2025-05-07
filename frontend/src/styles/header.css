@@ -1,0 +1,44 @@
+.background-container {
+  background-image: url("/images/MainPagePhoto.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+
+  color: white;
+  text-align: center;
+  margin: 20px;
+}
+
+.main {
+  padding: 32px;
+  text-align: center;
+}
+
+.background-container p {
+  text-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.6),
+    -2px -2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.background-container h2 {
+  color: white;
+  outline: black;
+  text-shadow: 1px;
+  font-size: 4rem;
+  text-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.6),
+    -2px -2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.header-text {
+  font-size: 1rem;
+  color: white;
+  font-weight: bold;
+}

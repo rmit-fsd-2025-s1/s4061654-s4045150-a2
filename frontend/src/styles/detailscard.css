@@ -1,0 +1,29 @@
+.infoCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.pStyle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4fc3f7;
+  text-decoration: underline;
+}
+
+.margin {
+  margin-top: 10px;
+}
+
+.commentBox {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #646f70;
+}
+
+.error {
+  color: red;
+}
