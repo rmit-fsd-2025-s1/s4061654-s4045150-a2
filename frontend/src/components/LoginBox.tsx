@@ -1,9 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
-
+import { userApi } from "../services/api";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
-import { loginCreds } from "../types/loginCreds";
+import { UserInformation } from "../types/loginCreds";
+import { compareSync } from "bcrypt-ts";
 
 // Login component for user authentication
 export default function login() {
@@ -39,69 +40,69 @@ export default function login() {
   };
 
   // useEffect that runs once to store dummy login data into localStorage.
-  useEffect(() => {
-    //Dummy login data
-    const userCreds: loginCreds[] = [
-      {
-        name: "Fred Smith",
-        email: "fred@yahoo.com",
-        password: "Password123",
-        tutor: true,
-      },
-      {
-        name: "Jessica Stevens",
-        email: "jessica01@gmail.com",
-        password: "Password123",
-        tutor: true,
-      },
-      {
-        name: "Ryan Praman",
-        email: "ryan@gmail.com",
-        password: "Password123",
-        tutor: true,
-      },
-      {
-        name: "Jean Paul",
-        email: "jean@gmail.com",
-        password: "Password123",
-        tutor: true,
-      },
-      {
-        name: "Lucas Brown",
-        email: "lucas@rmit.edu.au",
-        password: "Password123",
-        tutor: false,
-      },
-      {
-        name: "Lamar Davis",
-        email: "lamar@rmit.edu.au",
-        password: "Password123",
-        tutor: false,
-      },
-      {
-        name: "Gosling Small",
-        email: "gosling@rmit.edu.au",
-        password: "Password123",
-        tutor: false,
-      },
-      {
-        name: "Martha Stewart",
-        email: "martha@rmit.edu.au",
-        password: "Password123",
-        tutor: false,
-      },
-    ];
+  // useEffect(() => {
+  //Dummy login data
+  // const userCreds: loginCreds[] = [
+  //   {
+  //     name: "Fred Smith",
+  //     email: "fred@yahoo.com",
+  //     password: "Password123",
+  //     tutor: true,
+  //   },
+  //   {
+  //     name: "Jessica Stevens",
+  //     email: "jessica01@gmail.com",
+  //     password: "Password123",
+  //     tutor: true,
+  //   },
+  //   {
+  //     name: "Ryan Praman",
+  //     email: "ryan@gmail.com",
+  //     password: "Password123",
+  //     tutor: true,
+  //   },
+  //   {
+  //     name: "Jean Paul",
+  //     email: "jean@gmail.com",
+  //     password: "Password123",
+  //     tutor: true,
+  //   },
+  //   {
+  //     name: "Lucas Brown",
+  //     email: "lucas@rmit.edu.au",
+  //     password: "Password123",
+  //     tutor: false,
+  //   },
+  //   {
+  //     name: "Lamar Davis",
+  //     email: "lamar@rmit.edu.au",
+  //     password: "Password123",
+  //     tutor: false,
+  //   },
+  //   {
+  //     name: "Gosling Small",
+  //     email: "gosling@rmit.edu.au",
+  //     password: "Password123",
+  //     tutor: false,
+  //   },
+  //   {
+  //     name: "Martha Stewart",
+  //     email: "martha@rmit.edu.au",
+  //     password: "Password123",
+  //     tutor: false,
+  //   },
+  // ];
 
-    localStorage.setItem("users", JSON.stringify(userCreds));
-  }, []);
+  //   localStorage.setItem("users", JSON.stringify(userCreds));
+  // }, []);
 
   /**checkLogin checks whether the login credentials provided already exists in the respective localStorage keys.
    * Returns a boolean value upon doing so**/
-  const checkLogin = (email: String, password: String) => {
-    const allUsers = JSON.parse(localStorage.getItem("users") || "[]");
-
+  const checkLogin = async (email: string, password: string) => {
+    const allUsers = (await userApi.getAllUsers()) as UserInformation[];
     return allUsers.find(
-      (user: loginCreds) => user.email == email && user.password == password
+      (user: UserInformation) =>
+        user.email === email && compareSync(password, user.password)
     );
   };
 
@@ -118,7 +119,7 @@ export default function login() {
   };
 
   //handleSubmit function handles what happens when "Login" button is pressed.
-  const handleSubmit = (e: React.FormEvent<HTMLInputElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLInputElement>) => {
     // Ensures the 'required' tags in the input HTML are checked first before button click is handled.
     if (!e.currentTarget.form?.checkValidity()) return;
 
@@ -150,14 +151,14 @@ export default function login() {
 
     // If no errors are stored, and if the credentials exist in the database,
     // show a success message and take them to their respective page
-    const currentUser = checkLogin(loginData.email, loginData.password);
+    const currentUser = await checkLogin(loginData.email, loginData.password);
 
     if (currentUser) {
       login(loginData.email, loginData.password);
       // Check if the current user is a lecturer (tutor = false)
-      if (!currentUser.tutor) {
+      if (currentUser.role == "Lecturer") {
         // Save the current lecturer's name in localStorage
-        localStorage.setItem("lecturerName", currentUser.name);
+        localStorage.setItem("lecturerName", currentUser.firstName);
         setSuccess("Welcome user! Redirecting...");
         setTimeout(() => router.push("/lecturer"), 1000);
       } else {

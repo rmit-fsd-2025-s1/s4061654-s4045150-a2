@@ -11,13 +11,13 @@ export default function NavBar() {
         </h1>
         <ul className="leftLinks">
           {/*If tutor boolean in applicantInfo is true, show the apply for tutor link*/}
-          {user && user.tutor ? (
+          {user && user.role == "Candidate" ? (
             <li>
               <a href="/tutor">Apply For Tutor</a>
             </li>
           ) : null}
           {/*If tutor boolean in applicantInfo is false, show the apply for lecturer link*/}
-          {user && !user.tutor ? (
+          {user && user.role == "Lecturer" ? (
             <li>
               <a href="/lecturer">Lecturer Dashboard</a>
             </li>

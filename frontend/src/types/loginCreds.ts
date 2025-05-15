@@ -1,6 +1,9 @@
-export type loginCreds = {
-  name: string;
+export type UserInformation = {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
-  tutor: boolean;
+  role: string;
+  about: string;
+  createdAt: Date;
 };

@@ -1,25 +1,20 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginCreds } from "../types/loginCreds";
-// Interface for context
+import { UserInformation } from "../types/loginCreds";
+import { userApi } from "@/services/api";
+import { compareSync } from "bcrypt-ts";
+
 interface AuthContextType {
-  user: { name: string; tutor: boolean } | null;
-  login: (email: string, password: string) => boolean;
+  user: { name: string; role: string } | null;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<{ name: string; tutor: boolean } | null>(
-    null
-  );
-  const [users, setUsers] = useState<loginCreds[]>([]);
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
-  // Initial useEffect to retrieve all users and to check for existing logins
   useEffect(() => {
-    const allUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    setUsers(allUsers);
-
     const existing = localStorage.getItem("loggedIn");
     if (existing) {
       setUser(JSON.parse(existing));
@@ -27,27 +22,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // Login function
-  const login = (email: string, password: string) => {
-    const loginUser = users.find(
-      (u: loginCreds) => u.email === email && u.password === password
+  const login = async (email: string, password: string) => {
+    const allUsers = (await userApi.getAllUsers()) as UserInformation[];
+    const loginUser = allUsers.find(
+      (u: UserInformation) =>
+        u.email === email && compareSync(password, u.password)
     );
 
     if (loginUser) {
-      // Store the full user object including the tutor flag
-      setUser({ name: loginUser.name, tutor: loginUser.tutor });
-      localStorage.setItem("loggedIn", JSON.stringify(loginUser));
+      const loggedInUser = { name: loginUser.firstName, role: loginUser.role };
+      setUser(loggedInUser);
+      localStorage.setItem("loggedIn", JSON.stringify(loggedInUser));
       return true;
     }
     return false;
   };
 
-  // Logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem("loggedIn");
   };
 
-  // Return context
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}
