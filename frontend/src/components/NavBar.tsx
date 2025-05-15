@@ -14,12 +14,14 @@ export default function NavBar() {
           {user && user.role == "Candidate" ? (
             <li>
               <a href="/tutor">Apply For Tutor</a>
+              <a href="/profile">View Profile</a>
             </li>
           ) : null}
           {/*If tutor boolean in applicantInfo is false, show the apply for lecturer link*/}
           {user && user.role == "Lecturer" ? (
             <li>
               <a href="/lecturer">Lecturer Dashboard</a>
+              <a href="/profile">View Profile</a>
             </li>
           ) : null}
         </ul>

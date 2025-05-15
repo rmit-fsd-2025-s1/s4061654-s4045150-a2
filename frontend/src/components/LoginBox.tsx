@@ -39,63 +39,6 @@ export default function login() {
     return hasUpperCase && hasLowerCase && hasNumber && isLongEnough;
   };
 
-  // useEffect that runs once to store dummy login data into localStorage.
-  // useEffect(() => {
-  //Dummy login data
-  // const userCreds: loginCreds[] = [
-  //   {
-  //     name: "Fred Smith",
-  //     email: "fred@yahoo.com",
-  //     password: "Password123",
-  //     tutor: true,
-  //   },
-  //   {
-  //     name: "Jessica Stevens",
-  //     email: "jessica01@gmail.com",
-  //     password: "Password123",
-  //     tutor: true,
-  //   },
-  //   {
-  //     name: "Ryan Praman",
-  //     email: "ryan@gmail.com",
-  //     password: "Password123",
-  //     tutor: true,
-  //   },
-  //   {
-  //     name: "Jean Paul",
-  //     email: "jean@gmail.com",
-  //     password: "Password123",
-  //     tutor: true,
-  //   },
-  //   {
-  //     name: "Lucas Brown",
-  //     email: "lucas@rmit.edu.au",
-  //     password: "Password123",
-  //     tutor: false,
-  //   },
-  //   {
-  //     name: "Lamar Davis",
-  //     email: "lamar@rmit.edu.au",
-  //     password: "Password123",
-  //     tutor: false,
-  //   },
-  //   {
-  //     name: "Gosling Small",
-  //     email: "gosling@rmit.edu.au",
-  //     password: "Password123",
-  //     tutor: false,
-  //   },
-  //   {
-  //     name: "Martha Stewart",
-  //     email: "martha@rmit.edu.au",
-  //     password: "Password123",
-  //     tutor: false,
-  //   },
-  // ];
-
-  //   localStorage.setItem("users", JSON.stringify(userCreds));
-  // }, []);
-
   /**checkLogin checks whether the login credentials provided already exists in the respective localStorage keys.
    * Returns a boolean value upon doing so**/
   const checkLogin = async (email: string, password: string) => {

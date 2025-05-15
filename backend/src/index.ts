@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import express from "express";
 import { AppDataSource } from "./data-source";
-import { UserController } from "./controller/UserController";
 // import userRoutes from "./routes/user.routes";
 import cors from "cors";
 import userRoutes from "./routes/user.routes";
