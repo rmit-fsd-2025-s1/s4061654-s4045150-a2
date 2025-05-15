@@ -1,4 +1,3 @@
-import "../../styles/nav.css";
 import { useAuth } from "../context/authContext";
 
 export default function NavBar() {

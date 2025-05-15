@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { getByLabelText, render, screen } from "@testing-library/react";
 import TutorPage from "../src/pages/tutor";
-import { AuthProvider } from "@/pages/context/authContext";
+import { AuthProvider } from "@/context/authContext";
 import userEvent from "@testing-library/user-event";
 
 describe("Apply for tutor page, application submitting", () => {

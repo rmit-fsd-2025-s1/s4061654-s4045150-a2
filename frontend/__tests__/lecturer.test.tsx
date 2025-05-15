@@ -1,13 +1,13 @@
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
-import InfoDetailsCard from "../src/pages/components/InfoDetailsCard";
+import InfoDetailsCard from "../src/components/InfoDetailsCard";
 
-import { AuthProvider } from "../src/pages/context/authContext";
-import { experience } from "../src/pages/types/experience";
-import { qualification } from "../src/pages/types/qualification";
+import { AuthProvider } from "../src/context/authContext";
+import { experience } from "../src/types/experience";
+import { qualification } from "../src/types/qualification";
 
 import "@testing-library/jest-dom";
-import ApplicationListCard from "../src/pages/components/ApplicationList";
+import ApplicationListCard from "../src/components/ApplicationList";
 
 describe("LecturerPage dashboard", () => {
   it("adds a comment, also throws an error if nothing is typed in", async () => {

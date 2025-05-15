@@ -26,9 +26,9 @@ export class UserInformation {
   @Column()
   role: string;
 
+  @Column()
+  about: string;
+
   @CreateDateColumn()
   createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

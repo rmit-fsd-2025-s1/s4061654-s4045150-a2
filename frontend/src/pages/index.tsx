@@ -1,10 +1,10 @@
 import React from "react";
-import Nav from "./components/NavBar";
-import Footer from "./components/Footer";
-import Header from "./components/header";
-import MainContent from "./components/MainContent";
-import "../styles/globals.css";
-import "./components/LoginBox";
+import Nav from "../components/NavBar";
+import Footer from "../components/Footer";
+import Header from "../components/header";
+import MainContent from "../components/MainContent";
+
+import "../components/LoginBox";
 
 export default function HomePage() {
   return (

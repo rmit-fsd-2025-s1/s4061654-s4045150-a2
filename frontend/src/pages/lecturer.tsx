@@ -1,11 +1,11 @@
-import Nav from "./components/NavBar";
-import Footer from "./components/Footer";
-import "../styles/lecturer.css";
+import Nav from "../components/NavBar";
+import Footer from "../components/Footer";
+
 import { useState, useEffect } from "react";
-import ApplicationListCard from "./components/ApplicationList";
-import InfoDetailsCard from "./components/InfoDetailsCard";
-import { useAuth } from "./context/authContext";
-import { ApplicationInfo } from "./types/application";
+import ApplicationListCard from "../components/ApplicationList";
+import InfoDetailsCard from "../components/InfoDetailsCard";
+import { useAuth } from "../context/authContext";
+import { ApplicationInfo } from "../types/application";
 
 // Pre-populated courses as per assignment specifications.
 const courses: string[] = [

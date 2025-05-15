@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import "../../styles/login.css";
+
 import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
 import { loginCreds } from "../types/loginCreds";

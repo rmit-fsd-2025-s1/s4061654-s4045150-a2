@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import LoginBox from "../src/pages/components/LoginBox";
-import { AuthProvider } from "@/pages/context/authContext";
+import LoginBox from "../src/components/LoginBox";
+import { AuthProvider } from "@/context/authContext";
 import userEvent from "@testing-library/user-event";
 
 // Mocking router

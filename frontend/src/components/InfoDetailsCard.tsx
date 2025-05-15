@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/authContext";
 import { ApplicationInfo } from "../types/application";
-import "../../styles/detailscard.css";
 
 // Props for the component
 type InfoProps = {

@@ -1,5 +1,3 @@
-import "../../styles/button.css";
-
 // Custom Button
 type buttonName = {
   name: string;

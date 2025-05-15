@@ -1,5 +1,3 @@
-import "../../styles/header.css";
-
 // Header for all pages
 export default function Header() {
   return (

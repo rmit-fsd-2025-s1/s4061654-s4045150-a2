@@ -1,10 +1,10 @@
-import Nav from "./components/NavBar";
-import Header from "./components/header";
-import Footer from "./components/Footer";
-import { experience } from "./types/experience";
-import { qualification } from "./types/qualification";
-import { ApplicationInfo } from "./types/application";
-import "../styles/tutor.css";
+import Nav from "../components/NavBar";
+import Header from "../components/header";
+import Footer from "../components/Footer";
+import { experience } from "../types/experience";
+import { qualification } from "../types/qualification";
+import { ApplicationInfo } from "../types/application";
+
 import { useState, useEffect } from "react";
 
 export default function Lecturer() {
