@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { UserInformation } from "../types/loginCreds";
 import { userApi } from "@/services/api";
-import { compareSync } from "bcrypt-ts";
 
 interface AuthContextType {
   user: { name: string; role: string } | null;
@@ -23,19 +22,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Login function
   const login = async (email: string, password: string) => {
-    const allUsers = (await userApi.getAllUsers()) as UserInformation[];
-    const loginUser = allUsers.find(
-      (u: UserInformation) =>
-        u.email === email && compareSync(password, u.password)
-    );
-
-    if (loginUser) {
-      const loggedInUser = { name: loginUser.firstName, role: loginUser.role };
-      setUser(loggedInUser);
-      localStorage.setItem("loggedIn", JSON.stringify(loggedInUser));
-      return true;
+    try {
+      const loginUser = (await userApi.login(
+        email,
+        password
+      )) as UserInformation;
+      if (loginUser && loginUser.firstName && loginUser.role) {
+        const loggedInUser = {
+          name: loginUser.firstName,
+          role: loginUser.role,
+        };
+        setUser(loggedInUser);
+        localStorage.setItem("loggedIn", JSON.stringify(loggedInUser));
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
-    return false;
   };
 
   const logout = () => {

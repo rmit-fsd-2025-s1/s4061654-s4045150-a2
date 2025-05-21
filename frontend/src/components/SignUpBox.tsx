@@ -1,34 +1,58 @@
 import React, { useState } from "react";
 import { userApi } from "../services/api";
 import Router from "next/router";
-import { genSaltSync, hashSync } from "bcrypt-ts";
 
 export default function SignUpBox() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [role, setRole] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [userCredentials, setuserCredentials] = useState({
+    firstName: "",
+    lastName: "",
+    role: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    empty: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setuserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
+    setErrors({ email: "", password: "", empty: "" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const salt = genSaltSync(10);
-    const hashedPassword = hashSync(password, salt);
 
     const user = {
       userid: Math.floor(Math.random() * 1000000),
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      role,
+      firstName: userCredentials.firstName,
+      lastName: userCredentials.lastName,
+      email: userCredentials.email,
+      password: userCredentials.password,
+      role: userCredentials.role,
       createdAt: new Date().toISOString(),
       about: "",
     };
-    await userApi.createUser(user);
-    alert("User registered!");
-    Router.push("/login");
+    if (validateEmail(userCredentials.email)) {
+      if (validatePassword(userCredentials.password)) {
+        await userApi.createUser(user);
+        alert("User registered!");
+        Router.push("/login");
+      } else {
+        setErrors({
+          ...errors,
+          password:
+            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number",
+        });
+      }
+    } else {
+      setErrors({
+        ...errors,
+        email: "Please enter a valid email",
+      });
+    }
   };
 
   return (
@@ -40,15 +64,17 @@ export default function SignUpBox() {
           <label>First Name</label>
           <input
             type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            name="firstName"
+            value={userCredentials.firstName}
+            onChange={handleChange}
           />
 
           <label>Last Name</label>
           <input
             type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            name="lastName"
+            value={userCredentials.lastName}
+            onChange={handleChange}
           />
 
           <label>I'm signing up as a</label>
@@ -56,46 +82,80 @@ export default function SignUpBox() {
           <input
             type="radio"
             value="Candidate"
-            checked={role == "Candidate"}
-            onChange={() => setRole("Candidate")}
+            checked={userCredentials.role == "Candidate"}
+            onChange={handleChange}
+            name="role"
           />
           <label>Tutor</label>
           <input
             type="radio"
             value="Lecturer"
-            checked={role == "Lecturer"}
-            onChange={() => setRole("Lecturer")}
+            checked={userCredentials.role == "Lecturer"}
+            onChange={handleChange}
+            name="role"
           />
           <label>Lecturer</label>
 
           <label>Email</label>
           <input
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            value={userCredentials.email}
+            onChange={handleChange}
           />
+          {errors.email && <p className="error">{errors.email}</p>}
 
           <label>Password</label>
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            value={userCredentials.password}
+            onChange={handleChange}
           />
+          {errors.password && <p className="error">{errors.password}</p>}
 
           <label>Confirm Password</label>
           <input
             type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            name="confirmPassword"
+            value={userCredentials.confirmPassword}
+            onChange={handleChange}
           />
 
-          {password !== confirmPassword && (
+          {userCredentials.password !== userCredentials.confirmPassword && (
             <p className="error">Passwords do not match</p>
           )}
 
-          <input type="submit" value="Register" />
+          <input
+            type="submit"
+            value="Register"
+            disabled={
+              !userCredentials.firstName ||
+              !userCredentials.lastName ||
+              !userCredentials.role ||
+              !userCredentials.email ||
+              !userCredentials.password ||
+              !userCredentials.confirmPassword ||
+              userCredentials.password !== userCredentials.confirmPassword
+            }
+          />
         </form>
       </div>
     </div>
   );
 }
+
+// Helper functions
+const validatePassword = (password: string) => {
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const isLongEnough = password.length >= 8;
+
+  return hasUpperCase && hasLowerCase && hasNumber && isLongEnough;
+};
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};

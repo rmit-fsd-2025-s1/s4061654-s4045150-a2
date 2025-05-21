@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { UserInformation } from "../entity/UserInformation";
+import { genSaltSync, hashSync } from "bcrypt-ts";
+import { compareSync } from "bcrypt-ts";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(UserInformation);
@@ -65,6 +67,18 @@ export class UserController {
     });
 
     try {
+      if (validateEmail(email)) {
+        if (validatePassword(password)) {
+          console.log("Valid password");
+          const salt = genSaltSync(10);
+          const hashedPassword = hashSync(password, salt);
+          user.password = hashedPassword;
+        } else {
+          console.log("Invalid password!");
+        }
+      } else {
+        console.log("Invalid email!");
+      }
       const savedUser = await this.userRepository.save(user);
       return response.status(201).json(savedUser);
     } catch (error) {
@@ -92,6 +106,27 @@ export class UserController {
 
     await this.userRepository.remove(userToRemove);
     return response.json({ message: "User removed successfully" });
+  }
+
+  async login(request: Request, response: Response) {
+    const { email, password } = request.body;
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      return response
+        .status(401)
+        .json({ message: "Invalid credentials provided" });
+    }
+    const passwordMatches = compareSync(password, user.password);
+    if (!passwordMatches) {
+      return response
+        .status(401)
+        .json({ message: "Invalid credentials provided" });
+    }
+
+    return response.json({
+      firstName: user.firstName,
+      role: user.role,
+    });
   }
 
   /**
@@ -142,3 +177,18 @@ export class UserController {
     }
   }
 }
+
+// Helper functions
+const validatePassword = (password: string) => {
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const isLongEnough = password.length >= 8;
+
+  return hasUpperCase && hasLowerCase && hasNumber && isLongEnough;
+};
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};

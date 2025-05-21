@@ -1,12 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { userApi } from "../services/api";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
-import { UserInformation } from "../types/loginCreds";
-import { compareSync } from "bcrypt-ts";
 
-// Login component for user authentication
 export default function login() {
   const router = useRouter();
   const { login } = useAuth();
@@ -23,31 +19,8 @@ export default function login() {
 
   const [success, setSuccess] = useState("");
 
-  //Function to store regex for email validation. The validation happens in handle functions later on.
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  //Function to store regex for password validation. The validation happens in handle functions later on.
-  const validatePassword = (password: string) => {
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const isLongEnough = password.length >= 8;
-
-    return hasUpperCase && hasLowerCase && hasNumber && isLongEnough;
-  };
-
   /**checkLogin checks whether the login credentials provided already exists in the respective localStorage keys.
    * Returns a boolean value upon doing so**/
-  const checkLogin = async (email: string, password: string) => {
-    const allUsers = (await userApi.getAllUsers()) as UserInformation[];
-    return allUsers.find(
-      (user: UserInformation) =>
-        user.email === email && compareSync(password, user.password)
-    );
-  };
 
   //handleChange function sets the state of loginData as the user types into the textbox.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,51 +40,44 @@ export default function login() {
     if (!e.currentTarget.form?.checkValidity()) return;
 
     e.preventDefault();
-    // Resets the errors stored whenever this function runs (when user types again).
     setErrors({ email: "", password: "" });
 
-    let hasErrors = false;
-
-    // Email and password validation (if not valid, store error messages to show the user.)
-    if (!validateEmail(loginData.email)) {
-      setErrors((prev) => ({
-        ...prev,
-        email: "Please enter a valid email.",
-      }));
-      hasErrors = true;
-      return;
-    }
-
-    if (!validatePassword(loginData.password)) {
-      setErrors((prev) => ({
-        ...prev,
-        password:
-          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.",
-      }));
-      hasErrors = true;
-      return;
-    }
-
-    // If no errors are stored, and if the credentials exist in the database,
-    // show a success message and take them to their respective page
-    const currentUser = await checkLogin(loginData.email, loginData.password);
-
-    if (currentUser) {
-      login(loginData.email, loginData.password);
-      // Check if the current user is a lecturer (tutor = false)
-      if (currentUser.role == "Lecturer") {
-        // Save the current lecturer's name in localStorage
-        localStorage.setItem("lecturerName", currentUser.firstName);
-        setSuccess("Welcome user! Redirecting...");
-        setTimeout(() => router.push("/lecturer"), 1000);
-      } else {
-        setSuccess("Welcome user! Redirecting...");
-        router.push("/tutor");
+    try {
+      if (!loginData.email || !loginData.password) {
+        setErrors((prev) => ({
+          ...prev,
+          empty: "Please fill in all fields.",
+        }));
+        return;
       }
-    }
 
-    // If the credentials are not found, show an error message
-    if (!currentUser) {
+      if (validateEmail(loginData.email)) {
+        const successLogin = await login(loginData.email, loginData.password);
+        if (!successLogin) {
+          setErrors((prev) => ({
+            ...prev,
+            email: "Incorrect email or password.",
+          }));
+        } else {
+          // Get user info from context or localStorage
+          const loggedInUser = JSON.parse(
+            localStorage.getItem("loggedIn") || "{}"
+          );
+          setSuccess(`Welcome ${loggedInUser.name}! Redirecting...`);
+          if (loggedInUser.role === "Candidate") {
+            router.push("/candidate");
+          } else {
+            router.push("/lecturer");
+          }
+        }
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Please enter a valid email.",
+        }));
+        return;
+      }
+    } catch (err) {
       setErrors((prev) => ({
         ...prev,
         email: "Incorrect email or password.",
@@ -157,3 +123,10 @@ export default function login() {
     </div>
   );
 }
+
+//helper functions
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};

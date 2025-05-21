@@ -37,4 +37,9 @@ export const userApi = {
     const response = await api.delete(`/users/${id}`);
     return response.data;
   },
+
+  login: async (email: string, password: string) => {
+    const response = await api.post("/login", { email, password });
+    return response.data;
+  },
 };

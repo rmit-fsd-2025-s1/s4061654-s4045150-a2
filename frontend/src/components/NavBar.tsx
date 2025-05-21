@@ -13,7 +13,7 @@ export default function NavBar() {
           {/*If tutor boolean in applicantInfo is true, show the apply for tutor link*/}
           {user && user.role == "Candidate" ? (
             <li>
-              <a href="/tutor">Apply For Tutor</a>
+              <a href="/candidate">Apply For Tutor</a>
               <a href="/profile">View Profile</a>
             </li>
           ) : null}
