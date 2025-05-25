@@ -3,8 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  OneToMany,
 } from "typeorm";
+
+import { Applications } from "./Applications";
+import { ApplicantCourses } from "./ApplicantCourses";
 
 @Entity()
 export class UserInformation {
@@ -31,4 +34,11 @@ export class UserInformation {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  //FK to Applications
+  @OneToMany(() => Applications, (app) => app.applicant)
+  applications: Applications[];
+
+  @OneToMany(() => ApplicantCourses, (app) => app.applicantID)
+  applicantCourses: ApplicantCourses[];
 }

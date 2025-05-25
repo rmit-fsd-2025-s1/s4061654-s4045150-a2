@@ -11,7 +11,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [user, setUser] = useState<{
+    id: number;
+    name: string;
+    role: string;
+  } | null>(null);
 
   useEffect(() => {
     const existing = localStorage.getItem("loggedIn");
@@ -29,6 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       )) as UserInformation;
       if (loginUser && loginUser.firstName && loginUser.role) {
         const loggedInUser = {
+          id: loginUser.userid,
           name: loginUser.firstName,
           role: loginUser.role,
         };

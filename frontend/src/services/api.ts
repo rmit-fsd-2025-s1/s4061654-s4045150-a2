@@ -1,16 +1,10 @@
 import axios from "axios";
+import { UserInformation } from "../types/loginCreds";
+import { ApplicationInfo } from "@/types/application";
 
 export const api = axios.create({
-  baseURL: "http://localhost:3001/api", // Adjust this to match your backend URL
+  baseURL: "http://localhost:3001/api",
 });
-
-export interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  age: number;
-}
 
 export const userApi = {
   getAllUsers: async () => {
@@ -23,12 +17,12 @@ export const userApi = {
     return response.data;
   },
 
-  createUser: async (user: Partial<User>) => {
+  createUser: async (user: Partial<UserInformation>) => {
     const response = await api.post("/users", user);
     return response.data;
   },
 
-  updateUser: async (id: number, user: Partial<User>) => {
+  updateUser: async (id: number, user: Partial<UserInformation>) => {
     const response = await api.put(`/users/${id}`, user);
     return response.data;
   },
@@ -40,6 +34,15 @@ export const userApi = {
 
   login: async (email: string, password: string) => {
     const response = await api.post("/login", { email, password });
+    return response.data;
+  },
+  getAllCourses: async () => {
+    const response = await api.get("/courses");
+    return response.data;
+  },
+
+  saveApplication: async (application: ApplicationInfo) => {
+    const response = await api.post("/applications", application);
     return response.data;
   },
 };

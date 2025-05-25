@@ -32,7 +32,7 @@ export default function SignUpBox() {
       email: userCredentials.email,
       password: userCredentials.password,
       role: userCredentials.role,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
       about: "",
     };
     if (validateEmail(userCredentials.email)) {

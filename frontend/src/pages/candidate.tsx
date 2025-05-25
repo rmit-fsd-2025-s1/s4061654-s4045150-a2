@@ -6,27 +6,29 @@ import { qualification } from "../types/qualification";
 import { ApplicationInfo } from "../types/application";
 
 import { useState, useEffect } from "react";
+import { userApi } from "../services/api";
 
 export default function Lecturer() {
   //Pre-populated courses
-  const courses: string[] = [
-    "COSC4043 Full Stack Development",
-    "COSC2103 Algorithms & Analysis",
-    "COSC2333 Computing Theory",
-    "COSC2105 Computer Networks",
-    "COSC2106 Operating Systems",
-    "COSC2107 Database Systems",
-  ];
+
+  // const courses: string[] = [
+  //   "COSC4043 Full Stack Development",
+  //   "COSC2103 Algorithms & Analysis",
+  //   "COSC2333 Computing Theory",
+  //   "COSC2105 Computer Networks",
+  //   "COSC2106 Operating Systems",
+  //   "COSC2107 Database Systems",
+  // ];
 
   //useState of type applicationInfo to store all values in one state and then store in localStorage.
   const [applicantProfile, setApplicantProfile] = useState<ApplicationInfo>({
-    name: "",
-    coursesApplied: "",
+    applicationID: Math.floor(Math.random() * 1000000),
+    applicant: 0,
+    coursesApplied: [],
     availability: null,
-    prevExp: [] as experience[],
+    experience: [] as experience[],
     skills: [],
     academics: [],
-    selectedCount: 0,
   });
 
   const [experience, setExperience] = useState<experience>({
@@ -56,9 +58,15 @@ export default function Lecturer() {
   });
 
   //Store filteredCourses according to filter option usage in lecturer page.
-  const [filteredCourses, setFilteredCourses] = useState<string[]>(courses);
+  const [courses, setCourses] = useState<string[]>([]);
+  const [filteredCourses, setFilteredCourses] = useState<string[]>([]);
 
   useEffect(() => {
+    userApi.getAllCourses().then((courseArray) => {
+      const typedCourses = courseArray as { courseName: string }[];
+      setFilteredCourses(typedCourses.map((c) => c.courseName));
+    });
+
     const retrieveApplicant = localStorage.getItem("loggedIn");
     const allApplicants = JSON.parse(
       localStorage.getItem("applicantInfo") || "[]"
@@ -73,25 +81,44 @@ export default function Lecturer() {
       }));
 
       // Filter out the courses already applied for
-      const alreadyApplied = allApplicants
-        .filter((app: ApplicationInfo) => app.name === applicantName)
-        .map((app: ApplicationInfo) => app.coursesApplied);
+      // const alreadyApplied = allApplicants
+      //   .filter((app: ApplicationInfo) => app.name === applicantName)
+      //   .map((app: ApplicationInfo) => app.coursesApplied);
 
-      const filtered = courses.filter(
-        (course) => !alreadyApplied.includes(course)
-      );
-      setFilteredCourses(filtered);
+      // const filtered = courses.filter(
+      //   (course) => !alreadyApplied.includes(course)
+      // );
+      // setFilteredCourses(filtered);
     }
   }, []);
 
   /*This function handles ticking checkboxes to select from available courses.
     The function looks updates the state from its previous value of empty array.
     If the course already exists in the array, get rid of the course (checkbox functionality)*/
-  const handleCourseApplied = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setApplicantProfile((prev) => ({
-      ...prev,
-      coursesApplied: e.target.value,
-    }));
+  const handleCourseApplied = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const courseName = e.target.value;
+    // Find the course object by name to get its ID
+    const courseArray = (await userApi.getAllCourses()) as {
+      courseName: string;
+      courseID: number;
+    }[];
+    const courseObj = courseArray.find(
+      (c: { courseName: string; courseID: number }) =>
+        c.courseName === courseName
+    );
+    if (!courseObj) return;
+
+    setApplicantProfile((prev) => {
+      const alreadySelected = prev.coursesApplied.includes(courseObj.courseID);
+      return {
+        ...prev,
+        coursesApplied: alreadySelected
+          ? prev.coursesApplied.filter((id) => id !== courseObj.courseID)
+          : [...prev.coursesApplied, courseObj.courseID],
+      };
+    });
   };
 
   /*This function handles the radio buttons to choose availability.
@@ -108,7 +135,7 @@ export default function Lecturer() {
     if (experience.position && experience.company && experience.description) {
       setApplicantProfile((prev) => ({
         ...prev,
-        prevExp: [...(prev.prevExp || []), experience],
+        experience: [...(prev.experience || []), experience],
       }));
 
       setAffirmation((prev) => ({
@@ -171,19 +198,18 @@ export default function Lecturer() {
   };
 
   /*Finally after storing all the application information, the submission button can be clicked to store the applicantInfo object in localStorage.*/
-  const handleSubmit = () => {
-    const alreadyStored = JSON.parse(
-      localStorage.getItem("applicantInfo") || "[]"
-    );
-    alreadyStored.push(applicantProfile);
-    localStorage.setItem("applicantInfo", JSON.stringify(alreadyStored));
-
-    alert("Your application has been submitted!");
-
-    const newlyAppliedCourse = applicantProfile.coursesApplied;
-    setFilteredCourses((prev) =>
-      prev.filter((course) => course !== newlyAppliedCourse)
-    );
+  const handleSubmit = async () => {
+    try {
+      alert(
+        "Submitting application: " + JSON.stringify(applicantProfile, null, 2)
+      );
+      applicantProfile.applicant = JSON.parse(
+        localStorage.getItem("loggedIn") || "{}"
+      ).userid;
+      await userApi.saveApplication(applicantProfile);
+    } catch (error) {
+      console.error("Error saving application:", error);
+    }
 
     window.location.reload();
   };
@@ -221,7 +247,7 @@ export default function Lecturer() {
                     <li key={index} value={course}>
                       <input
                         id={course}
-                        type="radio"
+                        type="checkbox"
                         name="course"
                         value={course}
                         onChange={handleCourseApplied}
@@ -402,9 +428,9 @@ export default function Lecturer() {
 
           <h2>Previous Experience</h2>
 
-          {(applicantProfile.prevExp || []).length > 0 ? (
+          {(applicantProfile.experience || []).length > 0 ? (
             <ul>
-              {(applicantProfile.prevExp || []).map((exp, index) => (
+              {(applicantProfile.experience || []).map((exp, index) => (
                 <li key={index} className="listItem">
                   <p className="p2">
                     <strong>{exp.position}</strong> at {exp.company}

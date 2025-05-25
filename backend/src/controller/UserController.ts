@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { UserInformation } from "../entity/UserInformation";
-import { genSaltSync, hashSync } from "bcrypt-ts";
-import { compareSync } from "bcrypt-ts";
+import { genSaltSync, hashSync } from "bcrypt";
+import { compareSync } from "bcrypt";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(UserInformation);
@@ -74,10 +74,15 @@ export class UserController {
           const hashedPassword = hashSync(password, salt);
           user.password = hashedPassword;
         } else {
-          console.log("Invalid password!");
+          return response.status(400).json({
+            message:
+              "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.",
+          });
         }
       } else {
-        console.log("Invalid email!");
+        return response.status(400).json({
+          message: "Please enter a valid email address.",
+        });
       }
       const savedUser = await this.userRepository.save(user);
       return response.status(201).json(savedUser);
@@ -124,6 +129,7 @@ export class UserController {
     }
 
     return response.json({
+      userid: user.userid,
       firstName: user.firstName,
       role: user.role,
     });
