@@ -4,6 +4,9 @@ import { UserInformation } from "./entity/UserInformation";
 import { Applications } from "./entity/Applications";
 import { Courses } from "./entity/Courses";
 import { ApplicantCourses } from "./entity/ApplicantCourses";
+import { Lecturers } from "./entity/Lecturers";
+import { Selections } from "./entity/Selections";
+import { Rankings } from "./entity/Rankings";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -17,7 +20,15 @@ export const AppDataSource = new DataSource({
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true,
   logging: true,
-  entities: [UserInformation, Applications, Courses, ApplicantCourses],
+  entities: [
+    UserInformation,
+    Applications,
+    Courses,
+    ApplicantCourses,
+    Lecturers,
+    Selections,
+    Rankings,
+  ],
   migrations: [],
   subscribers: [],
 });
