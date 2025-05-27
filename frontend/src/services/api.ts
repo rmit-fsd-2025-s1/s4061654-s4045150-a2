@@ -2,6 +2,7 @@ import axios from "axios";
 import { UserInformation } from "../types/loginCreds";
 import { ApplicationInfo } from "@/types/application";
 
+
 export const api = axios.create({
   baseURL: "http://localhost:3001/api",
 });
@@ -36,6 +37,7 @@ export const userApi = {
     const response = await api.post("/login", { email, password });
     return response.data;
   },
+  
   getAllCourses: async () => {
     const response = await api.get("/courses");
     return response.data;
@@ -44,5 +46,54 @@ export const userApi = {
   saveApplication: async (application: ApplicationInfo) => {
     const response = await api.post("/applications", application);
     return response.data;
+  },
+
+  getAllApplications: async (): Promise<ApplicationInfo[]> => {
+    const response = await api.get<ApplicationInfo[]>("/applications");
+    return response.data;
+  },
+
+  // Lecturer methods
+  getLecturerCoursesById: async (lecturerId: number) => {
+    const response = await api.get(`/lecturers/${lecturerId}`);
+    return response.data;
+  },
+
+  assignLecturerCourse: async (lecturerId: number, courseId: number) => {
+    const response = await api.post("/lecturers", { lecturerId, courseId });
+    return response.data;
+  },
+
+  deleteLecturerCourse: async (rowId: number) => {
+    const response = await api.delete(`/lecturers/${rowId}`);
+    return response.data;
+  },
+
+  // Selected course methods
+  getSelectionsByLecturer: async (lecturerId: number): Promise<number[]> => {
+    const res = await api.get<number[]>(`/selections/${lecturerId}`);
+    return res.data;
+  },
+
+  selectApplicant: async (lecturerId: number, applicantId: number) => {
+    await api.post("/selections", { lecturerId, applicantId });
+  },
+
+  deselectApplicant: async (lecturerId: number, applicantId: number) => {
+    await api.delete("/selections", {
+      ...( {
+        data: { lecturerId, applicantId },
+      } as any )
+    });
+  },
+
+  // Ranking methods
+  getRankingsByLecturer: async (lecturerId: number): Promise<number[]> => {
+    const res = await api.get<number[]>(`/rankings/${lecturerId}`);
+    return res.data;
+  },
+
+  saveRankings: async (lecturerId: number, ranked: number[]) => {
+    await api.post("/rankings", { lecturerId, ranked });
   },
 };

@@ -2,7 +2,8 @@ import Nav from "../components/NavBar";
 import Footer from "../components/Footer";
 
 import { useState, useEffect } from "react";
-import ApplicationListCard from "../components/ApplicationList";
+import { userApi } from "../services/api";
+
 import InfoDetailsCard from "../components/InfoDetailsCard";
 import { useAuth } from "../context/authContext";
 import { ApplicationInfo } from "../types/application";
@@ -48,26 +49,19 @@ export default function Lecturer() {
   });
 
   useEffect(() => {
-    // Fetch applicant info from localStorage.
+  const fetchApplications = async () => {
     try {
-      const applicantObject: ApplicationInfo[] = JSON.parse(
-        localStorage.getItem("applicantInfo") || "[]"
-      );
-
-      // Update the selected count for each applicant using the localStorage data.
-      const updatedApplicants = applicantObject.map((app) => {
-        const count = parseInt(
-          localStorage.getItem(`selectedCount|${app.name}`) || "0",
-          10
-        );
-        return { ...app, selectedCount: count };
-      });
-
-      setTutorsList(updatedApplicants);
-    } catch (error) {
-      console.log("Problem occurred retrieving applicants.");
+      const data = await userApi.getAllApplications();
+      setTutorsList(data);
+    } catch (err) {
+      console.error("Failed to fetch tutor applications:", err);
     }
+  };
+
+  fetchApplications();
   }, []);
+
+  /*
 
   // Use effect to fetch the ranked candidates from localStorage based on the lecturer's name.
   useEffect(() => {
@@ -262,7 +256,7 @@ export default function Lecturer() {
   }
 
   // Compute the tutor with the highest selected count
-  const mostSelectedTutor = getMostSelectedTutor();
+  const mostSelectedTutor = getMostSelectedTutor(); */
 
   return (
     <div>
@@ -400,25 +394,6 @@ export default function Lecturer() {
                 : ""}
             </button>
           </div>
-
-          <div className="tutorApplications">
-            <ul>
-              {filteredTutors.map((tutor, index) => (
-                <ApplicationListCard
-                  key={index}
-                  name={tutor.name}
-                  course={tutor.coursesApplied}
-                  clickSelect={() =>
-                    handleSelection(tutor.name, tutor.coursesApplied)
-                  }
-                  selectedKeys={selectedCandidate}
-                  rank={rankedCandidates.includes(tutor.name)}
-                  handleRanking={handleRanking}
-                  handleShowInfo={handleShowInfo}
-                />
-              ))}
-            </ul>
-          </div>
         </div>
 
         {/* Right Column: Info Card */}
@@ -438,39 +413,6 @@ export default function Lecturer() {
             </ol>
           ) : (
             <p>No Tutors Ranked</p>
-          )}
-        </div>
-
-        <div className="candidate-box most-selected">
-          <h3>Most Selected Candidate</h3>
-          {mostSelectedTutor && (mostSelectedTutor.selectedCount || 0) > 0 ? (
-            <div>
-              <p>{mostSelectedTutor.name}</p>
-            </div>
-          ) : (
-            <p>No Tutors Selected Yet</p>
-          )}
-        </div>
-
-        <div className="candidate-box least-selected">
-          <h3>Least Selected Candidate</h3>
-          {getLeastSelectedTutor() ? (
-            <p>{getLeastSelectedTutor()?.name}</p>
-          ) : (
-            <p>No Tutors Selected Yet</p>
-          )}
-        </div>
-
-        <div className="candidate-box not-chosen">
-          <h3>Not Chosen</h3>
-          {getNotChosenTutors().length > 0 ? (
-            <ul>
-              {getNotChosenTutors().map((tutor, index) => (
-                <li key={index}>{tutor.name}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>All Tutors Have Been Selected</p>
           )}
         </div>
       </div>
