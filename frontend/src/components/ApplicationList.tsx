@@ -1,32 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "./Button";
-import { useState } from "react";
 
-// Props type for the ApplicationListCard component
 type CardProps = {
   name: string;
   course: string;
-  clickSelect: () => void;
-  selectedKeys: string[];
-  rank: boolean;
-  handleRanking: (name: string) => void;
+  applicantId: number;
+  isSelected: boolean;
+  isRanked: boolean;
+  onToggleSelect: (applicantId: number) => void;
+  onToggleRank: (applicantId: number) => void;
   handleShowInfo: (name: string, course: string) => void;
 };
 
-// Component for displaying each applicant card
 function ApplicationListCard({
   name,
   course,
-  clickSelect,
-  selectedKeys,
-  rank,
-  handleRanking,
+  applicantId,
+  isSelected,
+  isRanked,
+  onToggleSelect,
+  onToggleRank,
   handleShowInfo,
 }: CardProps) {
-  // Local state to track if Show Info button was clicked
   const [showInfoClicked, setShowInfoClicked] = useState(false);
-
-  const key = `${name}|${course}`;
 
   return (
     <div className="tutorCard">
@@ -44,25 +40,22 @@ function ApplicationListCard({
       />
       <br />
 
-      {/* Course info */}
       <p>Courses Applied: {course}</p>
       <br />
 
       {/* Select/Deselect button */}
-      <button data-testid="Select" onClick={clickSelect}>
-        {selectedKeys.includes(key)
-          ? "Deselect this candidate"
-          : "Select this candidate"}
+      <button data-testid="Select" onClick={() => onToggleSelect(applicantId)}>
+        {isSelected ? "Deselect this candidate" : "Select this candidate"}
       </button>
 
       {/* Rank/Unrank button */}
       <button
         data-testid="Rank"
         className="rankButton"
-        onClick={() => handleRanking(name)}
-        disabled={!selectedKeys.includes(key)}
+        onClick={() => onToggleRank(applicantId)}
+        disabled={!isSelected}
       >
-        {rank ? "Delete from ranking" : "Add to rankings"}
+        {isRanked ? "Delete from ranking" : "Add to rankings"}
       </button>
     </div>
   );
