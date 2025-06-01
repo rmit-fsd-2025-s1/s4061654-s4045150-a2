@@ -4,25 +4,16 @@ import Footer from "../components/Footer";
 import { experience } from "../types/experience";
 import { qualification } from "../types/qualification";
 import { ApplicationInfo } from "../types/application";
+import { course } from "../types/course";
 
 import { useState, useEffect } from "react";
 import { userApi } from "../services/api";
 
 export default function Lecturer() {
-  //Pre-populated courses
-
-  // const courses: string[] = [
-  //   "COSC4043 Full Stack Development",
-  //   "COSC2103 Algorithms & Analysis",
-  //   "COSC2333 Computing Theory",
-  //   "COSC2105 Computer Networks",
-  //   "COSC2106 Operating Systems",
-  //   "COSC2107 Database Systems",
-  // ];
-
   //useState of type applicationInfo to store all values in one state and then store in localStorage.
   const [applicantProfile, setApplicantProfile] = useState<ApplicationInfo>({
     applicationID: Math.floor(Math.random() * 1000000),
+    position: "",
     applicant: 0,
     coursesApplied: [],
     availability: null,
@@ -58,56 +49,41 @@ export default function Lecturer() {
   });
 
   //Store filteredCourses according to filter option usage in lecturer page.
-  const [courses, setCourses] = useState<string[]>([]);
-  const [filteredCourses, setFilteredCourses] = useState<string[]>([]);
+  const [courses, setCourses] = useState<course[]>([]);
+  const [filteredCourses, setFilteredCourses] = useState<course[]>([]);
 
   useEffect(() => {
     userApi.getAllCourses().then((courseArray) => {
-      const typedCourses = courseArray as { courseName: string }[];
-      setFilteredCourses(typedCourses.map((c) => c.courseName));
+      const typedCourses = courseArray as course[];
+      setCourses(courseArray as course[]);
+      setFilteredCourses(courseArray as course[]);
     });
 
-    const retrieveApplicant = localStorage.getItem("loggedIn");
-    const allApplicants = JSON.parse(
-      localStorage.getItem("applicantInfo") || "[]"
-    );
-
-    if (retrieveApplicant) {
-      const applicantName = JSON.parse(retrieveApplicant).name;
-
+    const id = localStorage.getItem("loggedIn");
+    if (id) {
       setApplicantProfile((prev) => ({
         ...prev,
-        name: applicantName,
+        applicant: JSON.parse(id).userid,
       }));
-
-      // Filter out the courses already applied for
-      // const alreadyApplied = allApplicants
-      //   .filter((app: ApplicationInfo) => app.name === applicantName)
-      //   .map((app: ApplicationInfo) => app.coursesApplied);
-
-      // const filtered = courses.filter(
-      //   (course) => !alreadyApplied.includes(course)
-      // );
-      // setFilteredCourses(filtered);
     }
+
+    // Filter out the courses already applied for
+    // const alreadyApplied = allApplicants
+    //   .filter((app: ApplicationInfo) => app.name === applicantName)
+    //   .map((app: ApplicationInfo) => app.coursesApplied);
+
+    // const filtered = courses.filter(
+    //   (course) => !alreadyApplied.includes(course)
+    // );
+    // setFilteredCourses(filtered);
   }, []);
 
   /*This function handles ticking checkboxes to select from available courses.
     The function looks updates the state from its previous value of empty array.
     If the course already exists in the array, get rid of the course (checkbox functionality)*/
-  const handleCourseApplied = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleCourseApplied = (e: React.ChangeEvent<HTMLInputElement>) => {
     const courseName = e.target.value;
-    // Find the course object by name to get its ID
-    const courseArray = (await userApi.getAllCourses()) as {
-      courseName: string;
-      courseID: number;
-    }[];
-    const courseObj = courseArray.find(
-      (c: { courseName: string; courseID: number }) =>
-        c.courseName === courseName
-    );
+    const courseObj = courses.find((c) => c.courseName === courseName);
     if (!courseObj) return;
 
     setApplicantProfile((prev) => {
@@ -197,6 +173,13 @@ export default function Lecturer() {
     }
   };
 
+  const handlePositionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setApplicantProfile((prev) => ({
+      ...prev,
+      position: e.target.value,
+    }));
+  };
+
   /*Finally after storing all the application information, the submission button can be clicked to store the applicantInfo object in localStorage.*/
   const handleSubmit = async () => {
     try {
@@ -232,6 +215,31 @@ export default function Lecturer() {
       <div className="form-container">
         <div className="box">
           <h1>Apply To Become A Tutor / Lab Assistant</h1>
+          <input
+            className="Tutor"
+            type="radio"
+            name="position"
+            value="Tutor"
+            onChange={handlePositionChange}
+          />
+          <label className="tutor" htmlFor="Tutor" style={{ color: "#003366" }}>
+            Tutor
+          </label>
+          <br />
+
+          <input
+            type="radio"
+            name="position"
+            value="Lab Assistant"
+            onChange={handlePositionChange}
+          />
+          <label
+            className="labAssistant"
+            htmlFor="position"
+            style={{ color: "#003366" }}
+          >
+            Lab Assistant
+          </label>
           <h2>Available courses this semester</h2>
 
           {/*Details HTML tag used  handily to make a collapseable list of courses and skills that can be checked*/}
@@ -244,15 +252,17 @@ export default function Lecturer() {
                 {/*Pre-populated courses array has been mapped into a list with checkbox input for selection*/}
                 <ol>
                   {filteredCourses.map((course, index) => (
-                    <li key={index} value={course}>
+                    <li key={course.courseID}>
                       <input
-                        id={course}
+                        id={course.courseName}
                         type="checkbox"
                         name="course"
-                        value={course}
+                        value={course.courseName}
                         onChange={handleCourseApplied}
                       />
-                      <label htmlFor={course}>{course}</label>
+                      <label htmlFor={course.courseName}>
+                        {course.courseName}
+                      </label>
                     </li>
                   ))}
                 </ol>
@@ -405,26 +415,39 @@ export default function Lecturer() {
           )}
         </div>
         <div className="applicantBox">
-          <h1>Applicant profile</h1>
+          <h1>
+            {applicantProfile.position === "Tutor"
+              ? "Tutor Application profile"
+              : applicantProfile.position === "Lab Assistant"
+                ? "Lab Assistant Application profile"
+                : "Application profile"}
+          </h1>
 
           <h2>Course Selected</h2>
           {/*This is to change the state in real time for making the applicant profile on the side.
         If length > 0, it will map it onto a li element*/}
 
-          {applicantProfile.coursesApplied ? (
-            <p className="courseName-green">
-              {applicantProfile.coursesApplied}
-            </p>
+          {applicantProfile.coursesApplied.length > 0 ? (
+            <ul>
+              {applicantProfile.coursesApplied.map((id) => {
+                const course = courses.find((c) => c.courseID === id);
+                return (
+                  <li key={id} className="courseName-green">
+                    {course ? course.courseName : id}
+                  </li>
+                );
+              })}
+            </ul>
           ) : (
             <p className="p2">No course selected</p>
           )}
 
           <h2>Availability</h2>
-          {applicantProfile.availability ? (
-            <p className="avail-green">{applicantProfile.availability}</p>
-          ) : (
-            <p className="p2">No availability selected</p>
-          )}
+          <p className="p2">
+            {applicantProfile.availability
+              ? applicantProfile.availability
+              : "Not specified"}
+          </p>
 
           <h2>Previous Experience</h2>
 

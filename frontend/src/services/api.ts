@@ -2,7 +2,6 @@ import axios from "axios";
 import { UserInformation } from "../types/loginCreds";
 import { ApplicationInfo } from "@/types/application";
 
-
 export const api = axios.create({
   baseURL: "http://localhost:3001/api",
 });
@@ -37,7 +36,7 @@ export const userApi = {
     const response = await api.post("/login", { email, password });
     return response.data;
   },
-  
+
   getAllCourses: async () => {
     const response = await api.get("/courses");
     return response.data;
@@ -81,9 +80,9 @@ export const userApi = {
 
   deselectApplicant: async (lecturerId: number, applicantId: number) => {
     await api.delete("/selections", {
-      ...( {
+      ...({
         data: { lecturerId, applicantId },
-      } as any )
+      } as any),
     });
   },
 
@@ -95,5 +94,10 @@ export const userApi = {
 
   saveRankings: async (lecturerId: number, ranked: number[]) => {
     await api.post("/rankings", { lecturerId, ranked });
+  },
+
+  getApplicantCourses: async (userId: number) => {
+    const response = await api.get(`/applicant-courses?applicantId=${userId}`);
+    return response.data;
   },
 };

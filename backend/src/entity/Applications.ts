@@ -1,7 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import { UserInformation } from "./UserInformation";
 import { experience } from "../types/experience";
 import { qualification } from "../types/qualification";
+import { ApplicantCourses } from "./ApplicantCourses";
 
 @Entity()
 export class Applications {
@@ -11,13 +18,19 @@ export class Applications {
   @ManyToOne(() => UserInformation, (user) => user.applications)
   applicant: UserInformation;
 
-  @Column({ nullable: true })
+  @Column()
   availability: string;
+
+  @Column()
+  position: string;
+
+  @OneToMany(() => ApplicantCourses, (ac) => ac.applicationID)
+  applicantCourses: ApplicantCourses[];
 
   @Column("simple-json", { nullable: true })
   experience: experience[];
 
-  @Column("simple-json", { nullable: true })
+  @Column("simple-array", { nullable: true })
   skills: string[];
 
   @Column("simple-json", { nullable: true })
