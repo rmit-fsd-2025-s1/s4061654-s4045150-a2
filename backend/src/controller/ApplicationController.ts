@@ -41,10 +41,10 @@ export class ApplicationController {
       const application: Applications = Object.assign(new Applications(), {
         applicationID: applicationID,
         position: position,
-        applicant: userID,
         availability: availability,
         experience: experience,
         skills: skills,
+        applicant: userID,
         academics: academics,
       });
       const savedApp: Applications = await this.applicationsRepository.save(
@@ -57,11 +57,14 @@ export class ApplicationController {
         const course = await AppDataSource.getRepository(Courses).findOne({
           where: { courseID },
         });
-        if (course) {
+        const applicantID = await this.userRepository.findOne({
+          where: { userid: applicant },
+        });
+        if (course && applicantID && savedApp) {
           const applicantCourse = new ApplicantCourses();
-          applicantCourse.applicantID = userID;
-          applicantCourse.courseID = course;
-          applicantCourse.applicationID = savedApp;
+          applicantCourse.applicant = applicantID;
+          applicantCourse.course = course;
+          applicantCourse.application = savedApp;
           await this.applicantCoursesRepository.save(applicantCourse);
         }
       }

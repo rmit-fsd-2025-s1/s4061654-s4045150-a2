@@ -5,6 +5,7 @@ import { experience } from "../types/experience";
 import { qualification } from "../types/qualification";
 import { ApplicationInfo } from "../types/application";
 import { course } from "../types/course";
+import { UserInformation } from "../types/loginCreds";
 
 import { useState, useEffect } from "react";
 import { userApi } from "../services/api";
@@ -14,7 +15,7 @@ export default function Lecturer() {
   const [applicantProfile, setApplicantProfile] = useState<ApplicationInfo>({
     applicationID: Math.floor(Math.random() * 1000000),
     position: "",
-    applicant: 0,
+    applicant: {} as UserInformation,
     coursesApplied: [],
     availability: null,
     experience: [] as experience[],
@@ -54,18 +55,9 @@ export default function Lecturer() {
 
   useEffect(() => {
     userApi.getAllCourses().then((courseArray) => {
-      const typedCourses = courseArray as course[];
       setCourses(courseArray as course[]);
       setFilteredCourses(courseArray as course[]);
     });
-
-    const id = localStorage.getItem("loggedIn");
-    if (id) {
-      setApplicantProfile((prev) => ({
-        ...prev,
-        applicant: JSON.parse(id).userid,
-      }));
-    }
 
     // Filter out the courses already applied for
     // const alreadyApplied = allApplicants
@@ -188,7 +180,7 @@ export default function Lecturer() {
       );
       applicantProfile.applicant = JSON.parse(
         localStorage.getItem("loggedIn") || "{}"
-      ).userid;
+      ).id;
       await userApi.saveApplication(applicantProfile);
     } catch (error) {
       console.error("Error saving application:", error);

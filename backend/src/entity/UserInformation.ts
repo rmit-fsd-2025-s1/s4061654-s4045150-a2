@@ -39,6 +39,6 @@ export class UserInformation {
   @OneToMany(() => Applications, (app) => app.applicant)
   applications: Applications[];
 
-  @OneToMany(() => ApplicantCourses, (app) => app.applicantID)
+  @OneToMany(() => ApplicantCourses, (app) => app.applicant)
   applicantCourses: ApplicantCourses[];
 }

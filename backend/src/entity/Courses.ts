@@ -10,7 +10,7 @@ export class Courses {
 
   @OneToMany(
     () => ApplicantCourses,
-    (applicantCourse) => applicantCourse.courseID
+    (applicantCourse) => applicantCourse.course
   )
   applicantCourses: ApplicantCourses[];
 }

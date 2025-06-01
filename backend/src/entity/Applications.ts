@@ -24,7 +24,7 @@ export class Applications {
   @Column()
   position: string;
 
-  @OneToMany(() => ApplicantCourses, (ac) => ac.applicationID)
+  @OneToMany(() => ApplicantCourses, (ac) => ac.application)
   applicantCourses: ApplicantCourses[];
 
   @Column("simple-json", { nullable: true })

@@ -9,11 +9,11 @@ export class ApplicantCourses {
   id: number;
 
   @ManyToOne(() => UserInformation, (user) => user.applicantCourses)
-  applicantID: UserInformation;
+  applicant: UserInformation;
 
   @ManyToOne(() => Courses, (course) => course.applicantCourses)
-  courseID: Courses;
+  course: Courses;
 
   @ManyToOne(() => Applications, (app) => app.applicantCourses)
-  applicationID: Applications;
+  application: Applications;
 }

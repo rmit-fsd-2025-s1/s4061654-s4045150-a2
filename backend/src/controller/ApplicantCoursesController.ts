@@ -21,38 +21,38 @@ export class ApplicantCoursesController {
   }
 
   async save(request: Request, response: Response) {
-    const { id, applicantId, courseId, applicationID } = request.body;
-    if (!applicantId || !courseId || !applicationID) {
+    const { id, applicant, course, application } = request.body;
+    if (!applicant || !course || !application) {
       return response.status(400).json({ error: "Missing required fields." });
     }
 
-    const userID = await this.userRepository.findOne({
-      where: { userid: applicantId },
+    const applicantID = await this.userRepository.findOne({
+      where: { userid: applicant.userid },
     });
-    const course = await this.courseRepository.findOne({
-      where: { courseID: courseId },
+    const courseID = await this.courseRepository.findOne({
+      where: { courseID: course.courseID },
     });
-    const application = await AppDataSource.getRepository(Applications).findOne(
-      {
-        where: { applicationID: applicationID },
-      }
-    );
-    if (!course) {
+    const applicationID = await AppDataSource.getRepository(
+      Applications
+    ).findOne({
+      where: { applicationID: application.applicationID },
+    });
+    if (!courseID) {
       return response.status(404).json({ error: "Course not found" });
     }
 
-    if (!userID) {
+    if (!applicantID) {
       return response.status(404).json({ error: "Applicant not found" });
     }
-    if (!application) {
+    if (!applicationID) {
       return response.status(404).json({ error: "Application not found" });
     }
 
     const alreadyExists = await this.applicantCoursesRepository.findOne({
       where: {
-        applicantID: userID,
-        courseID: course,
-        applicationID: applicationID,
+        applicant: applicantID,
+        course: courseID,
+        application: applicationID,
       },
     });
     if (alreadyExists) {
@@ -61,9 +61,9 @@ export class ApplicantCoursesController {
 
     const applicantCourse: ApplicantCourses = {
       id: Math.floor(Math.random() * 1000000),
-      applicantID: userID,
-      courseID: course,
-      applicationID: applicationID,
+      applicant: applicantID,
+      course: courseID,
+      application: applicationID,
     };
     const savedApplicantCourse = await this.applicantCoursesRepository.save(
       applicantCourse
