@@ -1,5 +1,5 @@
 export type selection = {
-  rowId: number;
-  lecturerId: number;
-  applicantId: number;
+  rowID: number;
+  lecturerID: number;
+  applicantID: number;
 };
