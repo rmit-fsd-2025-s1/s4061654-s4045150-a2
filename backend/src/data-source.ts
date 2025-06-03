@@ -4,9 +4,10 @@ import { UserInformation } from "./entity/UserInformation";
 import { Applications } from "./entity/Applications";
 import { Courses } from "./entity/Courses";
 import { ApplicantCourses } from "./entity/ApplicantCourses";
-import { Lecturers } from "./entity/Lecturers";
+import { LecturerCourses } from "./entity/lecturerCourses";
 import { Selections } from "./entity/Selections";
 import { Rankings } from "./entity/Rankings";
+import { Comments } from "./entity/Comments";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -25,9 +26,10 @@ export const AppDataSource = new DataSource({
     Applications,
     Courses,
     ApplicantCourses,
-    Lecturers,
+    LecturerCourses,
     Selections,
     Rankings,
+    Comments,
   ],
   migrations: [],
   subscribers: [],

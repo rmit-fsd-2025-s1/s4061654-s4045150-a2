@@ -389,7 +389,7 @@ export default function Lecturer() {
           <input
             data-testid="year"
             className="inputBox"
-            type="text"
+            type="number"
             placeholder="Year"
             value={academics.year}
             onChange={(e) =>

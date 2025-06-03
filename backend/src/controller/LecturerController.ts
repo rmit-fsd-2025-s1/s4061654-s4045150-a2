@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import { Lecturers } from "../entity/Lecturers";
+import { LecturerCourses } from "../entity/lecturerCourses";
 
-const lecturerRepo = AppDataSource.getRepository(Lecturers);
+const lecturerRepo = AppDataSource.getRepository(LecturerCourses);
 
 export const LecturerController = {
   // Get all lecturer-course assignments
@@ -34,7 +34,9 @@ export const LecturerController = {
     const { lecturerId, courseId } = req.body;
 
     if (!lecturerId || !courseId) {
-      return res.status(400).json({ message: "Missing lecturerId or courseId" });
+      return res
+        .status(400)
+        .json({ message: "Missing lecturerId or courseId" });
     }
 
     try {

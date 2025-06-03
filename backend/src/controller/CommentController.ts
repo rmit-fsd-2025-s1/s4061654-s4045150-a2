@@ -1,11 +1,11 @@
 import { Request, Response, Router } from "express";
 import { AppDataSource } from "../data-source";
-import { Comment } from "../entity/Comment";
+import { Comments } from "../entity/Comments";
 import { Applications } from "../entity/Applications";
 import { UserInformation } from "../entity/UserInformation";
 
 const router = Router();
-const commentRepo = AppDataSource.getRepository(Comment);
+const commentRepo = AppDataSource.getRepository(Comments);
 
 // Create a new comment
 router.post("/", async (req: Request, res: Response) => {
@@ -27,20 +27,23 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 // Get all comments for an application
-router.get("/application/:applicationId", async (req: Request, res: Response) => {
-  const { applicationId } = req.params;
+router.get(
+  "/application/:applicationId",
+  async (req: Request, res: Response) => {
+    const { applicationId } = req.params;
 
-  try {
-    const comments = await commentRepo.find({
-      where: { application: { applicationID: parseInt(applicationId) } },
-      relations: ["lecturer"],
-      order: { createdAt: "DESC" },
-    });
+    try {
+      const comments = await commentRepo.find({
+        where: { application: { applicationID: parseInt(applicationId) } },
+        relations: ["lecturer"],
+        order: { createdAt: "DESC" },
+      });
 
-    res.json(comments);
-  } catch (err) {
-    res.status(500).json({ error: "Could not retrieve comments" });
+      res.json(comments);
+    } catch (err) {
+      res.status(500).json({ error: "Could not retrieve comments" });
+    }
   }
-});
+);
 
 export default router;

@@ -1,12 +1,18 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { Profile } from "./entity/Profile";
-import { Pet } from "./entity/Pet";
+import { UserInformation } from "./entity/UserInformation";
+import { Applications } from "./entity/Applications";
+import { Courses } from "./entity/Courses";
+import { ApplicantCourses } from "./entity/ApplicantCourses";
+import { LecturerCourses } from "./entity/LecturerCourses";
+import { Selections } from "./entity/Selections";
+import { Rankings } from "./entity/Rankings";
+import { Comments } from "./entity/Comments";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
   host: "209.38.26.237",
-  port: 3006,
+  port: 3306,
   /* Change to your own credentials */
   username: "S4061654",
   password: "Password4231",
@@ -16,7 +22,16 @@ export const AppDataSource = new DataSource({
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true,
   logging: true,
-  entities: [Profile, Pet],
+  entities: [
+    UserInformation,
+    Applications,
+    Courses,
+    ApplicantCourses,
+    LecturerCourses,
+    Selections,
+    Rankings,
+    Comments,
+  ],
   migrations: [],
   subscribers: [],
 });

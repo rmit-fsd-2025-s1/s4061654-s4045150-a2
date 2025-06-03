@@ -1,9 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import { Courses } from "./Courses";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from "typeorm";
 import { UserInformation } from "./UserInformation";
 
 @Entity()
-export class Lecturers {
+export class Selections {
   @PrimaryGeneratedColumn()
   rowId: number;
 
@@ -11,14 +10,13 @@ export class Lecturers {
   lecturerId: number;
 
   @Column()
-  courseId: number;
+  applicantId: number;
 
   @ManyToOne(() => UserInformation)
   @JoinColumn({ name: "lecturerId" })
   lecturer: UserInformation;
 
-  @ManyToOne(() => Courses)
-  @JoinColumn({ name: "courseId" })
-  course: Courses;
-  
+  @ManyToOne(() => UserInformation)
+  @JoinColumn({ name: "applicantId" })
+  applicant: UserInformation;
 }

@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { AppDataSource } from "../data-source";
-import { Comment } from "../entity/Comment";
+import { Comments } from "../entity/Comments";
 import { UserInformation } from "../entity/UserInformation";
 import { Applications } from "../entity/Applications";
 
-
 const router = Router();
-const commentRepo = AppDataSource.getRepository(Comment);
+const commentRepo = AppDataSource.getRepository(Comments);
 
 // Create a new comment
 router.post("/", async (req, res) => {
@@ -14,9 +13,9 @@ router.post("/", async (req, res) => {
 
   try {
     const newComment = commentRepo.create({
-        content,
-        application: { applicationID: applicationId } as unknown as Applications,
-        lecturer: { id: lecturerId } as unknown as UserInformation,
+      content,
+      application: { applicationID: applicationId } as unknown as Applications,
+      lecturer: { id: lecturerId } as unknown as UserInformation,
     });
 
     const saved = await commentRepo.save(newComment);

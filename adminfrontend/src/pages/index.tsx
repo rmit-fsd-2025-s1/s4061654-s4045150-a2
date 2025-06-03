@@ -1,25 +1,33 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { Pet, petService } from "../services/api";
+import { useState, useEffect } from "react";
+import { userApi } from "../services/api";
+
+type UserInformation = {
+  userid: number;
+  firstName: string;
+  email: string;
+};
 
 export default function Home() {
-
-  const [pets, setPets] = useState<Pet[]>([]);
+  const [users, setUsers] = useState<UserInformation[]>([]);
 
   useEffect(() => {
-    petService.getAllPets().then(setPets);
+    userApi.getAllUsers().then((data) => setUsers(data));
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">Pets</h1>
-      <ul>
-        {pets.map((pet) => (
-          <li key={pet.pet_id}>
-          < p>{pet.name}</p>
-          </li>
-        ))}
-      </ul>
+    <div>
+      <h1>All users</h1>
+      {users.length > 0 ? (
+        <ul>
+          {users.map((user) => (
+            <li key={user.userid}>
+              {user.firstName} - {user.email}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <h1>No users</h1>
+      )}
     </div>
   );
 }

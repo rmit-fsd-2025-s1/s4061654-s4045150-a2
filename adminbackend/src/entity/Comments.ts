@@ -1,9 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
 import { Applications } from "./Applications";
 import { UserInformation } from "./UserInformation";
 
 @Entity()
-export class Comment {
+export class Comments {
   @PrimaryGeneratedColumn()
   commentId: number;
 
