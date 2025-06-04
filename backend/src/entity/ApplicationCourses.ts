@@ -4,7 +4,7 @@ import { Courses } from "./Courses";
 import { Applications } from "./Applications";
 
 @Entity()
-export class ApplicantCourses {
+export class ApplicationCourses {
   @PrimaryGeneratedColumn()
   id: number;
 

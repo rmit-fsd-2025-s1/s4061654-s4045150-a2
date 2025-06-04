@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Courses } from "../entity/Courses";
-import { ApplicantCourses } from "../entity/ApplicantionCourses";
+import { ApplicationCourses } from "../entity/ApplicationCourses";
 import { UserInformation } from "../entity/UserInformation";
 import { Applications } from "../entity/Applications";
 import { Experience } from "../entity/Experience";
@@ -10,7 +10,7 @@ import { Academics } from "../entity/Academics";
 export class ApplicationController {
   private userRepository = AppDataSource.getRepository(UserInformation);
   private applicantCoursesRepository =
-    AppDataSource.getRepository(ApplicantCourses);
+    AppDataSource.getRepository(ApplicationCourses);
   private applicationsRepository = AppDataSource.getRepository(Applications);
   private experienceRepository = AppDataSource.getRepository(Experience);
   private academicsRepository = AppDataSource.getRepository(Academics);
@@ -63,7 +63,7 @@ export class ApplicationController {
           where: { userid: applicant },
         });
         if (course && applicantID && savedApp) {
-          const applicantCourse = new ApplicantCourses();
+          const applicantCourse = new ApplicationCourses();
           applicantCourse.course = course;
           applicantCourse.application = savedApp;
           await this.applicantCoursesRepository.save(applicantCourse);

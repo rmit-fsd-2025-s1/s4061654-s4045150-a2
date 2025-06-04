@@ -8,7 +8,7 @@ import {
 import { UserInformation } from "./UserInformation";
 import { Experience } from "./Experience";
 import { Academics } from "./Academics";
-import { ApplicantCourses } from "./ApplicantionCourses";
+import { ApplicationCourses } from "./ApplicationCourses";
 
 @Entity()
 export class Applications {
@@ -27,8 +27,8 @@ export class Applications {
   @Column("simple-array")
   skills: string[];
 
-  @OneToMany(() => ApplicantCourses, (ac) => ac.application)
-  applicantCourses: ApplicantCourses[];
+  @OneToMany(() => ApplicationCourses, (ac) => ac.application)
+  applicantCourses: ApplicationCourses[];
 
   @OneToMany(() => Experience, (exp) => exp.application)
   experiences: Experience[];

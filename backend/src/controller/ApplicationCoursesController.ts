@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import { ApplicantCourses } from "../entity/ApplicantionCourses";
+import { ApplicationCourses } from "../entity/ApplicationCourses";
 import { UserInformation } from "../entity/UserInformation";
 import { Courses } from "../entity/Courses";
 import { Applications } from "../entity/Applications";
 
 export class ApplicantCoursesController {
   private applicantCoursesRepository =
-    AppDataSource.getRepository(ApplicantCourses);
+    AppDataSource.getRepository(ApplicationCourses);
 
   private userRepository = AppDataSource.getRepository(UserInformation);
 
@@ -58,7 +58,7 @@ export class ApplicantCoursesController {
       return response.status(409).json({ error: "This entry already exists" });
     }
 
-    const applicantCourse: ApplicantCourses = {
+    const applicantCourse: ApplicationCourses = {
       id: Math.floor(Math.random() * 1000000),
 
       course: courseID,
