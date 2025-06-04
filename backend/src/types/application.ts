@@ -1,6 +1,6 @@
 import { Comment } from "./comment";
 import { experience } from "./experience";
-import { qualification } from "./qualification";
+import { qualification } from "./academics";
 import { course } from "./course";
 
 export type ApplicationInfo = {

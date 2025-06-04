@@ -31,7 +31,7 @@ export default function Lecturer() {
 
   const [academics, setAcademics] = useState<qualification>({
     degree: "",
-    year: "",
+    year: 0,
     university: "",
   });
 
@@ -393,7 +393,7 @@ export default function Lecturer() {
             placeholder="Year"
             value={academics.year}
             onChange={(e) =>
-              setAcademics({ ...academics, year: e.target.value })
+              setAcademics({ ...academics, year: Number(e.target.value) })
             }
           />
           <button className="addButton" onClick={handleAcademics}>

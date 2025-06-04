@@ -6,8 +6,8 @@ import {
   OneToMany,
 } from "typeorm";
 import { UserInformation } from "./UserInformation";
-import { experience } from "../types/experience";
-import { qualification } from "../types/qualification";
+import { Experience } from "./experience";
+import { Academics } from "./academics";
 import { ApplicantCourses } from "./ApplicantCourses";
 
 @Entity()
@@ -24,15 +24,15 @@ export class Applications {
   @Column()
   position: string;
 
+  @Column("simple-array")
+  skills: string[];
+
   @OneToMany(() => ApplicantCourses, (ac) => ac.application)
   applicantCourses: ApplicantCourses[];
 
-  @Column("simple-json", { nullable: true })
-  experience: experience[];
+  @OneToMany(() => Experience, (exp) => exp.application)
+  experiences: Experience[];
 
-  @Column("simple-array", { nullable: true })
-  skills: string[];
-
-  @Column("simple-json", { nullable: true })
-  academics: qualification[];
+  @OneToMany(() => Academics, (ac) => ac.application)
+  academics: Academics[];
 }

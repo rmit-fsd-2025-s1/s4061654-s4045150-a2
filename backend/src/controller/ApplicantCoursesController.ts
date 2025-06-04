@@ -50,7 +50,6 @@ export class ApplicantCoursesController {
 
     const alreadyExists = await this.applicantCoursesRepository.findOne({
       where: {
-        applicant: applicantID,
         course: courseID,
         application: applicationID,
       },
@@ -61,7 +60,7 @@ export class ApplicantCoursesController {
 
     const applicantCourse: ApplicantCourses = {
       id: Math.floor(Math.random() * 1000000),
-      applicant: applicantID,
+
       course: courseID,
       application: applicationID,
     };

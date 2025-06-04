@@ -4,14 +4,16 @@ import { Courses } from "../entity/Courses";
 import { ApplicantCourses } from "../entity/ApplicantCourses";
 import { UserInformation } from "../entity/UserInformation";
 import { Applications } from "../entity/Applications";
-import { experience } from "../types/experience";
-import { qualification } from "../types/qualification";
+import { Experience } from "../entity/experience";
+import { Academics } from "../entity/academics";
 
 export class ApplicationController {
   private userRepository = AppDataSource.getRepository(UserInformation);
   private applicantCoursesRepository =
     AppDataSource.getRepository(ApplicantCourses);
   private applicationsRepository = AppDataSource.getRepository(Applications);
+  private experienceRepository = AppDataSource.getRepository(Experience);
+  private academicsRepository = AppDataSource.getRepository(Academics);
 
   async all(request: Request, response: Response) {
     const allApplications = await this.applicationsRepository.find();
@@ -62,11 +64,29 @@ export class ApplicationController {
         });
         if (course && applicantID && savedApp) {
           const applicantCourse = new ApplicantCourses();
-          applicantCourse.applicant = applicantID;
           applicantCourse.course = course;
           applicantCourse.application = savedApp;
           await this.applicantCoursesRepository.save(applicantCourse);
         }
+      }
+
+      for (const exp of experience) {
+        const newExperience = new Experience();
+        newExperience.position = exp.position;
+        newExperience.company = exp.company;
+        newExperience.description = exp.description;
+        newExperience.application = savedApp;
+        await this.experienceRepository.save(newExperience);
+      }
+
+      for (const aca of academics) {
+        const newAcademics = new Academics();
+
+        newAcademics.degree = aca.degree;
+        newAcademics.year = aca.year;
+        newAcademics.university = aca.university;
+        newAcademics.application = savedApp;
+        await this.academicsRepository.save(newAcademics);
       }
 
       return response.status(201).json({

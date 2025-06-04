@@ -1,15 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from "typeorm";
 import { UserInformation } from "./UserInformation";
 import { Courses } from "./Courses";
 import { Applications } from "./Applications";
 
 @Entity()
-export class ApplicantCourses {
+export class Experience {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Courses, (course) => course.applicantCourses)
-  course: Courses;
+  @Column()
+  position: string;
+
+  @Column()
+  company: string;
+
+  @Column()
+  description: string;
 
   @ManyToOne(() => Applications, (app) => app.applicantCourses)
   application: Applications;
