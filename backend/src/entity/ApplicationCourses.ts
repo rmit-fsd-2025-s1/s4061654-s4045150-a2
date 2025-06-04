@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { UserInformation } from "./UserInformation";
 import { Courses } from "./Courses";
 import { Applications } from "./Applications";
 

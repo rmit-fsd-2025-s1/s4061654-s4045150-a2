@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import { userApi } from "../services/api";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import AddCourses from "../components/AddCourses";
+import AvailableCourses from "../components/AvailableCourses";
 
 type UserInformation = {
   userid: number;
@@ -8,26 +12,15 @@ type UserInformation = {
 };
 
 export default function Home() {
-  const [users, setUsers] = useState<UserInformation[]>([]);
-
-  useEffect(() => {
-    userApi.getAllUsers().then((data) => setUsers(data));
-  }, []);
-
   return (
     <div>
-      <h1>All users</h1>
-      {users.length > 0 ? (
-        <ul>
-          {users.map((user) => (
-            <li key={user.userid}>
-              {user.firstName} - {user.email}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <h1>No users</h1>
-      )}
+      <Header />
+      <div className="flex gap-6 w-full max-w-6xl mx-auto">
+        <AddCourses />
+        <AvailableCourses />
+      </div>
+
+      <Footer />
     </div>
   );
 }

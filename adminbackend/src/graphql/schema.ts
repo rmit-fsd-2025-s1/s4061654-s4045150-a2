@@ -13,8 +13,20 @@ export const typeDefs = gql`
     email: String!
   }
 
+  type Courses {
+    courseID: ID!
+    courseName: String!
+  }
+
   type Query {
     lecturerCourses: [LecturerCourse!]!
     userInformation: [UserInformation!]!
+    getAllCourses: [Courses!]!
+  }
+
+  type Mutation {
+    addCourse(courseName: String!): Courses!
+    removeCourse(courseID: ID!): Boolean!
+    editCourse(courseID: ID!): Courses!
   }
 `;

@@ -3,11 +3,13 @@ import { DataSource } from "typeorm";
 import { UserInformation } from "./entity/UserInformation";
 import { Applications } from "./entity/Applications";
 import { Courses } from "./entity/Courses";
-import { ApplicantCourses } from "./entity/ApplicantCourses";
+import { ApplicationCourses } from "./entity/ApplicationCourses";
 import { LecturerCourses } from "./entity/LecturerCourses";
 import { Selections } from "./entity/Selections";
 import { Rankings } from "./entity/Rankings";
 import { Comments } from "./entity/Comments";
+import { Experience } from "./entity/Experience";
+import { Academics } from "./entity/Academics";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -26,11 +28,13 @@ export const AppDataSource = new DataSource({
     UserInformation,
     Applications,
     Courses,
-    ApplicantCourses,
+    ApplicationCourses,
     LecturerCourses,
     Selections,
     Rankings,
     Comments,
+    Experience,
+    Academics,
   ],
   migrations: [],
   subscribers: [],

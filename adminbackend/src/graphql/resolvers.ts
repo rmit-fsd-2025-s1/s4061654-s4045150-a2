@@ -3,17 +3,18 @@ import { AppDataSource } from "../data-source";
 import { UserInformation } from "../entity/UserInformation";
 import { Applications } from "../entity/Applications";
 import { Courses } from "../entity/Courses";
-import { ApplicantCourses } from "../entity/ApplicantCourses";
+import { ApplicationCourses } from "../entity/ApplicationCourses";
 import { LecturerCourses } from "../entity/LecturerCourses";
 import { Selections } from "../entity/Selections";
 import { Rankings } from "../entity/Rankings";
 import { Comments } from "../entity/Comments";
+import { course } from "../types/course";
 
 const userInformationRepository = AppDataSource.getRepository(UserInformation);
 const applicationsRepository = AppDataSource.getRepository(Applications);
 const coursesRepository = AppDataSource.getRepository(Courses);
-const applicantCoursesRepository =
-  AppDataSource.getRepository(ApplicantCourses);
+const applicationCoursesRepository =
+  AppDataSource.getRepository(ApplicationCourses);
 const lecturerCoursesRepository = AppDataSource.getRepository(LecturerCourses);
 const selectionsRepository = AppDataSource.getRepository(Selections);
 const rankingsRepository = AppDataSource.getRepository(Rankings);
@@ -26,6 +27,9 @@ export const resolvers = {
     },
     userInformation: async () => {
       return await userInformationRepository.find();
+    },
+    getAllCourses: async () => {
+      return await coursesRepository.find();
     },
   },
 
@@ -41,11 +45,40 @@ export const resolvers = {
   //     return await petRepository.findOne({ where: { pet_id: parseInt(id) } });
   //   },
   // },
-  // Mutation: {
-  //   createProfile: async (_: any, args: any) => {
-  //     const profile = profileRepository.create(args);
-  //     return await profileRepository.save(profile);
-  //   },
+  Mutation: {
+    addCourse: async (_: course, { courseName }: { courseName: string }) => {
+      const course = coursesRepository.create({ courseName });
+      return await coursesRepository.save(course);
+    },
+    removeCourse: async (_: course, { courseID }: { courseID: string }) => {
+      // Find the course entity
+      const course = await coursesRepository.findOne({
+        where: { courseID: parseInt(courseID) },
+      });
+      if (!course) return false;
+
+      // Remove related LecturerCourses and ApplicationCourses
+      await lecturerCoursesRepository.delete({ course: course });
+      await applicationCoursesRepository.delete({ course: course });
+
+      // Remove the course itself
+      const result = await coursesRepository.delete(courseID);
+      return result.affected !== 0;
+    },
+
+    editCourse: async (
+      _: course,
+      { courseID, courseName }: { courseID: string; courseName: string }
+    ) => {
+      const course = await coursesRepository.findOne({
+        where: { courseID: parseInt(courseID) },
+      });
+      if (!course) throw new Error("Course not found");
+
+      course.courseName = courseName;
+      return await coursesRepository.save(course);
+    },
+  },
   //   updateProfile: async (
   //     _: any,
   //     { id, ...args }: { id: string } & Partial<Profile>

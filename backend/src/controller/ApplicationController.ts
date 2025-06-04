@@ -4,8 +4,8 @@ import { Courses } from "../entity/Courses";
 import { ApplicationCourses } from "../entity/ApplicationCourses";
 import { UserInformation } from "../entity/UserInformation";
 import { Applications } from "../entity/Applications";
-import { Experience } from "../entity/Experience";
-import { Academics } from "../entity/Academics";
+import { Experience } from "../entity/experience";
+import { Academics } from "../entity/academics";
 
 export class ApplicationController {
   private userRepository = AppDataSource.getRepository(UserInformation);

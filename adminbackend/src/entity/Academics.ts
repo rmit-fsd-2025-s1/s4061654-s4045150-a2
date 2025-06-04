@@ -2,19 +2,19 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from "typeorm";
 import { Applications } from "./Applications";
 
 @Entity()
-export class Experience {
+export class Academics {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  position: string;
+  degree: string;
 
   @Column()
-  company: string;
+  year: number;
 
   @Column()
-  description: string;
+  university: string;
 
-  @ManyToOne(() => Applications, (app) => app.applicantCourses)
+  @ManyToOne(() => Applications, (app) => app.academics)
   application: Applications;
 }

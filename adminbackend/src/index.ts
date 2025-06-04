@@ -8,7 +8,7 @@ import { resolvers } from "./graphql/resolvers";
 import { expressMiddleware } from "@apollo/server/express4";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3003;
 
 app.use(cors());
 app.use(express.json());
