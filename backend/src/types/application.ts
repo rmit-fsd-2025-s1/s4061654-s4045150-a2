@@ -1,6 +1,6 @@
 import { Comment } from "./comment";
 import { experience } from "./experience";
-import { qualification } from "./academics";
+import { academics } from "./academics";
 import { course } from "./course";
 
 export type ApplicationInfo = {
@@ -11,7 +11,7 @@ export type ApplicationInfo = {
   availability: string | null;
   prevExp?: experience[];
   skills: string[];
-  academics: qualification[];
+  academics: academics[];
   comment?: Comment[];
   selectedCount?: number;
 };

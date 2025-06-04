@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import { ApplicantCourses } from "../entity/ApplicantCourses";
+import { ApplicantCourses } from "../entity/ApplicantionCourses";
 import { UserInformation } from "../entity/UserInformation";
 import { Courses } from "../entity/Courses";
 import { Applications } from "../entity/Applications";

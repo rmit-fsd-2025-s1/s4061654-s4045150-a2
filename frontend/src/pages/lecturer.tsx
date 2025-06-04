@@ -65,35 +65,64 @@ export default function Lecturer() {
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
   };
 
+  const [lecturerCourseIDs, setLecturerCourseIDs] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchLecturerCourses = async () => {
+      if (!user) return;
+
+      try {
+        const data = await userApi.getCoursesByLecturer(user.id); // returns [{ courseID, courseName }]
+        const ids = data.map((c) => c.courseID);
+        setLecturerCourseIDs(ids);
+      } catch (err) {
+        console.error("Failed to fetch lecturer courses", err);
+      }
+    };
+
+    fetchLecturerCourses();
+  }, [user]);
+
+
   // Build filteredTutors array, guarding applicant access
   const filteredTutors = tutorsList
-    // First remove any entries where `applicant` is undefined
-    .filter((applicant) => applicant.applicant != null)
-    // Now apply name/skill/course/availability filters
-    .filter((applicant) => {
-      const fullName = `${applicant.applicant!.firstName} ${applicant.applicant!.lastName}`.toLowerCase();
-      const filterSearch = fullName.includes(searchName.toLowerCase());
+  .filter((applicant) => {
+    // Make sure there's an applicant object
+    if (!applicant.applicant) return false;
 
-      const filterSearchSkills = applicant.skills.some((skill) =>
-        skill.toLowerCase().includes(searchSkills.toLowerCase())
-      );
+    // Step 1: Check if at least one of the applicant's courses is assigned to this lecturer
+    const hasMatchingCourse = applicant.coursesApplied.some((cid) =>
+      lecturerCourseIDs.includes(cid)
+    );
+    if (!hasMatchingCourse) return false;
 
-      // Convert numeric course IDs → course names
-      const appliedCourseNames = applicant.coursesApplied
-        .map((id) => courses.find((c) => c.courseID === id)?.courseName)
-        .filter((name): name is string => !!name);
+    // Step 2: Apply name filter
+    const fullName = `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
+    const filterSearch = fullName.includes(searchName.toLowerCase());
 
-      const filterCourse =
-        courseFilter.length === 0 ||
-        courseFilter.some((c) => appliedCourseNames.includes(c));
+    // Step 3: Apply skill filter
+    const filterSearchSkills = applicant.skills.some((skill) =>
+      skill.toLowerCase().includes(searchSkills.toLowerCase())
+    );
 
-      const availability = applicant.availability || "";
-      const filterAvailability =
-        availFilter.length === 0 ||
-        availFilter.includes(availability.toLowerCase());
+    // Step 4: Apply course name filter (from checkboxes)
+    const appliedCourseNames = applicant.coursesApplied
+      .map((id) => courses.find((c) => c.courseID === id)?.courseName)
+      .filter((name): name is string => !!name);
 
-      return filterSearch && filterSearchSkills && filterCourse && filterAvailability;
-    });
+    const filterCourse =
+      courseFilter.length === 0 ||
+      courseFilter.some((c) => appliedCourseNames.includes(c));
+
+    // Step 5: Apply availability filter
+    const availability = applicant.availability || "";
+    const filterAvailability =
+      availFilter.length === 0 ||
+      availFilter.includes(availability.toLowerCase());
+
+    return filterSearch && filterSearchSkills && filterCourse && filterAvailability;
+  });
+
 
   /*
   // Sorting logic (commented out per request)
@@ -213,24 +242,27 @@ export default function Lecturer() {
       <div className="dashboardContainer">
         <div className="pageContentCenter">
           {filteredTutors.map((app) => {
-            // Guard: skip if no applicant (though filter already removed those)
             if (!app.applicant) return null;
 
             const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
-            return app.coursesApplied.map((courseID, idx) => (
-              <ApplicationListCard
-                key={`${app.applicationID}-${courseID}-${idx}`}
-                name={fullName}
-                course={courseID.toString()}
-                applicantId={app.applicant.userid}
-                isSelected={false} // not tracking yet
-                isRanked={false}   // not tracking yet
-                onToggleSelect={() => {}}
-                onToggleRank={() => {}}
-                handleShowInfo={handleShowInfo}
-              />
-            ));
+
+            return app.coursesApplied
+              .filter((courseID) => lecturerCourseIDs.includes(courseID)) // ✅ Only render courses assigned to this lecturer
+              .map((courseID, idx) => (
+                <ApplicationListCard
+                  key={`${app.applicationID}-${courseID}-${idx}`}
+                  name={fullName}
+                  course={courseID.toString()}
+                  applicantId={app.applicant.userid}
+                  isSelected={false}
+                  isRanked={false}
+                  onToggleSelect={() => {}}
+                  onToggleRank={() => {}}
+                  handleShowInfo={handleShowInfo}
+                />
+              ));
           })}
+
         </div>
 
         <div className="pageContentRight">

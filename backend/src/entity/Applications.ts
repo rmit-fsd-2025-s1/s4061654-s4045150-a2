@@ -6,9 +6,9 @@ import {
   OneToMany,
 } from "typeorm";
 import { UserInformation } from "./UserInformation";
-import { Experience } from "./experience";
-import { Academics } from "./academics";
-import { ApplicantCourses } from "./ApplicantCourses";
+import { Experience } from "./Experience";
+import { Academics } from "./Academics";
+import { ApplicantCourses } from "./ApplicantionCourses";
 
 @Entity()
 export class Applications {

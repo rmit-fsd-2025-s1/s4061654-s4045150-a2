@@ -1,6 +1,8 @@
 import axios from "axios";
 import { UserInformation } from "../types/loginCreds";
 import { ApplicationInfo } from "@/types/application";
+import { Comment } from "@/types/comment";
+
 
 export const api = axios.create({
   baseURL: "http://localhost:3001/api",
@@ -37,8 +39,8 @@ export const userApi = {
     return response.data;
   },
 
-  getAllCourses: async () => {
-    const response = await api.get("/courses");
+  getAllCourses: async (): Promise<{ id: number; courseName: string }[]> => {
+    const response = await api.get<{ id: number; courseName: string }[]>("/courses");
     return response.data;
   },
 
@@ -53,10 +55,11 @@ export const userApi = {
   },
 
   // Lecturer methods
-  getLecturerCoursesById: async (lecturerId: number) => {
-    const response = await api.get(`/lecturers/${lecturerId}`);
-    return response.data;
+  getCoursesByLecturer: async (lecturerId: number): Promise<{ courseID: number; courseName: string }[]> => {
+    const res = await api.get(`/lecturers/${lecturerId}/courses`);
+    return res.data as { courseID: number; courseName: string }[];
   },
+
 
   assignLecturerCourse: async (lecturerId: number, courseId: number) => {
     const response = await api.post("/lecturers", { lecturerId, courseId });
@@ -100,4 +103,21 @@ export const userApi = {
     const response = await api.get(`/applicant-courses?applicantId=${userId}`);
     return response.data;
   },
+
+  // Add a comment to an application
+  addComment: async (applicationId: number, lecturerId: number, content: string): Promise<Comment> => {
+    const res = await api.post<Comment>("/comments", {
+      content,
+      applicationId,
+      lecturerId,
+    });
+    return res.data;
+  },
+
+  // Get all comments for a specific application
+  getCommentsByApplication: async (applicationId: number): Promise<Comment[]> => {
+    const res = await api.get<Comment[]>(`/comments/application/${applicationId}`);
+    return res.data;
+  },
+
 };

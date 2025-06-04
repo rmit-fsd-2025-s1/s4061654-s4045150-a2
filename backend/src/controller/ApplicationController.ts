@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Courses } from "../entity/Courses";
-import { ApplicantCourses } from "../entity/ApplicantCourses";
+import { ApplicantCourses } from "../entity/ApplicantionCourses";
 import { UserInformation } from "../entity/UserInformation";
 import { Applications } from "../entity/Applications";
-import { Experience } from "../entity/experience";
-import { Academics } from "../entity/academics";
+import { Experience } from "../entity/Experience";
+import { Academics } from "../entity/Academics";
 
 export class ApplicationController {
   private userRepository = AppDataSource.getRepository(UserInformation);

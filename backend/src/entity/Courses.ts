@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { ApplicantCourses } from "./ApplicantCourses";
+import { ApplicantCourses } from "./ApplicantionCourses";
 
 @Entity()
 export class Courses {

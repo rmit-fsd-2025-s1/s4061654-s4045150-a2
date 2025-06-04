@@ -16,18 +16,28 @@ export const LecturerController = {
   },
 
   // Get courses for one lecturer
+  // Get courses for one lecturer (with course name)
   getLecturerCoursesById: async (req: Request, res: Response) => {
     const lecturerId = parseInt(req.params.lecturerId);
 
     try {
       const lecturerCourses = await lecturerRepo.find({
         where: { lecturerId: lecturerId },
+        relations: ["course"], // joins with Courses entity
       });
-      res.json(lecturerCourses);
+
+      const result = lecturerCourses.map((lc) => ({
+        courseID: lc.course.courseID,
+        courseName: lc.course.courseName,
+      }));
+
+      res.json(result);
     } catch (err) {
+      console.error(err);
       res.status(500).json({ message: "Error finding courses for lecturer" });
     }
   },
+
 
   // Assign course to lecturer
   assignLecturerCourse: async (req: Request, res: Response) => {
