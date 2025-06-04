@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
-import { LecturerCourses } from "../entity/lecturerCourses";
+import { LecturerCourses } from "../entity/LecturerCourses";
 
 const lecturerRepo = AppDataSource.getRepository(LecturerCourses);
 

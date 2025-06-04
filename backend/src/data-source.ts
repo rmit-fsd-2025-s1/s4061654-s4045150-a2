@@ -4,7 +4,7 @@ import { UserInformation } from "./entity/UserInformation";
 import { Applications } from "./entity/Applications";
 import { Courses } from "./entity/Courses";
 import { ApplicantCourses } from "./entity/ApplicantCourses";
-import { LecturerCourses } from "./entity/lecturerCourses";
+import { LecturerCourses } from "./entity/LecturerCourses";
 import { Selections } from "./entity/Selections";
 import { Rankings } from "./entity/Rankings";
 import { Comments } from "./entity/Comments";

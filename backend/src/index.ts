@@ -7,9 +7,10 @@ import userRoutes from "./routes/user.routes";
 import coursesRoutes from "./routes/courses.routes";
 import applicationRoutes from "./routes/application.routes";
 import applicantCoursesRoutes from "./routes/applicantCourses.routes";
-import lecturerRoutes from "./routes/lecturer.routes";
+import lecturerRoutes from "./routes/lecturercourses.routes";
 import selectionRoutes from "./routes/selections.routes";
 import rankingRoutes from "./routes/rankings.routes";
+import commentRoutes from "./routes/comment.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -25,6 +26,7 @@ app.use("/api", applicantCoursesRoutes);
 app.use("/api", lecturerRoutes);
 app.use("/api", selectionRoutes);
 app.use("/api", rankingRoutes);
+app.use("/api/comments", commentRoutes);
 
 AppDataSource.initialize()
   .then(() => {

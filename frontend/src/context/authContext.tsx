@@ -3,7 +3,7 @@ import { UserInformation } from "../types/loginCreds";
 import { userApi } from "@/services/api";
 
 interface AuthContextType {
-  user: { name: string; role: string } | null;
+  user: { id: number; name: string; role: string } | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
