@@ -4,7 +4,7 @@ import { academics } from "./academics";
 import { course } from "./course";
 
 export type ApplicationInfo = {
-  applicantionID: number;
+  applicationID: number;
   position: string;
   name: string;
   coursesApplied: course[];
