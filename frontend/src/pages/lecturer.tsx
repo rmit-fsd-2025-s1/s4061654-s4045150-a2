@@ -9,20 +9,23 @@ import { useAuth } from "../context/authContext";
 import { ApplicationInfo } from "../types/application";
 
 export default function Lecturer() {
+  // All state hooks stay inside the component
   const [tutorsList, setTutorsList] = useState<ApplicationInfo[]>([]);
   const [searchName, setSearchName] = useState("");
   const [searchSkills, setSearchSkills] = useState("");
   const [courseFilter, setCourseFilter] = useState<string[]>([]);
   const [availFilter, setAvailFilter] = useState<string[]>([]);
-  const [showInfoTutor, setShowInfoTutor] = useState<ApplicationInfo[]>();
+  const [showInfoTutor, setShowInfoTutor] = useState<ApplicationInfo[] | undefined>(undefined);
   const { user } = useAuth();
 
+  // courses come from backend as { courseID, courseName }
   const [courses, setCourses] = useState<{ courseID: number; courseName: string }[]>([]);
 
+  // Fetch course list on mount
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data = await userApi.getAllCourses(); // returns { id, courseName }
+        const data = await userApi.getAllCourses(); // should return something like [{ id, courseName }, …]
         const formatted = data.map((c: { id: number; courseName: string }) => ({
           courseID: c.id,
           courseName: c.courseName,
@@ -35,11 +38,14 @@ export default function Lecturer() {
     fetchCourses();
   }, []);
 
+  // Fetch all applications on mount, then filter out any missing applicant
   useEffect(() => {
     const fetchApplications = async () => {
       try {
         const data = await userApi.getAllApplications();
-        setTutorsList(data);
+        // Remove any application that doesn’t have an applicant object
+        const validApps = data.filter((app) => app.applicant != null);
+        setTutorsList(validApps);
       } catch (err) {
         console.error("Failed to fetch tutor applications:", err);
       }
@@ -47,42 +53,50 @@ export default function Lecturer() {
     fetchApplications();
   }, []);
 
+  // When “Show info” is clicked, match by fullName + courseID
   const handleShowInfo = (name: string, course: string) => {
     const courseId = Number(course);
     const matched = tutorsList.filter(
       (t) =>
-        t.applicant.firstName + " " + t.applicant.lastName === name &&
+        t.applicant != null &&
+        `${t.applicant.firstName} ${t.applicant.lastName}` === name &&
         t.coursesApplied.includes(courseId)
     );
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
   };
 
-  const filteredTutors = tutorsList.filter((applicant) => {
-    const fullName = `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
-    const filterSearch = fullName.includes(searchName.toLowerCase());
+  // Build filteredTutors array, guarding applicant access
+  const filteredTutors = tutorsList
+    // First remove any entries where `applicant` is undefined
+    .filter((applicant) => applicant.applicant != null)
+    // Now apply name/skill/course/availability filters
+    .filter((applicant) => {
+      const fullName = `${applicant.applicant!.firstName} ${applicant.applicant!.lastName}`.toLowerCase();
+      const filterSearch = fullName.includes(searchName.toLowerCase());
 
-    const filterSearchSkills = applicant.skills.some((skill) =>
-      skill.toLowerCase().includes(searchSkills.toLowerCase())
-    );
+      const filterSearchSkills = applicant.skills.some((skill) =>
+        skill.toLowerCase().includes(searchSkills.toLowerCase())
+      );
 
-    const appliedCourseNames = applicant.coursesApplied
-      .map((id) => courses.find((c) => c.courseID === id)?.courseName)
-      .filter((name): name is string => !!name);
+      // Convert numeric course IDs → course names
+      const appliedCourseNames = applicant.coursesApplied
+        .map((id) => courses.find((c) => c.courseID === id)?.courseName)
+        .filter((name): name is string => !!name);
 
-    const filterCourse =
-      courseFilter.length === 0 ||
-      courseFilter.some((c) => appliedCourseNames.includes(c));
+      const filterCourse =
+        courseFilter.length === 0 ||
+        courseFilter.some((c) => appliedCourseNames.includes(c));
 
-    const availability = applicant.availability || "";
-    const filterAvailability =
-      availFilter.length === 0 ||
-      availFilter.includes(availability.toLowerCase());
+      const availability = applicant.availability || "";
+      const filterAvailability =
+        availFilter.length === 0 ||
+        availFilter.includes(availability.toLowerCase());
 
-    return filterSearch && filterSearchSkills && filterCourse && filterAvailability;
-  });
+      return filterSearch && filterSearchSkills && filterCourse && filterAvailability;
+    });
 
   /*
-  // Sorting logic is commented out for now
+  // Sorting logic (commented out per request)
   if (sortState.type === "availability") {
     filteredTutors.sort((a, b) => {
       const aAvail = a.availability?.toLowerCase() || "";
@@ -97,7 +111,9 @@ export default function Lecturer() {
     filteredTutors.sort((a, b) => {
       const aCourse = getFirstCourseName(a);
       const bCourse = getFirstCourseName(b);
-      return sortState.order === "asc" ? aCourse.localeCompare(bCourse) : bCourse.localeCompare(aCourse);
+      return sortState.order === "asc"
+        ? aCourse.localeCompare(bCourse)
+        : bCourse.localeCompare(aCourse);
     });
   }
   */
@@ -144,11 +160,11 @@ export default function Lecturer() {
                       name={course.courseName}
                       value={course.courseName}
                       onChange={(e) => {
-                        const course = e.target.value;
+                        const value = e.target.value;
                         setCourseFilter((prev) =>
                           e.target.checked
-                            ? [...prev, course]
-                            : prev.filter((c) => c !== course)
+                            ? [...prev, value]
+                            : prev.filter((c) => c !== value)
                         );
                       }}
                     />
@@ -196,51 +212,19 @@ export default function Lecturer() {
       {/* Content Section */}
       <div className="dashboardContainer">
         <div className="pageContentCenter">
-          {/* 
-          // Sorting buttons are commented for now
-          <div className="sortButtons">
-            <button
-              onClick={() =>
-                setSortState((prev) => ({
-                  type: "availability",
-                  order:
-                    prev.type === "availability" && prev.order === "asc"
-                      ? "desc"
-                      : "asc",
-                }))
-              }
-              className="sortButton"
-            >
-              Sort by Availability
-            </button>
-
-            <button
-              onClick={() =>
-                setSortState((prev) => ({
-                  type: "course",
-                  order:
-                    prev.type === "course" && prev.order === "asc"
-                      ? "desc"
-                      : "asc",
-                }))
-              }
-              className="sortButton"
-            >
-              Sort by Course Name
-            </button>
-          </div>
-          */}
-
           {filteredTutors.map((app) => {
+            // Guard: skip if no applicant (though filter already removed those)
+            if (!app.applicant) return null;
+
             const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
-            return app.coursesApplied.map((course, idx) => (
+            return app.coursesApplied.map((courseID, idx) => (
               <ApplicationListCard
-                key={`${app.applicationID}-${course}-${idx}`}
+                key={`${app.applicationID}-${courseID}-${idx}`}
                 name={fullName}
-                course={course.toString()}
+                course={courseID.toString()}
                 applicantId={app.applicant.userid}
-                isSelected={false}
-                isRanked={false}
+                isSelected={false} // not tracking yet
+                isRanked={false}   // not tracking yet
                 onToggleSelect={() => {}}
                 onToggleRank={() => {}}
                 handleShowInfo={handleShowInfo}
@@ -254,7 +238,7 @@ export default function Lecturer() {
         </div>
       </div>
 
-      {/* 
+      {/*
       // Commented out until backend ranking is implemented
       <div className="candidate-stats-container">
         <div className="candidate-box ranking">
