@@ -98,7 +98,8 @@ export default function Lecturer() {
                 createdAt: new Date(),
               },
 
-              coursesApplied: coursesAppliedObj,
+              coursesApplied: courseIds, // number[]
+              coursesAppliedObj: coursesAppliedObj, // course[] (optional, for your own use)
               experience: [],
               academics: [],
             };
@@ -163,7 +164,9 @@ export default function Lecturer() {
       const fullName = `${t.applicant.firstName} ${t.applicant.lastName}`;
       if (fullName !== applicantName) return false;
       // Does t.coursesApplied include courseObj.courseID?
-      return t.coursesApplied.some((c) => c.courseID === courseObj.courseID);
+      return t.coursesApplied.some((c: number | course) =>
+        (typeof c === "number" ? c : c.courseID) === courseObj.courseID
+      );
     });
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
   };
@@ -324,11 +327,11 @@ export default function Lecturer() {
             tutorsList.map((app) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
               // Pick the first applied course ID (or fallback to 0)
-              const firstApplied = app.coursesApplied[0];
+              const firstApplied = app.coursesApplied[0] as number | course | undefined;
               let firstCourseId = 0;
               if (firstApplied != null) {
                 firstCourseId =
-                  typeof firstApplied === "number" ? firstApplied : firstApplied.courseID;
+                  typeof firstApplied === "number" ? firstApplied : (firstApplied as course).courseID;
               }
                     // now it's definitely a number
 
