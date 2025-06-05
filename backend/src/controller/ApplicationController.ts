@@ -16,7 +16,9 @@ export class ApplicationController {
   private academicsRepository = AppDataSource.getRepository(Academics);
 
   async all(request: Request, response: Response) {
-    const allApplications = await this.applicationsRepository.find();
+    const allApplications = await this.applicationsRepository.find({
+      relations: ["applicant", "experiences", "academics"],
+    });
     return response.json(allApplications);
   }
 

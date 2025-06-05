@@ -8,6 +8,7 @@ import InfoDetailsCard from "../components/InfoDetailsCard";
 import { useAuth } from "../context/authContext";
 import { ApplicationInfo } from "../types/application";
 import { course } from "../types/course";
+import { User } from "../types/user";
 
 export default function Lecturer() {
   const [tutorsList, setTutorsList] = useState<ApplicationInfo[]>([]);
@@ -66,56 +67,28 @@ export default function Lecturer() {
         // b) Turn each raw row into a full ApplicationInfo
         const fullApps: ApplicationInfo[] = await Promise.all(
           rawApps.map(async (r) => {
-            // 1) Fetch join-rows: applicationcourses where applicationID = r.applicationID
             const courseRows = await userApi.getApplicationCoursesByAppID(
               r.applicationID
             );
-            // courseRows is like [{ course: { courseID, courseName } }, …]
-
-            // 2) Extract numeric IDs
             const courseIds: number[] = courseRows.map(
               (cr) => cr.course.courseID
             );
+            const coursesAppliedObj: course[] = courseRows.map(
+              (cr) => cr.course
+            );
 
-            // 3) For each numeric ID, fetch the actual { courseID, courseName }
-            const coursesAppliedObj: course[] = [];
-            for (const cid of courseIds) {
-              try {
-                const courseData = await userApi.getCourseById(cid);
-                coursesAppliedObj.push({
-                  courseID: courseData.courseID,
-                  courseName: courseData.courseName,
-                });
-              } catch {
-                // if lookup fails, push a placeholder
-                coursesAppliedObj.push({
-                  courseID: cid,
-                  courseName: "Unknown Course",
-                });
-              }
-            }
+            // Fetch the full applicant object usin// Fetch the full applicant ob
 
             return {
               applicationID: r.applicationID,
               position: r.position,
               availability: r.availability,
               skills: r.skills,
-
-              applicant: {
-                userid: r.applicant,
-                firstName: "",
-                lastName: "",
-                email: "",
-                role: "",
-                password: "",
-                about: "",
-                createdAt: new Date(),
-              },
-
-              coursesApplied: courseIds, // number[]
-              coursesAppliedObj: coursesAppliedObj, // course[] (optional, for your own use)
-              experience: [],
-              academics: [],
+              applicant: r.applicant, // full object from backend
+              coursesApplied: courseIds,
+              coursesAppliedObj: coursesAppliedObj,
+              experience: (r as any).experience ?? [],
+              academics: (r as any).academics ?? [],
             };
           })
         );

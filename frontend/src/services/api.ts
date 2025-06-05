@@ -2,7 +2,7 @@ import axios from "axios";
 import { UserInformation } from "../types/loginCreds";
 import { ApplicationInfo } from "@/types/application";
 import { Comment } from "@/types/comment";
-
+import { User } from "@/types/user";
 
 export const api = axios.create({
   baseURL: "http://localhost:3001/api",
@@ -40,7 +40,8 @@ export const userApi = {
   },
 
   getAllCourses: async (): Promise<{ id: number; courseName: string }[]> => {
-    const response = await api.get<{ id: number; courseName: string }[]>("/courses");
+    const response =
+      await api.get<{ id: number; courseName: string }[]>("/courses");
     return response.data;
   },
   // ─────────────────────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ export const userApi = {
   getAllApplications: async (): Promise<
     Array<{
       applicationID: number;
-      applicant: number;
+      applicant: UserInformation;
       position: string;
       availability: string;
       skills: string[];
@@ -69,7 +70,7 @@ export const userApi = {
     const response = await api.get<
       Array<{
         applicationID: number;
-        applicant: number;
+        applicant: UserInformation;
         position: string;
         availability: string;
         skills: string[];
@@ -115,7 +116,6 @@ export const userApi = {
     return response.data;
   },
 
-
   // ─────────────────────────────────────────────────────────────────────────────
   // LECTURER‐related endpoints
 
@@ -145,11 +145,19 @@ export const userApi = {
     return res.data;
   },
 
-  selectApplicant: async (lecturerId: number, applicationId: number, courseId: number) => {
+  selectApplicant: async (
+    lecturerId: number,
+    applicationId: number,
+    courseId: number
+  ) => {
     await api.post("/selections", { lecturerId, applicationId, courseId });
   },
 
-  deselectApplicant: async (lecturerId: number, applicationId: number, courseId: number) => {
+  deselectApplicant: async (
+    lecturerId: number,
+    applicationId: number,
+    courseId: number
+  ) => {
     await api.delete("/selections", {
       headers: {
         "Content-Type": "application/json",
@@ -194,8 +202,12 @@ export const userApi = {
   // ─────────────────────────────────────────────────────────────────────────────
   // COMMENT‐related endpoints
 
-  getCommentsByApplication: async (applicationId: number): Promise<Comment[]> => {
-    const res = await api.get<Comment[]>(`/comments/application/${applicationId}`);
+  getCommentsByApplication: async (
+    applicationId: number
+  ): Promise<Comment[]> => {
+    const res = await api.get<Comment[]>(
+      `/comments/application/${applicationId}`
+    );
     return res.data;
   },
 
@@ -216,34 +228,40 @@ export const userApi = {
   getApplicationCoursesByAppID: async (
     applicationId: number
   ): Promise<{ course: { courseID: number; courseName: string } }[]> => {
-    const res = await api.get<{ course: { courseID: number; courseName: string } }[]>(
-      `/applicationcourses?applicationId=${applicationId}`
+    const res = await api.get<
+      { course: { courseID: number; courseName: string } }[]
+    >(`/applicationcourses?applicationId=${applicationId}`);
+    return res.data;
+  },
+
+  getCourseById: async (
+    id: number
+  ): Promise<{ courseID: number; courseName: string }> => {
+    const res = await api.get<{ courseID: number; courseName: string }>(
+      `/courses/${id}`
     );
     return res.data;
   },
 
-  getCourseById: async (id: number): Promise<{ courseID: number; courseName: string }> => {
-    const res = await api.get<{ courseID: number; courseName: string }>(`/courses/${id}`);
-    return res.data;
-  },
-
   getExperienceByApplicationId: async (applicationId: number) => {
-    const response = await api.get(`/experience?applicationId=${applicationId}`)
+    const response = await api.get(
+      `/experience?applicationId=${applicationId}`
+    );
     return response.data as Array<{
-      position: string
-      company: string
-      description: string
+      position: string;
+      company: string;
+      description: string;
       // plus whatever other fields your Experience entity has
-    }>
+    }>;
   },
 
   getAcademicsByApplicationId: async (applicationId: number) => {
-    const response = await api.get(`/academics?applicationId=${applicationId}`)
+    const response = await api.get(`/academics?applicationId=${applicationId}`);
     return response.data as Array<{
-      degree: string
-      university: string
-      year: number
+      degree: string;
+      university: string;
+      year: number;
       // plus any other fields from your Academics entity
-    }>
+    }>;
   },
 };
