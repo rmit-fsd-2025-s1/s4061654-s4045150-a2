@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import AddCourses from "../components/AddCourses";
 import AvailableCourses from "../components/AvailableCourses";
+import AdminLogin from "../components/AdminLogin";
 
 type UserInformation = {
   userid: number;
@@ -16,8 +17,7 @@ export default function Home() {
     <div>
       <Header />
       <div className="flex gap-6 w-full max-w-6xl mx-auto">
-        <AddCourses />
-        <AvailableCourses />
+        <AdminLogin />
       </div>
 
       <Footer />

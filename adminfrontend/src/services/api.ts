@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { client } from "./apollo-client";
+import { get } from "http";
 
 // GraphQL Queries
 
@@ -25,7 +26,10 @@ export const userApi = {
           userInformation {
             userid
             firstName
+            lastName
             email
+            role
+            isBlocked
           }
         }
       `,
@@ -85,5 +89,26 @@ export const userApi = {
       `,
       variables: { courseID, courseName },
     });
+  },
+
+  getLecturerCourses: async (): Promise<any[]> => {
+    const { data } = await client.query({
+      query: gql`
+        query {
+          getLecturerCourses {
+            lecturer {
+              userid
+              firstName
+              lastName
+            }
+            course {
+              courseID
+              courseName
+            }
+          }
+        }
+      `,
+    });
+    return data.getLecturerCourses;
   },
 };

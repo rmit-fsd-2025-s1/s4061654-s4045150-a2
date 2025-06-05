@@ -31,6 +31,12 @@ export const resolvers = {
     getAllCourses: async () => {
       return await coursesRepository.find();
     },
+
+    getLecturerCourses: async () => {
+      return await lecturerCoursesRepository.find({
+        relations: ["lecturer", "course"],
+      });
+    },
   },
 
   //   profile: async (_: any, { id }: { id: string }) => {
