@@ -15,7 +15,9 @@ export default function Lecturer() {
   const [searchSkills, setSearchSkills] = useState("");
   const [courseFilter, setCourseFilter] = useState<string[]>([]);
   const [availFilter, setAvailFilter] = useState<string[]>([]);
-  const [showInfoTutor, setShowInfoTutor] = useState<ApplicationInfo[] | undefined>(undefined);
+  const [showInfoTutor, setShowInfoTutor] = useState<
+    ApplicationInfo[] | undefined
+  >(undefined);
   const { user } = useAuth();
 
   // All courses from backend as { courseID, courseName }
@@ -32,10 +34,18 @@ export default function Lecturer() {
       try {
         // getAllCourses() returns something like [{ id, courseName }, …]
         const data = await userApi.getAllCourses();
-        const formatted: course[] = data.map((c: { id: number; courseName: string }) => ({
-          courseID: c.id,
-          courseName: c.courseName,
-        }));
+        const formatted: course[] = data
+          .map((c: { id?: number; courseID?: number; courseName: string }) => {
+            const courseID = c.courseID ?? c.id;
+            if (typeof courseID === "number") {
+              return {
+                courseID,
+                courseName: c.courseName,
+              };
+            }
+            return null;
+          })
+          .filter((c): c is course => c !== null);
         setCourses(formatted);
       } catch (error) {
         console.error("Failed to fetch courses:", error);
@@ -57,11 +67,15 @@ export default function Lecturer() {
         const fullApps: ApplicationInfo[] = await Promise.all(
           rawApps.map(async (r) => {
             // 1) Fetch join-rows: applicationcourses where applicationID = r.applicationID
-            const courseRows = await userApi.getApplicationCoursesByAppID(r.applicationID);
+            const courseRows = await userApi.getApplicationCoursesByAppID(
+              r.applicationID
+            );
             // courseRows is like [{ course: { courseID, courseName } }, …]
 
             // 2) Extract numeric IDs
-            const courseIds: number[] = courseRows.map((cr) => cr.course.courseID);
+            const courseIds: number[] = courseRows.map(
+              (cr) => cr.course.courseID
+            );
 
             // 3) For each numeric ID, fetch the actual { courseID, courseName }
             const coursesAppliedObj: course[] = [];
@@ -134,7 +148,11 @@ export default function Lecturer() {
   // ─────────────────────────────────────────────────────────────────────────────
   // 4. Once courses, tutorsList, and lecturerCourseIDs are populated, we can stop loading
   useEffect(() => {
-    if (courses.length > 0 && tutorsList.length >= 0 && lecturerCourseIDs.length >= 0) {
+    if (
+      courses.length > 0 &&
+      tutorsList.length >= 0 &&
+      lecturerCourseIDs.length >= 0
+    ) {
       // All three arrays have at least been attempted to load
       setIsLoading(false);
     }
@@ -146,7 +164,7 @@ export default function Lecturer() {
    */
   const normalizeCoursesApplied = (app: ApplicationInfo): course[] => {
     // Either coursesApplied is number[] or course[]
-    const ids = (app.coursesApplied as Array<number | course>).map(item =>
+    const ids = (app.coursesApplied as Array<number | course>).map((item) =>
       typeof item === "number" ? item : item.courseID
     );
 
@@ -154,7 +172,6 @@ export default function Lecturer() {
       .map((cid) => courses.find((c) => c.courseID === cid))
       .filter((c): c is course => !!c);
   };
-
 
   // ─────────────────────────────────────────────────────────────────────────────
   // When “Show info” is clicked on a card, we pass the ApplicationInfo into state
@@ -164,8 +181,9 @@ export default function Lecturer() {
       const fullName = `${t.applicant.firstName} ${t.applicant.lastName}`;
       if (fullName !== applicantName) return false;
       // Does t.coursesApplied include courseObj.courseID?
-      return t.coursesApplied.some((c: number | course) =>
-        (typeof c === "number" ? c : c.courseID) === courseObj.courseID
+      return t.coursesApplied.some(
+        (c: number | course) =>
+          (typeof c === "number" ? c : c.courseID) === courseObj.courseID
       );
     });
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
@@ -187,7 +205,8 @@ export default function Lecturer() {
     if (!hasMatchingCourse) return false;
 
     // 2) Name filter
-    const fullName = `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
+    const fullName =
+      `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
     if (!fullName.includes(searchName.toLowerCase())) return false;
 
     // 3) Skills filter
@@ -203,7 +222,9 @@ export default function Lecturer() {
     const appliedCourseNames = appliedCourses.map((c) => c.courseName);
     if (
       courseFilter.length > 0 &&
-      !courseFilter.some((filterName) => appliedCourseNames.includes(filterName))
+      !courseFilter.some((filterName) =>
+        appliedCourseNames.includes(filterName)
+      )
     ) {
       return false;
     }
@@ -232,15 +253,15 @@ export default function Lecturer() {
       <div className="pageHeader" style={{ padding: "1rem 2rem" }}>
         <h1>Dashboard</h1>
         <p>
-          Logged in as{" "}
-          <strong>
-            {user?.name}
-          </strong>
+          Logged in as <strong>{user?.name}</strong>
         </p>
       </div>
 
       {/* Filter Bar */}
-      <div className="filterBar" style={{ padding: "0 2rem", marginBottom: "1rem" }}>
+      <div
+        className="filterBar"
+        style={{ padding: "0 2rem", marginBottom: "1rem" }}
+      >
         <div className="filterItem">
           <p>Search By Name</p>
           <input
@@ -296,7 +317,9 @@ export default function Lecturer() {
             onChange={(e) => {
               const val = e.target.value;
               setAvailFilter((prev) =>
-                e.target.checked ? [...prev, val] : prev.filter((v) => v !== val)
+                e.target.checked
+                  ? [...prev, val]
+                  : prev.filter((v) => v !== val)
               );
             }}
           />
@@ -310,7 +333,9 @@ export default function Lecturer() {
             onChange={(e) => {
               const val = e.target.value;
               setAvailFilter((prev) =>
-                e.target.checked ? [...prev, val] : prev.filter((v) => v !== val)
+                e.target.checked
+                  ? [...prev, val]
+                  : prev.filter((v) => v !== val)
               );
             }}
           />
@@ -327,19 +352,27 @@ export default function Lecturer() {
             tutorsList.map((app) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
               // Pick the first applied course ID (or fallback to 0)
-              const firstApplied = app.coursesApplied[0] as number | course | undefined;
+              const firstApplied = app.coursesApplied[0] as
+                | number
+                | course
+                | undefined;
               let firstCourseId = 0;
               if (firstApplied != null) {
                 firstCourseId =
-                  typeof firstApplied === "number" ? firstApplied : (firstApplied as course).courseID;
+                  typeof firstApplied === "number"
+                    ? firstApplied
+                    : (firstApplied as course).courseID;
               }
-                    // now it's definitely a number
+              // now it's definitely a number
 
-              const courseObj =
-                courses.find((c) => c.courseID === firstCourseId) || {
-                  courseID: firstCourseId,
-                  courseName: "Unknown Course",
-                };
+              console.log("First course ID:", firstCourseId);
+              console.log("Courses:", courses);
+              const courseObj = courses.find(
+                (c) => c.courseID === firstCourseId
+              ) || {
+                courseID: firstCourseId,
+                courseName: "Unknown Course",
+              };
 
               return (
                 <ApplicationListCard
@@ -358,8 +391,6 @@ export default function Lecturer() {
             })
           )}
         </div>
-
-
 
         <div className="pageContentRight">
           <InfoDetailsCard showInfoTut={showInfoTutor} />
