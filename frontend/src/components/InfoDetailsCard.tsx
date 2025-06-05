@@ -3,6 +3,7 @@ import { useAuth } from "../context/authContext";
 import { ApplicationInfo } from "../types/application";
 import { userApi } from "@/services/api";
 import { Comment } from "@/types/comment";
+import { course } from "@/types/course";
 
 type InfoProps = {
   showInfoTut?: ApplicationInfo[];
@@ -11,15 +12,18 @@ type InfoProps = {
 function InfoDetailsCard({ showInfoTut }: InfoProps) {
   const [comment, setComment] = useState<string>("");
   const [noComment, setNoComment] = useState(false);
-  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
+  const { user } = useAuth();
 
+  // Fetch all comments for the application (no course filtering)
   useEffect(() => {
     const fetchComments = async () => {
       if (showInfoTut && showInfoTut.length > 0) {
+        const application = showInfoTut[0];
         try {
+          // Now calls with only applicationID
           const res = await userApi.getCommentsByApplication(
-            showInfoTut[0].applicationID
+            application.applicationID
           );
           setComments(res);
         } catch (err) {
@@ -44,30 +48,18 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     }
 
     try {
+      // Now calls with only applicationID, lecturerID, content
       const newComment = await userApi.addComment(
         application.applicationID,
         user.id,
         comment
       );
-
-
       setComments((prev) => [newComment, ...prev]);
       setComment("");
     } catch (err) {
       console.error("Error submitting comment:", err);
     }
   };
-
-  const [courses, setCourses] = useState<{ id: number; courseName: string }[]>([]);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      const data = await userApi.getAllCourses(); 
-      setCourses(data);
-    };
-    fetchCourses();
-  }, []);
-
 
   if (!showInfoTut || showInfoTut.length === 0) {
     return (
@@ -85,26 +77,28 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
         {application.applicant.firstName} {application.applicant.lastName}
       </h2>
 
+      <p className="pStyle">Position Applied For</p>
+      <p>{application.position}</p>
 
       <p className="pStyle">Course(s) Applied</p>
-      <p>
-        {application.coursesApplied
-          .map((id) => courses.find((c) => c.id === id)?.courseName || `Course ${id}`)
-          .join(", ")}
-      </p>
-
+      <ul>
+        {application.coursesApplied.map((course) => (
+          <li key={course.courseID}>
+            <strong>{course.courseName}</strong>
+          </li>
+        ))}
+      </ul>
 
       <div className="margin">
         <p className="pStyle">Availability</p>
         <p>{application.availability}</p>
       </div>
 
-        <div className="margin">
-          <p className="pStyle">Previous Experience</p>
-          {(application.experience ?? []).length > 0 ? (
-            <ul>
-              {(application.experience ?? []).map((exp, index) => (
-
+      <div className="margin">
+        <p className="pStyle">Previous Experience</p>
+        {(application.experience ?? []).length > 0 ? (
+          <ul>
+            {(application.experience ?? []).map((exp, index) => (
               <li key={index} className="listItem">
                 <p className="p2">
                   <strong>{exp.position}</strong> at {exp.company}
@@ -125,9 +119,9 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
 
       <div className="margin">
         <p className="pStyle">Academic Details</p>
-        {application.academics.length > 0 ? (
+        {(application.academics ?? []).length > 0 ? (
           <ul>
-            {application.academics.map((acad, index) => (
+            {(application.academics ?? []).map((acad, index) => (
               <li className="listItem" key={index}>
                 <strong>{acad.degree}</strong> from{" "}
                 <strong>{acad.university}</strong> ({acad.year})

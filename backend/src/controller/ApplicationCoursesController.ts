@@ -69,4 +69,35 @@ export class ApplicantCoursesController {
     );
     return response.status(201).json(savedApplicantCourse);
   }
+
+  async findByApplicationId(request: Request, response: Response) {
+    try {
+      // parse applicationId from query string
+      const appIdRaw = request.query.applicationId;
+      if (!appIdRaw) {
+        return response.status(400).json({ message: "Missing applicationId" });
+      }
+
+      const applicationId = parseInt(appIdRaw as string, 10);
+      if (isNaN(applicationId)) {
+        return response.status(400).json({ message: "Invalid applicationId" });
+      }
+
+      // Use the correct repository and field name (applicationID)
+      const rows = await this.applicantCoursesRepository.find({
+        where: { application: { applicationID: applicationId } },
+        relations: ["course"],
+      });
+
+      return response.json(rows);
+    } catch (error) {
+      console.error(
+        "Error in ApplicationCoursesController.findByApplicationId:",
+        error
+      );
+      return response
+        .status(500)
+        .json({ message: "Failed to fetch application-courses" });
+    }
+  }
 }

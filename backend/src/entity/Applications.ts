@@ -6,8 +6,8 @@ import {
   OneToMany,
 } from "typeorm";
 import { UserInformation } from "./UserInformation";
-import { Experience } from "./experience";
-import { Academics } from "./academics";
+import { Experience } from "./Experience";
+import { Academics } from "./Academics";
 import { ApplicationCourses } from "./ApplicationCourses";
 
 @Entity()

@@ -1,21 +1,24 @@
 import React, { useState } from "react";
 import Button from "./Button";
+import { course } from "@/types/course"; // Assuming this is the correct path
 
 type CardProps = {
   name: string;
-  course: string;
+  course: course; // changed from string
   applicantId: number;
+  position?: string;
   isSelected: boolean;
   isRanked: boolean;
-  onToggleSelect: (applicantId: number) => void;
-  onToggleRank: (applicantId: number) => void;
-  handleShowInfo: (name: string, course: string) => void;
+  onToggleSelect: (applicantId: number, courseId: number) => void;
+  onToggleRank: (applicantId: number, courseId: number) => void;
+  handleShowInfo: (name: string, course: course) => void;
 };
 
 function ApplicationListCard({
   name,
   course,
   applicantId,
+  position,
   isSelected,
   isRanked,
   onToggleSelect,
@@ -30,7 +33,6 @@ function ApplicationListCard({
         <h2>{name}</h2>
       </div>
 
-      {/* Show info button */}
       <Button
         name="Show info"
         func={() => {
@@ -40,19 +42,22 @@ function ApplicationListCard({
       />
       <br />
 
-      <p>Courses Applied: {course}</p>
+      <p>Course: {course.courseName}</p>
+      {position && <p>Position: {position}</p>}
       <br />
+  
 
-      {/* Select/Deselect button */}
-      <button data-testid="Select" onClick={() => onToggleSelect(applicantId)}>
+      <button
+        data-testid="Select"
+        onClick={() => onToggleSelect(applicantId, course.courseID)}
+      >
         {isSelected ? "Deselect this candidate" : "Select this candidate"}
       </button>
 
-      {/* Rank/Unrank button */}
       <button
         data-testid="Rank"
         className="rankButton"
-        onClick={() => onToggleRank(applicantId)}
+        onClick={() => onToggleRank(applicantId, course.courseID)}
         disabled={!isSelected}
       >
         {isRanked ? "Delete from ranking" : "Add to rankings"}

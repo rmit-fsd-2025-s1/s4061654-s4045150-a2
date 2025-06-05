@@ -8,15 +8,16 @@ import {
 import { Courses } from "./Courses";
 import { UserInformation } from "./UserInformation";
 
-@Entity()
+// AFTER: explicitly tell TypeORM “this property maps to column lecturer_id”
+@Entity("lecturer_courses")
 export class LecturerCourses {
   @PrimaryGeneratedColumn()
   rowId: number;
 
-  @Column()
-  lecturerId: number;
+  @Column({ name: "lecturer_id" })
+  lecturerId: number;      // now it reads from column “lecturer_id”
 
-  @Column()
+  @Column({ name: "course_id" })
   courseId: number;
 
   @ManyToOne(() => UserInformation)

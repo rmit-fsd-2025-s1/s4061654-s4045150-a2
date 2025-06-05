@@ -11,6 +11,8 @@ import lecturerRoutes from "./routes/lecturercourses.routes";
 import selectionRoutes from "./routes/selections.routes";
 import rankingRoutes from "./routes/rankings.routes";
 import commentRoutes from "./routes/comment.routes";
+import experienceRoutes from './routes/experience.routes'
+import academicsRoutes from './routes/academics.routes'
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -26,6 +28,8 @@ app.use("/api", applicationcoursesRoutes);
 app.use("/api", lecturerRoutes);
 app.use("/api", selectionRoutes);
 app.use("/api", rankingRoutes);
+app.use('/api', experienceRoutes)
+app.use('/api', academicsRoutes)
 app.use("/api/comments", commentRoutes);
 
 AppDataSource.initialize()
