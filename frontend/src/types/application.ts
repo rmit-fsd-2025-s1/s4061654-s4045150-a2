@@ -9,10 +9,9 @@ export type ApplicationInfo = {
   applicationID: number;
   position: string;
   applicant: UserInformation;
-  coursesApplied: course[]; // ✅ updated from number[]
+  coursesApplied: number[];
   availability: string | null;
   experience?: experience[];
   skills: string[];
   academics: qualification[];
 };
-

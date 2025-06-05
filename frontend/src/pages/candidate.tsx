@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { userApi } from "../services/api";
 
 export default function Lecturer() {
-  // State for building a single application submission
+  //useState of type applicationInfo to store all values in one state and then store in localStorage.
   const [applicantProfile, setApplicantProfile] = useState<ApplicationInfo>({
     applicationID: Math.floor(Math.random() * 1000000),
     position: "",
@@ -36,7 +36,7 @@ export default function Lecturer() {
   });
 
   const [skill, setSkill] = useState("");
-  // For success and error messages
+  // For success messages and error messages
   const [affirmation, setAffirmation] = useState({
     experienceAffirm: "",
     academicsAffirm: "",
@@ -49,53 +49,54 @@ export default function Lecturer() {
     applicationCannotSubmit: "",
   });
 
-  // All courses from backend
+  //Store filteredCourses according to filter option usage in lecturer page.
   const [courses, setCourses] = useState<course[]>([]);
-  // If you ever want a filtered subset (e.g. search), you can keep this; for now it will mirror `courses`
   const [filteredCourses, setFilteredCourses] = useState<course[]>([]);
 
-  // Fetch courses once on mount; populate both `courses` and `filteredCourses`
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const courseArray = await userApi.getAllCourses(); // returns [{ id, courseName }, …]
-        const fixedCourses: course[] = courseArray.map((c) => ({
-          courseID: c.id,
-          courseName: c.courseName,
-        }));
-        setCourses(fixedCourses);
-        setFilteredCourses(fixedCourses);
-      } catch (err) {
-        console.error("Failed to fetch courses:", err);
-      }
-    };
+    userApi.getAllCourses().then((courseArray) => {
+      const mappedCourses = (
+        courseArray as { id: number; courseName: string }[]
+      ).map((c) => ({
+        courseID: c.id,
+        courseName: c.courseName,
+      }));
+      setCourses(mappedCourses);
+      setFilteredCourses(mappedCourses);
+    });
 
-    fetchCourses();
+    // Filter out the courses already applied for
+    // const alreadyApplied = allApplicants
+    //   .filter((app: ApplicationInfo) => app.name === applicantName)
+    //   .map((app: ApplicationInfo) => app.coursesApplied);
+
+    // const filtered = courses.filter(
+    //   (course) => !alreadyApplied.includes(course)
+    // );
+    // setFilteredCourses(filtered);
   }, []);
 
-  /* 
-    Handles ticking checkboxes to select/unselect courses.
-    Because `coursesApplied` is now `course[]`, we push/pull the full `course` object.
-  */
+  /*This function handles ticking checkboxes to select from available courses.
+    The function looks updates the state from its previous value of empty array.
+    If the course already exists in the array, get rid of the course (checkbox functionality)*/
   const handleCourseApplied = (e: React.ChangeEvent<HTMLInputElement>) => {
     const courseName = e.target.value;
     const courseObj = courses.find((c) => c.courseName === courseName);
     if (!courseObj) return;
 
     setApplicantProfile((prev) => {
-      const alreadySelected = prev.coursesApplied.some(
-        (c) => c.courseID === courseObj.courseID
-      );
+      const alreadySelected = prev.coursesApplied.includes(courseObj.courseID);
       return {
         ...prev,
         coursesApplied: alreadySelected
-          ? prev.coursesApplied.filter((c) => c.courseID !== courseObj.courseID)
-          : [...prev.coursesApplied, courseObj],
+          ? prev.coursesApplied.filter((id) => id !== courseObj.courseID)
+          : [...prev.coursesApplied, courseObj.courseID],
       };
     });
   };
 
-  /* Handles availability radio buttons */
+  /*This function handles the radio buttons to choose availability.
+    It changes the state of it from previous value to new target.value*/
   const handleAvailability = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApplicantProfile((prev) => ({
       ...prev,
@@ -103,24 +104,20 @@ export default function Lecturer() {
     }));
   };
 
-  /* Adds an experience object into the application */
+  /*Handles choosing experience and storing the object in applicantInfo object*/
   const handleExperience = () => {
-    if (
-      experience.position &&
-      experience.company &&
-      experience.description
-    ) {
+    if (experience.position && experience.company && experience.description) {
       setApplicantProfile((prev) => ({
         ...prev,
         experience: [...(prev.experience || []), experience],
       }));
+
       setAffirmation((prev) => ({
         ...prev,
         experienceAffirm: "Added to application profile!",
       }));
       setTimeout(
-        () =>
-          setAffirmation((prev) => ({ ...prev, experienceAffirm: "" })),
+        () => setAffirmation((prev) => ({ ...prev, experienceAffirm: "" })),
         3000
       );
     } else {
@@ -129,27 +126,25 @@ export default function Lecturer() {
         experienceError: "Please fill out every detail before submitting.",
       }));
       setTimeout(
-        () =>
-          setError((prev) => ({ ...prev, experienceError: "" })),
+        () => setError((prev) => ({ ...prev, experienceError: "" })),
         3000
       );
     }
   };
-
-  /* Adds an academics object into the application */
+  /*Handles choosing academics and storing the object in applicantInfo object*/
   const handleAcademics = () => {
     if (academics.degree && academics.university && academics.year) {
       setApplicantProfile((prev) => ({
         ...prev,
         academics: [...prev.academics, academics],
       }));
+
       setAffirmation((prev) => ({
         ...prev,
         academicsAffirm: "Added to application profile!",
       }));
       setTimeout(
-        () =>
-          setAffirmation((prev) => ({ ...prev, academicsAffirm: "" })),
+        () => setAffirmation((prev) => ({ ...prev, academicsAffirm: "" })),
         3000
       );
     } else {
@@ -158,16 +153,14 @@ export default function Lecturer() {
         academicsError: "Please fill out every detail before submitting.",
       }));
       setTimeout(
-        () =>
-          setError((prev) => ({ ...prev, academicsError: "" })),
+        () => setError((prev) => ({ ...prev, academicsError: "" })),
         3000
       );
     }
   };
 
   /*
-    Adds a skill string to the `skills` array in the application.
-  */
+    Changes state from previous default value in real time, and if the skill exists, gets rid of it and vice versa*/
   const handleSkills = () => {
     if (skill && !applicantProfile.skills.includes(skill)) {
       setApplicantProfile((prev) => ({
@@ -178,7 +171,6 @@ export default function Lecturer() {
     }
   };
 
-  /* Handles changing the position radio */
   const handlePositionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setApplicantProfile((prev) => ({
       ...prev,
@@ -186,42 +178,21 @@ export default function Lecturer() {
     }));
   };
 
-  /*
-    Submits the application object to the backend
-  */
+  /*Finally after storing all the application information, the submission button can be clicked to store the applicantInfo object in localStorage.*/
   const handleSubmit = async () => {
     try {
       alert(
-        "Submitting application: " +
-          JSON.stringify(applicantProfile, null, 2)
+        "Submitting application: " + JSON.stringify(applicantProfile, null, 2)
       );
-      // Assume `loggedIn` in localStorage is something like { id: 123, ... }
       applicantProfile.applicant = JSON.parse(
         localStorage.getItem("loggedIn") || "{}"
       ).id;
       await userApi.saveApplication(applicantProfile);
-      setAffirmation((prev) => ({
-        ...prev,
-        applicationSubmitted: "Application submitted successfully!",
-      }));
     } catch (error) {
       console.error("Error saving application:", error);
-      setError((prev) => ({
-        ...prev,
-        applicationCannotSubmit: "Failed to submit application.",
-      }));
-      setTimeout(
-        () =>
-          setError((prev) => ({
-            ...prev,
-            applicationCannotSubmit: "",
-          })),
-        3000
-      );
     }
 
-    // If you truly want a reload, you can call window.location.reload(),
-    // but consider just clearing the form instead of reloading the page.
+    window.location.reload();
   };
 
   return (
@@ -262,19 +233,23 @@ export default function Lecturer() {
           />
           <label
             className="labAssistant"
-            htmlFor="Lab Assistant"
+            htmlFor="position"
             style={{ color: "#003366" }}
           >
             Lab Assistant
           </label>
-
           <h2>Available courses this semester</h2>
+
+          {/*Details HTML tag used  handily to make a collapseable list of courses and skills that can be checked*/}
+
           <details className="coursesAvail">
             <summary>Available courses this semester</summary>
+
             <div className="courseAvailContent">
               <form>
+                {/*Pre-populated courses array has been mapped into a list with checkbox input for selection*/}
                 <ol>
-                  {courses.map((course, index) => (
+                  {filteredCourses.map((course, index) => (
                     <li key={course.courseID}>
                       <input
                         id={course.courseName}
@@ -294,6 +269,8 @@ export default function Lecturer() {
           </details>
 
           <br />
+          {/*Rest of the inputs are being handled by the functions above*/}
+          {/*Availability portion of the form*/}
           <h2>Availability</h2>
           <input
             className="Full-time"
@@ -324,8 +301,9 @@ export default function Lecturer() {
           >
             Part-time
           </label>
-
+          {/*Previous experience portion of the form*/}
           <h2>Previous Experience (If any)</h2>
+
           <input
             data-testid="position"
             className="inputBox"
@@ -366,6 +344,8 @@ export default function Lecturer() {
           >
             Add to applicant profile
           </button>
+          {/*This button will add the experience to the applicant profile*/}
+          {/*If the experience is added, it will show a success message. Error message otherwise.*/}
 
           {affirmation.experienceAffirm && (
             <p className="fieldsPopulated">{affirmation.experienceAffirm}</p>
@@ -373,8 +353,9 @@ export default function Lecturer() {
           {error.experienceError && (
             <p className="fieldsNotPopulated">{error.experienceError}</p>
           )}
-
+          {/*Skills portion of the form*/}
           <h2>Your Skillsets</h2>
+
           <input
             className="inputBox"
             type="text"
@@ -389,7 +370,7 @@ export default function Lecturer() {
               }
             }}
           />
-
+          {/*Qualifications portion of the form*/}
           <h2>Your Academic Qualifications</h2>
           <input
             data-testid="degree"
@@ -414,7 +395,7 @@ export default function Lecturer() {
           <input
             data-testid="year"
             className="inputBox"
-            type="number"
+            type="text"
             placeholder="Year"
             value={academics.year}
             onChange={(e) =>
@@ -431,24 +412,29 @@ export default function Lecturer() {
             <p className="fieldsNotPopulated">{error.academicsError}</p>
           )}
         </div>
-
         <div className="applicantBox">
           <h1>
             {applicantProfile.position === "Tutor"
-              ? "Tutor Application Profile"
+              ? "Tutor Application profile"
               : applicantProfile.position === "Lab Assistant"
-              ? "Lab Assistant Application Profile"
-              : "Application Profile"}
+                ? "Lab Assistant Application profile"
+                : "Application profile"}
           </h1>
 
           <h2>Course Selected</h2>
+          {/*This is to change the state in real time for making the applicant profile on the side.
+        If length > 0, it will map it onto a li element*/}
+
           {applicantProfile.coursesApplied.length > 0 ? (
             <ul>
-              {applicantProfile.coursesApplied.map((course) => (
-                <li key={course.courseID} className="courseName-green">
-                  {course.courseName}
-                </li>
-              ))}
+              {applicantProfile.coursesApplied.map((id) => {
+                const course = courses.find((c) => c.courseID === id);
+                return (
+                  <li key={id} className="courseName-green">
+                    {course ? course.courseName : id}
+                  </li>
+                );
+              })}
             </ul>
           ) : (
             <p className="p2">No course selected</p>
@@ -462,6 +448,7 @@ export default function Lecturer() {
           </p>
 
           <h2>Previous Experience</h2>
+
           {(applicantProfile.experience || []).length > 0 ? (
             <ul>
               {(applicantProfile.experience || []).map((exp, index) => (
@@ -480,6 +467,7 @@ export default function Lecturer() {
           )}
 
           <h2>Relevant Skillset</h2>
+
           {applicantProfile.skills.length > 0 ? (
             <ul>
               {applicantProfile.skills.map((skill, index) => (
@@ -520,16 +508,11 @@ export default function Lecturer() {
               applicantProfile.academics.length == 0
             }
             onClick={() => {
+              //Call handleSubmit function, then reload the page.
               handleSubmit();
               window.location.reload();
             }}
           />
-          {affirmation.applicationSubmitted && (
-            <p className="fieldsPopulated">{affirmation.applicationSubmitted}</p>
-          )}
-          {error.applicationCannotSubmit && (
-            <p className="fieldsNotPopulated">{error.applicationCannotSubmit}</p>
-          )}
         </div>
       </div>
       <Footer />
