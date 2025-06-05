@@ -13,7 +13,28 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
   const [comment, setComment] = useState<string>("");
   const [noComment, setNoComment] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [allCourses, setAllCourses] = useState<course[]>([]);
   const { user } = useAuth();
+
+  // Fetch all courses once on mount
+  useEffect(() => {
+    userApi.getAllCourses().then((data) => {
+      // getAllCourses returns { id, courseID?: number, courseName }
+      const formatted = data
+        .map((c: { id?: number; courseID?: number; courseName: string }) => {
+          const courseID = c.courseID ?? c.id;
+          if (typeof courseID === "number") {
+            return {
+              courseID,
+              courseName: c.courseName,
+            };
+          }
+          return null;
+        })
+        .filter((c): c is course => c !== null);
+      setAllCourses(formatted);
+    });
+  }, []);
 
   // Fetch all comments for the application (no course filtering)
   useEffect(() => {
@@ -21,7 +42,6 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
       if (showInfoTut && showInfoTut.length > 0) {
         const application = showInfoTut[0];
         try {
-          // Now calls with only applicationID
           const res = await userApi.getCommentsByApplication(
             application.applicationID
           );
@@ -48,13 +68,14 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     }
 
     try {
-      // Now calls with only applicationID, lecturerID, content
-      const newComment = await userApi.addComment(
+      await userApi.addComment(
         application.applicationID,
         user.id,
         comment
       );
-      setComments((prev) => [newComment, ...prev]);
+      // Fetch all comments again to get full lecturer info
+      const res = await userApi.getCommentsByApplication(application.applicationID);
+      setComments(res);
       setComment("");
     } catch (err) {
       console.error("Error submitting comment:", err);
@@ -63,13 +84,30 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
 
   if (!showInfoTut || showInfoTut.length === 0) {
     return (
-      <div className="infoCard" style={{ fontWeight: "bold", color: "#36454F" }}>
+      <div
+        className="infoCard"
+        style={{ fontWeight: "bold", color: "#36454F" }}
+      >
         Click 'Show info' to view more details.
       </div>
     );
   }
 
   const application = showInfoTut[0];
+
+  // Map course IDs to course objects using allCourses
+  const coursesApplied: course[] = (application.coursesApplied ?? []).map(
+    (c: any) => {
+      if (typeof c === "object" && c.courseID && c.courseName) return c;
+      // If c is an ID, find the course object
+      return (
+        allCourses.find((course) => course.courseID === c) || {
+          courseID: c,
+          courseName: "Unknown Course",
+        }
+      );
+    }
+  );
 
   return (
     <div className="infoCard2">
@@ -82,7 +120,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
 
       <p className="pStyle">Course(s) Applied</p>
       <ul>
-        {application.coursesApplied.map((course) => (
+        {coursesApplied.map((course) => (
           <li key={course.courseID}>
             <strong>{course.courseName}</strong>
           </li>
@@ -140,7 +178,8 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
           {comments.map((c, index) => (
             <div key={index} className="commentBox">
               <p>
-                {c.lecturer?.firstName ?? "Lecturer"} {c.lecturer?.lastName ?? ""}{" "}
+                {c.lecturer?.firstName ?? "Lecturer"}{" "}
+                {c.lecturer?.lastName ?? ""}{" "}
                 <span>({new Date(c.createdAt).toLocaleString()})</span>
               </p>
               <p>{c.content}</p>

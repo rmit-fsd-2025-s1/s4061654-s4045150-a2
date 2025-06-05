@@ -33,19 +33,12 @@ function ApplicationListCard({
         <h2>{name}</h2>
       </div>
 
-      <Button
-        name="Show info"
-        func={() => {
-          handleShowInfo(name, course);
-          setShowInfoClicked(!showInfoClicked);
-        }}
-      />
+      <Button name="Show info" func={() => handleShowInfo(name, course)} />
       <br />
 
       <p>Course: {course.courseName}</p>
       {position && <p>Position: {position}</p>}
       <br />
-  
 
       <button
         data-testid="Select"

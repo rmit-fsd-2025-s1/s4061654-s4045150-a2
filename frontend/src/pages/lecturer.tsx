@@ -87,7 +87,7 @@ export default function Lecturer() {
               applicant: r.applicant, // full object from backend
               coursesApplied: courseIds,
               coursesAppliedObj: coursesAppliedObj,
-              experience: (r as any).experience ?? [],
+              experience: (r as any).experiences ?? [],
               academics: (r as any).academics ?? [],
             };
           })
@@ -148,15 +148,13 @@ export default function Lecturer() {
 
   // ─────────────────────────────────────────────────────────────────────────────
   // When “Show info” is clicked on a card, we pass the ApplicationInfo into state
-  const handleShowInfo = (applicantName: string, courseObj: course) => {
-    // applicantName = "<First> <Last>"
+  const handleShowInfo = (name: string, course: course) => {
     const matched = tutorsList.filter((t) => {
       const fullName = `${t.applicant.firstName} ${t.applicant.lastName}`;
-      if (fullName !== applicantName) return false;
-      // Does t.coursesApplied include courseObj.courseID?
+      if (fullName !== name) return false;
       return t.coursesApplied.some(
         (c: number | course) =>
-          (typeof c === "number" ? c : c.courseID) === courseObj.courseID
+          (typeof c === "number" ? c : c.courseID) === course.courseID
       );
     });
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
@@ -210,6 +208,9 @@ export default function Lecturer() {
 
     return true;
   });
+
+  const [selected, setSelected] = useState<{ [key: string]: boolean }>({});
+  const [ranked, setRanked] = useState<{ [key: string]: boolean }>({});
 
   if (isLoading) {
     return (
@@ -358,7 +359,7 @@ export default function Lecturer() {
                   isRanked={false}
                   onToggleSelect={() => {}}
                   onToggleRank={() => {}}
-                  handleShowInfo={() => {}}
+                  handleShowInfo={handleShowInfo}
                 />
               );
             })

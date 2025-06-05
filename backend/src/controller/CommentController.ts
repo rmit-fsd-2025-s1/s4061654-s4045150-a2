@@ -15,7 +15,7 @@ router.post("/", async (req: Request, res: Response) => {
     const comment = commentRepo.create({
       content,
       application: { applicationID: applicationId } as unknown as Applications,
-      lecturer: { id: lecturerId } as unknown as UserInformation,
+      lecturer: { userid: lecturerId } as unknown as UserInformation,
     });
 
     const result = await commentRepo.save(comment);
