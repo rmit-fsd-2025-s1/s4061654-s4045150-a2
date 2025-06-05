@@ -4,7 +4,8 @@ import { course } from "../types/course";
 
 export default function AvailableCourses() {
   const [courses, setCourses] = useState<course[]>([]);
-  const [editCourse, setEditCourse] = useState<string>("");
+  const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
+  const [editCourseName, setEditCourseName] = useState<string>("");
 
   useEffect(() => {
     userApi.getAllCourses().then((data: course[]) => {
@@ -18,15 +19,18 @@ export default function AvailableCourses() {
     window.location.reload();
   };
 
-  const handleEditCourse = (c: number) => {
+  const startEditCourse = (c: number) => {
     const courseToEdit = courses.find((course) => course.courseID === c);
-    if (!courseToEdit) {
-      return;
-    }
+    if (!courseToEdit) return;
+    setEditingCourseId(c);
+    setEditCourseName(courseToEdit.courseName);
+  };
 
-    setEditCourse(courseToEdit.courseName);
-
-    userApi.editCourse(c);
+  const saveEditCourse = async (c: number) => {
+    await userApi.editCourse(c, editCourseName);
+    setEditingCourseId(null);
+    setEditCourseName("");
+    window.location.reload();
   };
 
   return (
@@ -35,31 +39,56 @@ export default function AvailableCourses() {
         Available Courses
       </h2>
       <p className="text-gray-600">List of courses available for applicants.</p>
-      {courses.map((c) => (
-        <div key={c.courseID} className="border-b border-gray-200 py-4">
-          <h3 className="text-lg font-medium text-black">{c.courseName}</h3>
-          <button
-            className="text-black border p-2"
-            onClick={() => handleRemoveCourse(c.courseID)}
-          >
-            Remove
-          </button>
-          <button
-            className="text-black border p-2"
-            onClick={() => handleEditCourse(c.courseID)}
-          >
-            Edit
-          </button>
-          {editCourse && editCourse === c.courseName && (
+
+      {courses.map((c) =>
+        editingCourseId === c.courseID ? (
+          <div key={c.courseID}>
             <input
               type="text"
-              value={editCourse}
-              onChange={(e) => setEditCourse(e.target.value)}
-              className="border p-2 mt-2 w-full"
+              value={editCourseName}
+              onChange={(e) => setEditCourseName(e.target.value)}
+              className="border p-2 mt-2 w-full text-black"
             />
-          )}
-        </div>
-      ))}
+            <button
+              className="text-black border p-2"
+              onClick={() => handleRemoveCourse(c.courseID)}
+            >
+              Remove
+            </button>
+            <button
+              className="text-black border p-2"
+              onClick={() => saveEditCourse(c.courseID)}
+            >
+              Save
+            </button>
+            <button
+              className="text-black border p-2"
+              onClick={() => {
+                setEditingCourseId(null);
+                setEditCourseName("");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div key={c.courseID} className="border-b border-gray-200 py-4">
+            <h3 className="text-lg font-medium text-black">{c.courseName}</h3>
+            <button
+              className="text-black border p-2"
+              onClick={() => handleRemoveCourse(c.courseID)}
+            >
+              Remove
+            </button>
+            <button
+              className="text-black border p-2"
+              onClick={() => startEditCourse(c.courseID)}
+            >
+              Edit
+            </button>
+          </div>
+        )
+      )}
     </div>
   );
 }

@@ -73,17 +73,17 @@ export const userApi = {
     return data.removeCourse;
   },
 
-  editCourse: async (courseID: number): Promise<any> => {
+  editCourse: async (courseID: number, courseName: string): Promise<any> => {
     const { data } = await client.mutate({
       mutation: gql`
-        mutation EditCourse($courseID: ID!) {
-          editCourse(courseID: $courseID) {
+        mutation EditCourse($courseID: ID!, $courseName: String!) {
+          editCourse(courseID: $courseID, courseName: $courseName) {
             courseID
             courseName
           }
         }
       `,
-      variables: { courseID },
+      variables: { courseID, courseName },
     });
   },
 };

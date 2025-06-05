@@ -27,6 +27,6 @@ export const typeDefs = gql`
   type Mutation {
     addCourse(courseName: String!): Courses!
     removeCourse(courseID: ID!): Boolean!
-    editCourse(courseID: ID!): Courses!
+    editCourse(courseID: ID!, courseName: String!): Courses!
   }
 `;
