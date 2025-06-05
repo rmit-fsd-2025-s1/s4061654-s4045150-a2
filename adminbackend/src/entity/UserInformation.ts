@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 
 import { Applications } from "./Applications";
+import { LecturerCourses } from "./LecturerCourses";
 
 @Entity()
 export class UserInformation {
@@ -39,4 +40,7 @@ export class UserInformation {
 
   @OneToMany(() => Applications, (app) => app.applicant)
   applications: Applications[];
+
+  @OneToMany(() => LecturerCourses, (lc) => lc.lecturer)
+  lecturerCourses: LecturerCourses[];
 }

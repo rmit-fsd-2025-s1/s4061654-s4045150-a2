@@ -13,17 +13,9 @@ export class LecturerCourses {
   @PrimaryGeneratedColumn()
   rowId: number;
 
-  @Column()
-  lecturerId: number;
-
-  @Column()
-  courseId: number;
-
-  @ManyToOne(() => UserInformation)
-  @JoinColumn({ name: "lecturerId" })
+  @ManyToOne(() => UserInformation, (user) => user.lecturerCourses)
   lecturer: UserInformation;
 
-  @ManyToOne(() => Courses)
-  @JoinColumn({ name: "courseId" })
+  @ManyToOne(() => Courses, (course) => course.lecturerCourses)
   course: Courses;
 }

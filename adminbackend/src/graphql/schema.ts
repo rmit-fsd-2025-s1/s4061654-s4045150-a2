@@ -3,14 +3,17 @@ import gql from "graphql-tag";
 export const typeDefs = gql`
   type LecturerCourse {
     rowId: ID!
-    lecturerId: Int!
-    courseId: Int!
+    lecturer: UserInformation!
+    course: Courses!
   }
 
   type UserInformation {
     userid: ID!
     firstName: String!
+    lastName: String!
     email: String!
+    role: String!
+    isBlocked: Boolean!
   }
 
   type Courses {
@@ -22,6 +25,7 @@ export const typeDefs = gql`
     lecturerCourses: [LecturerCourse!]!
     userInformation: [UserInformation!]!
     getAllCourses: [Courses!]!
+    getLecturerCourses: [LecturerCourse!]!
   }
 
   type Mutation {
