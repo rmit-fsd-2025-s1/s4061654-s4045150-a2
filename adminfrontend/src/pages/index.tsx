@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { userApi } from "../services/api";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import AddCourses from "../components/AddCourses";
@@ -17,7 +15,8 @@ export default function Home() {
     <div>
       <Header />
       <div className="flex gap-6 w-full max-w-6xl mx-auto">
-        <AdminLogin />
+        <AddCourses />
+        <AvailableCourses />
       </div>
 
       <Footer />

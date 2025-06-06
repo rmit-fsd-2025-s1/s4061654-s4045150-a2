@@ -55,7 +55,6 @@ export default function Lecturer() {
 
   useEffect(() => {
     userApi.getAllCourses().then((courseArray) => {
-      const typedCourses = courseArray as course[];
       setCourses(courseArray as course[]);
       setFilteredCourses(courseArray as course[]);
     });
@@ -64,7 +63,7 @@ export default function Lecturer() {
     if (id) {
       setApplicantProfile((prev) => ({
         ...prev,
-        applicant: JSON.parse(id).userid,
+        applicant: JSON.parse(id).id,
       }));
     }
 
@@ -189,7 +188,7 @@ export default function Lecturer() {
       );
       applicantProfile.applicant = JSON.parse(
         localStorage.getItem("loggedIn") || "{}"
-      ).userid;
+      ).id;
       await userApi.saveApplication(applicantProfile);
     } catch (error) {
       console.error("Error saving application:", error);
