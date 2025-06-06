@@ -252,16 +252,24 @@ export default function Lecturer() {
               <form>
                 {/*Pre-populated courses array has been mapped into a list with checkbox input for selection*/}
                 <ol>
-                  {filteredCourses.map((course, index) => (
+                  {filteredCourses.map((course) => (
                     <li key={course.courseID}>
                       <input
-                        id={course.courseName}
-                        type="checkbox"
+                        id={`course-${course.courseID}`}
+                        type="radio"
                         name="course"
-                        value={course.courseName}
-                        onChange={handleCourseApplied}
+                        value={course.courseID}
+                        checked={
+                          applicantProfile.coursesApplied[0] === course.courseID
+                        }
+                        onChange={(e) => {
+                          setApplicantProfile((prev) => ({
+                            ...prev,
+                            coursesApplied: [Number(e.target.value)],
+                          }));
+                        }}
                       />
-                      <label htmlFor={course.courseName}>
+                      <label htmlFor={`course-${course.courseID}`}>
                         {course.courseName}
                       </label>
                     </li>
