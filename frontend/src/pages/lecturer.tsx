@@ -16,6 +16,7 @@ export default function Lecturer() {
   const [searchSkills, setSearchSkills] = useState("");
   const [courseFilter, setCourseFilter] = useState<string[]>([]);
   const [availFilter, setAvailFilter] = useState<string[]>([]);
+  const [positionFilter, setPositionFilter] = useState<string[]>([]);
   const [showInfoTutor, setShowInfoTutor] = useState<
     ApplicationInfo[] | undefined
   >(undefined);
@@ -160,50 +161,63 @@ export default function Lecturer() {
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
   };
 
-  // ─────────────────────────────────────────────────────────────────────────────
+ // ─────────────────────────────────────────────────────────────────────────────
   // Filter tutorsList according to:
-  //  1) At least one course is taught by this lecturer
+  //  1) At least one course is taught by this lecturer (if lecturerCourseIDs is not empty)
   //  2) Name matches searchName
   //  3) At least one skill matches searchSkills
-  //  4) Course‐checkbox filter
+  //  4) Course‐checkbox filter (by courseName)
   //  5) Availability filter
+  //  6) Position filter
   const filteredTutors = tutorsList.filter((applicant) => {
-    // 1) Must have at least one course that this lecturer teaches
-    const appliedCourses = normalizeCoursesApplied(applicant);
-    const hasMatchingCourse = appliedCourses.some((c) =>
-      lecturerCourseIDs.includes(c.courseID)
-    );
-    if (!hasMatchingCourse) return false;
+    // 1) If lecturerCourseIDs is set, must have at least one course that this lecturer teaches
+    if (lecturerCourseIDs.length > 0) {
+      const appliedCourses = normalizeCoursesApplied(applicant);
+      const hasMatchingCourse = appliedCourses.some((c) =>
+        lecturerCourseIDs.includes(c.courseID)
+      );
+      if (!hasMatchingCourse) return false;
+    }
 
-    // 2) Name filter
-    const fullName =
-      `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
-    if (!fullName.includes(searchName.toLowerCase())) return false;
+    // 2) Name filter (case-insensitive, partial match)
+    const fullName = `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
+    if (searchName.trim() && !fullName.includes(searchName.toLowerCase().trim()))
+      return false;
 
-    // 3) Skills filter
+    // 3) Skills filter (case-insensitive, partial match, any skill)
     if (
+      searchSkills.trim() &&
       !applicant.skills.some((skill) =>
-        skill.toLowerCase().includes(searchSkills.toLowerCase())
+        skill.toLowerCase().includes(searchSkills.toLowerCase().trim())
       )
     ) {
       return false;
     }
 
-    // 4) Course‐checkbox filter (match by courseName)
-    const appliedCourseNames = appliedCourses.map((c) => c.courseName);
-    if (
-      courseFilter.length > 0 &&
-      !courseFilter.some((filterName) =>
-        appliedCourseNames.includes(filterName)
-      )
-    ) {
-      return false;
+    // 4) Course‐checkbox filter (by courseName)
+    if (courseFilter.length > 0) {
+      const appliedCourseNames = normalizeCoursesApplied(applicant).map(
+        (c) => c.courseName
+      );
+      if (!courseFilter.some((filterName) => appliedCourseNames.includes(filterName))) {
+        return false;
+      }
     }
 
-    // 5) Availability filter
-    const availability = (applicant.availability || "").toLowerCase();
-    if (availFilter.length > 0 && !availFilter.includes(availability)) {
-      return false;
+    // 5) Availability filter (case-insensitive, matches any selected)
+    if (availFilter.length > 0) {
+      const availability = (applicant.availability || "").toLowerCase();
+      if (!availFilter.some((a) => availability.includes(a))) {
+        return false;
+      }
+    }
+
+    // 6) Position filter (case-insensitive, matches any selected)
+    if (positionFilter.length > 0) {
+      const position = (applicant.position || "").toLowerCase();
+      if (!positionFilter.some((p) => position === p.toLowerCase())) {
+        return false;
+      }
     }
 
     return true;
@@ -325,30 +339,64 @@ export default function Lecturer() {
           />
           Part-Time
         </label>
+
+        <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
+          <input
+            type="checkbox"
+            value="Tutor"
+            onChange={(e) => {
+              const val = e.target.value;
+              setPositionFilter((prev) =>
+                e.target.checked
+                  ? [...prev, val]
+                  : prev.filter((v) => v !== val)
+              );
+            }}
+          />
+          Tutor
+        </label>
+        <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
+          <input
+            type="checkbox"
+            value="Lab Assistant"
+            onChange={(e) => {
+              const val = e.target.value;
+              setPositionFilter((prev) =>
+                e.target.checked
+                  ? [...prev, val]
+                  : prev.filter((v) => v !== val)
+              );
+            }}
+          />
+          Lab Assistant
+        </label>
       </div>
 
       {/* Content Section */}
       <div className="dashboardContainer" style={{ padding: "0 2rem" }}>
         <div className="pageContentCenter">
-          {flattenedApps.length === 0 ? (
-            <p>No applications at all.</p>
+          {filteredTutors.length === 0 ? (
+            <p></p>
           ) : (
-            flattenedApps.map(({ app, courseObj }) => {
-              const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
-              return (
-                <ApplicationListCard
-                  key={`${app.applicationID}-${courseObj.courseID}`}
-                  name={fullName}
-                  course={courseObj}
-                  applicantId={app.applicant.userid}
-                  position={app.position}
-                  isSelected={false}
-                  isRanked={false}
-                  onToggleSelect={() => {}}
-                  onToggleRank={() => {}}
-                  handleShowInfo={handleShowInfo}
-                />
-              );
+            filteredTutors.flatMap((app) => {
+              const appliedCourses = normalizeCoursesApplied(app);
+              return appliedCourses.map((courseObj) => {
+          const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
+          return (
+            <ApplicationListCard
+              key={`${app.applicationID}-${courseObj.courseID}`}
+              name={fullName}
+              course={courseObj}
+              applicantId={app.applicant.userid}
+              position={app.position}
+              isSelected={false}
+              isRanked={false}
+              onToggleSelect={() => {}}
+              onToggleRank={() => {}}
+              handleShowInfo={handleShowInfo}
+            />
+          );
+              });
             })
           )}
         </div>
