@@ -84,7 +84,7 @@ export default function Lecturer() {
               position: r.position,
               availability: r.availability,
               skills: r.skills,
-              applicant: r.applicant, // full object from backend
+              applicant: r.applicant, 
               coursesApplied: courseIds,
               coursesAppliedObj: coursesAppliedObj,
               experience: (r as any).experiences ?? [],
@@ -162,52 +162,48 @@ export default function Lecturer() {
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Filter tutorsList according to:
-  //  1) At least one course is taught by this lecturer (if lecturerCourseIDs is not empty)
+  //  1) At least one course is taught by this lecturer
   //  2) Name matches searchName
   //  3) At least one skill matches searchSkills
-  //  4) Course‐checkbox filter (by courseName)
+  //  4) Course‐checkbox filter
   //  5) Availability filter
   const filteredTutors = tutorsList.filter((applicant) => {
-    // 1) If lecturerCourseIDs is set, must have at least one course that this lecturer teaches
-    if (lecturerCourseIDs.length > 0) {
-      const appliedCourses = normalizeCoursesApplied(applicant);
-      const hasMatchingCourse = appliedCourses.some((c) =>
-        lecturerCourseIDs.includes(c.courseID)
-      );
-      if (!hasMatchingCourse) return false;
-    }
+    // 1) Must have at least one course that this lecturer teaches
+    const appliedCourses = normalizeCoursesApplied(applicant);
+    const hasMatchingCourse = appliedCourses.some((c) =>
+      lecturerCourseIDs.includes(c.courseID)
+    );
+    if (!hasMatchingCourse) return false;
 
-    // 2) Name filter (case-insensitive, partial match)
-    const fullName = `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
-    if (searchName.trim() && !fullName.includes(searchName.toLowerCase().trim()))
-      return false;
+    // 2) Name filter
+    const fullName =
+      `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
+    if (!fullName.includes(searchName.toLowerCase())) return false;
 
-    // 3) Skills filter (case-insensitive, partial match, any skill)
+    // 3) Skills filter
     if (
-      searchSkills.trim() &&
       !applicant.skills.some((skill) =>
-        skill.toLowerCase().includes(searchSkills.toLowerCase().trim())
+        skill.toLowerCase().includes(searchSkills.toLowerCase())
       )
     ) {
       return false;
     }
 
-    // 4) Course‐checkbox filter (by courseName)
-    if (courseFilter.length > 0) {
-      const appliedCourseNames = normalizeCoursesApplied(applicant).map(
-        (c) => c.courseName
-      );
-      if (!courseFilter.some((filterName) => appliedCourseNames.includes(filterName))) {
-        return false;
-      }
+    // 4) Course‐checkbox filter (match by courseName)
+    const appliedCourseNames = appliedCourses.map((c) => c.courseName);
+    if (
+      courseFilter.length > 0 &&
+      !courseFilter.some((filterName) =>
+        appliedCourseNames.includes(filterName)
+      )
+    ) {
+      return false;
     }
 
-    // 5) Availability filter (case-insensitive, matches any selected)
-    if (availFilter.length > 0) {
-      const availability = (applicant.availability || "").toLowerCase();
-      if (!availFilter.some((a) => availability.includes(a))) {
-        return false;
-      }
+    // 5) Availability filter
+    const availability = (applicant.availability || "").toLowerCase();
+    if (availFilter.length > 0 && !availFilter.includes(availability)) {
+      return false;
     }
 
     return true;
@@ -215,6 +211,16 @@ export default function Lecturer() {
 
   const [selected, setSelected] = useState<{ [key: string]: boolean }>({});
   const [ranked, setRanked] = useState<{ [key: string]: boolean }>({});
+
+  // Flattened structure for displaying in the dashboard
+  const flattenedApps = tutorsList.flatMap((app) => {
+    // Normalize to array of course objects
+    const appliedCourses = normalizeCoursesApplied(app);
+    return appliedCourses.map((courseObj) => ({
+      app,
+      courseObj,
+    }));
+  });
 
   if (isLoading) {
     return (
@@ -324,30 +330,11 @@ export default function Lecturer() {
       {/* Content Section */}
       <div className="dashboardContainer" style={{ padding: "0 2rem" }}>
         <div className="pageContentCenter">
-          {filteredTutors.length === 0 ? (
-            <p>No applications match the filters.</p>
+          {flattenedApps.length === 0 ? (
+            <p>No applications at all.</p>
           ) : (
-            filteredTutors.map((app) => {
+            flattenedApps.map(({ app, courseObj }) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
-              // Pick the first applied course ID (or fallback to 0)
-              const firstApplied = app.coursesApplied[0] as
-                | number
-                | course
-                | undefined;
-              let firstCourseId = 0;
-              if (firstApplied != null) {
-                firstCourseId =
-                  typeof firstApplied === "number"
-                    ? firstApplied
-                    : (firstApplied as course).courseID;
-              }
-              const courseObj = courses.find(
-                (c) => c.courseID === firstCourseId
-              ) || {
-                courseID: firstCourseId,
-                courseName: "Unknown Course",
-              };
-
               return (
                 <ApplicationListCard
                   key={`${app.applicationID}-${courseObj.courseID}`}

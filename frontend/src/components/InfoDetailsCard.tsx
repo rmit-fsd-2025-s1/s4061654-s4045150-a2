@@ -68,13 +68,11 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     }
 
     try {
-      await userApi.addComment(
-        application.applicationID,
-        user.id,
-        comment
-      );
+      await userApi.addComment(application.applicationID, user.id, comment);
       // Fetch all comments again to get full lecturer info
-      const res = await userApi.getCommentsByApplication(application.applicationID);
+      const res = await userApi.getCommentsByApplication(
+        application.applicationID
+      );
       setComments(res);
       setComment("");
     } catch (err) {
@@ -117,15 +115,6 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
 
       <p className="pStyle">Position Applied For</p>
       <p>{application.position}</p>
-
-      <p className="pStyle">Course(s) Applied</p>
-      <ul>
-        {coursesApplied.map((course) => (
-          <li key={course.courseID}>
-            <strong>{course.courseName}</strong>
-          </li>
-        ))}
-      </ul>
 
       <div className="margin">
         <p className="pStyle">Availability</p>

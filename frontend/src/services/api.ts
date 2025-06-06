@@ -39,9 +39,11 @@ export const userApi = {
     return response.data;
   },
 
-  getAllCourses: async (): Promise<{ id: number; courseName: string }[]> => {
+  getAllCourses: async (): Promise<
+    { courseID: number; courseName: string }[]
+  > => {
     const response =
-      await api.get<{ id: number; courseName: string }[]>("/courses");
+      await api.get<{ courseID: number; courseName: string }[]>("/courses");
     return response.data;
   },
   // ─────────────────────────────────────────────────────────────────────────────
