@@ -84,7 +84,7 @@ export default function Lecturer() {
               position: r.position,
               availability: r.availability,
               skills: r.skills,
-              applicant: r.applicant, // full object from backend
+              applicant: r.applicant, 
               coursesApplied: courseIds,
               coursesAppliedObj: coursesAppliedObj,
               experience: (r as any).experiences ?? [],
@@ -212,6 +212,16 @@ export default function Lecturer() {
   const [selected, setSelected] = useState<{ [key: string]: boolean }>({});
   const [ranked, setRanked] = useState<{ [key: string]: boolean }>({});
 
+  // Flattened structure for displaying in the dashboard
+  const flattenedApps = tutorsList.flatMap((app) => {
+    // Normalize to array of course objects
+    const appliedCourses = normalizeCoursesApplied(app);
+    return appliedCourses.map((courseObj) => ({
+      app,
+      courseObj,
+    }));
+  });
+
   if (isLoading) {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -320,34 +330,11 @@ export default function Lecturer() {
       {/* Content Section */}
       <div className="dashboardContainer" style={{ padding: "0 2rem" }}>
         <div className="pageContentCenter">
-          {tutorsList.length === 0 ? (
+          {flattenedApps.length === 0 ? (
             <p>No applications at all.</p>
           ) : (
-            tutorsList.map((app) => {
+            flattenedApps.map(({ app, courseObj }) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
-              // Pick the first applied course ID (or fallback to 0)
-              const firstApplied = app.coursesApplied[0] as
-                | number
-                | course
-                | undefined;
-              let firstCourseId = 0;
-              if (firstApplied != null) {
-                firstCourseId =
-                  typeof firstApplied === "number"
-                    ? firstApplied
-                    : (firstApplied as course).courseID;
-              }
-              // now it's definitely a number
-
-              console.log("First course ID:", firstCourseId);
-              console.log("Courses:", courses);
-              const courseObj = courses.find(
-                (c) => c.courseID === firstCourseId
-              ) || {
-                courseID: firstCourseId,
-                courseName: "Unknown Course",
-              };
-
               return (
                 <ApplicationListCard
                   key={`${app.applicationID}-${courseObj.courseID}`}
