@@ -1,17 +1,17 @@
+import { UserInfo } from "os";
 import { Comment } from "./comment";
 import { experience } from "./experience";
 import { qualification } from "./qualification";
+import { UserInformation } from "./loginCreds";
 import { course } from "./course";
 
 export type ApplicationInfo = {
-  applicantionID: number;
+  applicationID: number;
   position: string;
-  name: string;
-  coursesApplied: course[];
+  applicant: UserInformation;
+  coursesApplied: number[];
   availability: string | null;
-  prevExp?: experience[];
+  experience?: experience[];
   skills: string[];
   academics: qualification[];
-  comment?: Comment[];
-  selectedCount?: number;
 };

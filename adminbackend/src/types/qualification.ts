@@ -1,5 +1,5 @@
 export type qualification = {
   degree: string;
-  year: string;
+  year: number;
   university: string;
 };

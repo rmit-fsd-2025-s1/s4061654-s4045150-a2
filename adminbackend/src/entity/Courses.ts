@@ -16,6 +16,9 @@ export class Courses {
   )
   applicantCourses: ApplicationCourses[];
 
-  @OneToMany(() => LecturerCourses, (lc) => lc.course)
+  @OneToMany(
+    () => LecturerCourses,
+    (lecturerCourse) => lecturerCourse.course
+  )
   lecturerCourses: LecturerCourses[];
 }

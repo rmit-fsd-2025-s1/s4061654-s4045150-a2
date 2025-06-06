@@ -41,6 +41,9 @@ export class UserInformation {
   @OneToMany(() => Applications, (app) => app.applicant)
   applications: Applications[];
 
-  @OneToMany(() => LecturerCourses, (lc) => lc.lecturer)
+  @OneToMany(
+    () => LecturerCourses,
+    (lecturerCourse) => lecturerCourse.lecturer
+  )
   lecturerCourses: LecturerCourses[];
 }

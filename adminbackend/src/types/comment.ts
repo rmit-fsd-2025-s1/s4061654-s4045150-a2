@@ -1,5 +1,10 @@
 export type Comment = {
-  username: string;
-  text: string;
-  timestamp: string;
+  id: number;
+  content: string;
+  createdAt: string;
+  lecturer: {
+    firstName: string;
+    lastName: string;
+    id: number;
+  };
 };
