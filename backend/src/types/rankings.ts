@@ -1,7 +1,6 @@
 export type ranking = {
   rowId: number;
   lecturerId: number;
-  firstChoiceId: number | null;
-  secondChoiceId: number | null;
-  thirdChoiceId: number | null;
+  applicationId: number;
+  rank: 1 | 2 | 3;
 };

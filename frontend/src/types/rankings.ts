@@ -1,4 +1,4 @@
-export type ranking = {
+export type Ranking = {
   rowId: number;
   lecturerId: number;
   applicationId: number;

@@ -26,8 +26,8 @@ app.use("/api", coursesRoutes);
 app.use("/api", applicationRoutes);
 app.use("/api", applicationcoursesRoutes);
 app.use("/api", lecturerRoutes);
-app.use("/api", selectionRoutes);
-app.use("/api", rankingRoutes);
+app.use("/api/selections", selectionRoutes);
+app.use("/api/rankings", rankingRoutes);
 app.use('/api', experienceRoutes)
 app.use('/api', academicsRoutes)
 app.use("/api/comments", commentRoutes);

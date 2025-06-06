@@ -9,6 +9,7 @@ import { useAuth } from "../context/authContext";
 import { ApplicationInfo } from "../types/application";
 import { course } from "../types/course";
 import { User } from "../types/user";
+import { Ranking } from "../types/rankings";
 
 export default function Lecturer() {
   const [tutorsList, setTutorsList] = useState<ApplicationInfo[]>([]);
@@ -28,6 +29,7 @@ export default function Lecturer() {
   const [lecturerCourseIDs, setLecturerCourseIDs] = useState<number[]>([]);
   // Once courses, applications, and lecturerCourseIDs are loaded, we can stop loading
   const [isLoading, setIsLoading] = useState(true);
+  const [rankings, setRankings] = useState<Ranking[]>([]);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // 1. Fetch course list on mount
@@ -221,6 +223,103 @@ export default function Lecturer() {
   const [pendingSkills, setPendingSkills] = useState("");
   const [pendingName, setPendingName] = useState("");
 
+  const [selected, setSelected] = useState<{ [key: string]: boolean }>({});
+
+  // Fetch selected applications for this lecturer
+  useEffect(() => {
+    if (!user) return;
+    userApi.getSelectionsByLecturer(user.id).then((selections) => {
+      // selections: [{ applicationId }]
+      const selectedMap: { [key: string]: boolean } = {};
+      selections.forEach(sel => {
+        selectedMap[`${sel.applicationId}`] = true;
+      });
+      setSelected(selectedMap);
+    });
+  }, [user]);
+
+  // Handler to select or deselect an application
+  const handleSelect = async (applicationId: number) => {
+    if (!user) return;
+    const key = `${applicationId}`;
+    try {
+      if (selected[key]) {
+        // Deselect: call backend to remove selection
+        await userApi.deselectApplicant(user.id, applicationId);
+        setSelected(prev => {
+          const newSelected = { ...prev };
+          delete newSelected[key];
+          return newSelected;
+        });
+        // Also remove from rankings if present
+        const rankingObj = rankings.find(r => r.applicationId === applicationId);
+        if (rankingObj) {
+          await userApi.deleteRanking(user.id, rankingObj.rank);
+          // Refresh rankings
+          const data = (await userApi.getRankingsByLecturer(user.id)) as any[];
+          setRankings(data.map((r: any) => ({
+            rowId: r.rowId ?? 0,
+            lecturerId: user.id,
+            applicationId: r.applicationId,
+            rank: r.rank
+          })));
+        }
+      } else {
+        // Select: call backend to add selection
+        await userApi.selectApplicant(user.id, applicationId);
+        setSelected(prev => ({
+          ...prev,
+          [key]: true,
+        }));
+      }
+    } catch (err) {
+      alert("Failed to update selection.");
+      console.error(err);
+    }
+  };
+
+  // Fetch rankings for this lecturer
+  useEffect(() => {
+    if (!user) return;
+    userApi.getRankingsByLecturer(user.id).then((data: unknown) => {
+      const arr = Array.isArray(data) ? data : [];
+      setRankings(arr.map((r: any) => ({
+        rowId: r.rowId ?? 0,
+        lecturerId: user.id,
+        applicationId: r.applicationId,
+        rank: r.rank
+      })));
+    });
+  }, [user, selected]);
+
+  // Handler to set a rank for a selected application
+  const handleSetRank = async (applicationId: number, rank: 1 | 2 | 3) => {
+    if (!user) return;
+    await userApi.setRanking(user.id, applicationId, rank);
+    // Refresh rankings
+    const data = (await userApi.getRankingsByLecturer(user.id)) as any[];
+    setRankings(data.map((r: any) => ({
+      rowId: r.rowId ?? 0,
+      lecturerId: user.id,
+      applicationId: r.applicationId,
+      rank: r.rank
+    })));
+  };
+
+  // Handler to delete a rank
+  const handleDeleteRank = async (rank: 1 | 2 | 3) => {
+    if (!user) return;
+    await userApi.deleteRanking(user.id, rank);
+    // Refresh rankings
+    const data = (await userApi.getRankingsByLecturer(user.id)) as any[];
+    setRankings(data.map((r: any) => ({
+      rowId: r.rowId ?? 0,
+      lecturerId: user.id,
+      applicationId: r.applicationId,
+      rank: r.rank
+    })));
+  };
+
   if (isLoading) {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -399,6 +498,10 @@ export default function Lecturer() {
           ) : (
             getAppCoursePairs().map(({ app, courseObj }) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
+              const isSelected = !!selected[`${app.applicationID}`];
+              const rankingObj = rankings.find(r => r.applicationId === app.applicationID);
+              const isRanked = !!rankingObj;
+              const currentRank = rankingObj?.rank;
               return (
                 <ApplicationListCard
                   key={`${app.applicationID}-${courseObj.courseID}`}
@@ -406,9 +509,12 @@ export default function Lecturer() {
                   course={courseObj}
                   applicantId={app.applicant.userid}
                   position={app.position}
-                  isSelected={false}
-                  isRanked={false}
-                  onToggleSelect={() => {}}
+                  isSelected={isSelected}
+                  isRanked={isRanked}
+                  currentRank={currentRank}
+                  onToggleSelect={() => handleSelect(app.applicationID)}
+                  onSetRank={(rank) => handleSetRank(app.applicationID, rank)}
+                  onDeleteRank={() => currentRank && handleDeleteRank(currentRank)}
                   onToggleRank={() => {}}
                   handleShowInfo={handleShowInfo}
                 />

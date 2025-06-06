@@ -143,55 +143,39 @@ export const userApi = {
   // ─────────────────────────────────────────────────────────────────────────────
   // SELECTION‐related endpoints (select/deselect an applicant)
 
-  getSelectionsByLecturer: async (lecturerId: number): Promise<number[]> => {
-    const res = await api.get<number[]>(`/selections/${lecturerId}`);
+  getSelectionsByLecturer: async (lecturerId: number): Promise<{ applicationId: number }[]> => {
+    const res = await api.get<{ applicationId: number }[]>(`/selections/${lecturerId}`);
     return res.data;
   },
 
   selectApplicant: async (
     lecturerId: number,
-    applicationId: number,
-    courseId: number
+    applicationId: number
   ) => {
-    await api.post("/selections", { lecturerId, applicationId, courseId });
+    await api.post("/selections", { lecturerId, applicationId });
   },
 
   deselectApplicant: async (
     lecturerId: number,
-    applicationId: number,
-    courseId: number
+    applicationId: number
   ) => {
-    await api.delete("/selections", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        lecturerId,
-        applicationId,
-        courseId,
-      },
-    } as any);
+    await api.delete(`/selections/${lecturerId}/${applicationId}`);
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
   // RANKING‐related endpoints
 
-  getRankingsByLecturer: async (
-    lecturerId: number,
-    courseId: number
-  ): Promise<{ applicationId: number; rank: number }[]> => {
-    const res = await api.get<{ applicationId: number; rank: number }[]>(
-      `/rankings/${lecturerId}/${courseId}`
-    );
+  getRankingsByLecturer: async (lecturerId: number) => {
+    const res = await api.get(`/rankings/${lecturerId}`);
     return res.data;
   },
 
-  saveRankings: async (
-    lecturerId: number,
-    courseId: number,
-    ranked: { applicationId: number; rank: number }[]
-  ) => {
-    await api.post("/rankings", { lecturerId, courseId, ranked });
+  setRanking: async (lecturerId: number, applicationId: number, rank: 1 | 2 | 3) => {
+    await api.post("/rankings", { lecturerId, applicationId, rank });
+  },
+
+  deleteRanking: async (lecturerId: number, rank: 1 | 2 | 3) => {
+    await api.delete(`/rankings/${lecturerId}/${rank}`);
   },
 
   // ─────────────────────────────────────────────────────────────────────────────

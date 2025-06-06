@@ -10,6 +10,6 @@ router.get("/:lecturerId", SelectionsController.getSelectionsByLecturer);
 router.post("/", SelectionsController.selectApplicant);
 
 // DELETE: deselect an applicant
-router.delete("/", SelectionsController.deselectApplicant);
+router.delete("/:lecturerId/:applicationId", SelectionsController.deselectApplicant);
 
 export default router;

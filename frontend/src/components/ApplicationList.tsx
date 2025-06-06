@@ -9,8 +9,11 @@ type CardProps = {
   position?: string;
   isSelected: boolean;
   isRanked: boolean;
+  currentRank?: 1 | 2 | 3;
   onToggleSelect: (applicantId: number, courseId: number) => void;
   onToggleRank: (applicantId: number, courseId: number) => void;
+  onSetRank: (rank: 1 | 2 | 3) => void;
+  onDeleteRank: () => void;
   handleShowInfo: (name: string, course: course) => void;
 };
 
@@ -21,8 +24,11 @@ function ApplicationListCard({
   position,
   isSelected,
   isRanked,
+  currentRank,
   onToggleSelect,
   onToggleRank,
+  onSetRank,
+  onDeleteRank,
   handleShowInfo,
 }: CardProps) {
   const [showInfoClicked, setShowInfoClicked] = useState(false);
@@ -47,14 +53,29 @@ function ApplicationListCard({
         {isSelected ? "Deselect this candidate" : "Select this candidate"}
       </button>
 
-      <button
-        data-testid="Rank"
-        className="rankButton"
-        onClick={() => onToggleRank(applicantId, course.courseID)}
-        disabled={!isSelected}
-      >
-        {isRanked ? "Delete from ranking" : "Add to rankings"}
-      </button>
+      {/* Ranking controls, only enabled if selected */}
+      <div style={{ marginTop: 8 }}>
+        <label>Ranking:&nbsp;</label>
+        {[1, 2, 3].map((rank) => (
+          <button
+            key={rank}
+            disabled={!isSelected || (isRanked && currentRank !== rank)}
+            style={{
+              fontWeight: currentRank === rank ? "bold" : undefined,
+              marginRight: 4,
+            }}
+            onClick={() => {
+              if (currentRank === rank) {
+                onDeleteRank();
+              } else {
+                onSetRank(rank as 1 | 2 | 3);
+              }
+            }}
+          >
+            {currentRank === rank ? `Remove ${rank}` : `Set ${rank}`}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
