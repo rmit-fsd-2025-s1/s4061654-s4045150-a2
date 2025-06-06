@@ -50,17 +50,10 @@ export const userApi = {
   // APPLICATION‐related endpoints
 
   /**
-   * Fetch every row from the `applications` table.
-   * We assume the server returns objects shaped like:
-   *   {
-   *     applicationID: number;
-   *     applicant: number;      // userID foreign key
-   *     position: string;
-   *     availability: string;
-   *     skills: string[];
-   *   }
+   * Fetch every row from the `applications` table, with optional filters/sorting.
+   * Accepts an optional filters object with keys: name, skills, course, availability, position, sortBy, sortOrder
    */
-  getAllApplications: async (): Promise<
+  getAllApplications: async (filters: Record<string, any> = {}): Promise<
     Array<{
       applicationID: number;
       applicant: UserInformation;
@@ -69,6 +62,14 @@ export const userApi = {
       skills: string[];
     }>
   > => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        if (value.length > 0) params.set(key, value.join(","));
+      } else if (value !== undefined && value !== null && value !== "") {
+        params.set(key, value);
+      }
+    });
     const response = await api.get<
       Array<{
         applicationID: number;
@@ -77,7 +78,7 @@ export const userApi = {
         availability: string;
         skills: string[];
       }>
-    >("/applications");
+    >(`/applications${params.toString() ? `?${params.toString()}` : ""}`);
     return response.data;
   },
 

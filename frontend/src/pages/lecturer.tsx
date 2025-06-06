@@ -68,24 +68,15 @@ export default function Lecturer() {
         // b) Turn each raw row into a full ApplicationInfo
         const fullApps: ApplicationInfo[] = await Promise.all(
           rawApps.map(async (r) => {
-            const courseRows = await userApi.getApplicationCoursesByAppID(
-              r.applicationID
-            );
-            const courseIds: number[] = courseRows.map(
-              (cr) => cr.course.courseID
-            );
-            const coursesAppliedObj: course[] = courseRows.map(
-              (cr) => cr.course
-            );
-
-            // Fetch the full applicant object usin// Fetch the full applicant ob
-
+            const courseRows = await userApi.getApplicationCoursesByAppID(r.applicationID);
+            const courseIds = courseRows.map((cr) => cr.course.courseID);
+            const coursesAppliedObj = courseRows.map((cr) => cr.course);
             return {
               applicationID: r.applicationID,
               position: r.position,
               availability: r.availability,
               skills: r.skills,
-              applicant: r.applicant, 
+              applicant: r.applicant,
               coursesApplied: courseIds,
               coursesAppliedObj: coursesAppliedObj,
               experience: (r as any).experiences ?? [],
@@ -161,107 +152,74 @@ export default function Lecturer() {
     setShowInfoTutor(matched.length > 0 ? matched : undefined);
   };
 
- // ─────────────────────────────────────────────────────────────────────────────
-  // Filter tutorsList according to:
-  //  1) At least one course is taught by this lecturer (if lecturerCourseIDs is not empty)
-  //  2) Name matches searchName
-  //  3) At least one skill matches searchSkills
-  //  4) Course‐checkbox filter (by courseName)
-  //  5) Availability filter
-  //  6) Position filter
-  const filteredTutors = tutorsList.filter((applicant) => {
-    // 1) If lecturerCourseIDs is set, must have at least one course that this lecturer teaches
-    if (lecturerCourseIDs.length > 0) {
-      const appliedCourses = normalizeCoursesApplied(applicant);
-      const hasMatchingCourse = appliedCourses.some((c) =>
-        lecturerCourseIDs.includes(c.courseID)
-      );
-      if (!hasMatchingCourse) return false;
-    }
-
-    // 2) Name filter (case-insensitive, partial match)
-    const fullName = `${applicant.applicant.firstName} ${applicant.applicant.lastName}`.toLowerCase();
-    if (searchName.trim() && !fullName.includes(searchName.toLowerCase().trim()))
-      return false;
-
-    // 3) Skills filter (case-insensitive, partial match, any skill)
-    if (
-      searchSkills.trim() &&
-      !applicant.skills.some((skill) =>
-        skill.toLowerCase().includes(searchSkills.toLowerCase().trim())
-      )
-    ) {
-      return false;
-    }
-
-    // 4) Course‐checkbox filter (by courseName)
-    if (courseFilter.length > 0) {
-      const appliedCourseNames = normalizeCoursesApplied(applicant).map(
-        (c) => c.courseName
-      );
-      if (!courseFilter.some((filterName) => appliedCourseNames.includes(filterName))) {
-        return false;
-      }
-    }
-
-    // 5) Availability filter (case-insensitive, matches any selected)
-    if (availFilter.length > 0) {
-      const availability = (applicant.availability || "").toLowerCase();
-      if (!availFilter.some((a) => availability.includes(a))) {
-        return false;
-      }
-    }
-
-    // 6) Position filter (case-insensitive, matches any selected)
-    if (positionFilter.length > 0) {
-      const position = (applicant.position || "").toLowerCase();
-      if (!positionFilter.some((p) => position === p.toLowerCase())) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  const [selected, setSelected] = useState<{ [key: string]: boolean }>({});
-  const [ranked, setRanked] = useState<{ [key: string]: boolean }>({});
-
   // Sorting state
   const [sortBy, setSortBy] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  // Helper to sort application-course pairs
-  const getSortedAppCoursePairs = () => {
-    // Flatten filteredTutors to [{ app, courseObj }]
-    const pairs = filteredTutors.flatMap((app) => {
+  // Fetch applications from backend with filters/sorting
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const filters: Record<string, any> = {
+          name: searchName,
+          skills: searchSkills,
+          course: courseFilter,
+          availability: availFilter,
+          position: positionFilter,
+          sortBy,
+          sortOrder,
+          lecturerCourseIDs, // <-- add this line
+        };
+        Object.keys(filters).forEach((key) => {
+          if (
+            (Array.isArray(filters[key]) && filters[key].length === 0) ||
+            filters[key] === ""
+          ) {
+            delete filters[key];
+          }
+        });
+        const rawApps = await userApi.getAllApplications(filters);
+        // For each application, fetch its courses and academics if missing
+        const fullApps: ApplicationInfo[] = await Promise.all(
+          rawApps.map(async (r) => {
+            const courseRows = await userApi.getApplicationCoursesByAppID(r.applicationID);
+            const courseIds = courseRows.map((cr) => cr.course.courseID);
+            const coursesAppliedObj = courseRows.map((cr) => cr.course);
+            return {
+              applicationID: r.applicationID,
+              position: r.position,
+              availability: r.availability,
+              skills: r.skills,
+              applicant: r.applicant,
+              coursesApplied: courseIds,
+              coursesAppliedObj: coursesAppliedObj,
+              experience: (r as any).experiences ?? [],
+              academics: (r as any).academics ?? [],
+            };
+          })
+        );
+        setTutorsList(fullApps);
+      } catch (err) {
+        console.error("Failed to fetch tutor applications:", err);
+      }
+    };
+    fetchApplications();
+  }, [searchName, searchSkills, courseFilter, availFilter, positionFilter, sortBy, sortOrder, lecturerCourseIDs]);
+
+  // Replace filteredTutors and getSortedAppCoursePairs usage with tutorsList
+  // For displaying, flatten tutorsList to [{ app, courseObj }]
+  const getAppCoursePairs = () => {
+    return tutorsList.flatMap((app) => {
       const appliedCourses = normalizeCoursesApplied(app);
-      return appliedCourses.map((courseObj) => ({ app, courseObj }));
+      // Only include courses assigned to this lecturer
+      return appliedCourses
+        .filter((courseObj) => lecturerCourseIDs.includes(courseObj.courseID))
+        .map((courseObj) => ({ app, courseObj }));
     });
-    if (sortBy === "courseName") {
-      pairs.sort((a, b) => {
-        const cmp = a.courseObj.courseName.localeCompare(b.courseObj.courseName);
-        return sortOrder === "asc" ? cmp : -cmp;
-      });
-    } else if (sortBy === "availability") {
-      pairs.sort((a, b) => {
-        const availA = (a.app.availability || "").toLowerCase();
-        const availB = (b.app.availability || "").toLowerCase();
-        const cmp = availA.localeCompare(availB);
-        return sortOrder === "asc" ? cmp : -cmp;
-      });
-    }
-    return pairs;
   };
 
-  // Flattened structure for displaying in the dashboard
-  const flattenedApps = tutorsList.flatMap((app) => {
-    // Normalize to array of course objects
-    const appliedCourses = normalizeCoursesApplied(app);
-    return appliedCourses.map((courseObj) => ({
-      app,
-      courseObj,
-    }));
-  });
+  const [pendingSkills, setPendingSkills] = useState("");
+  const [pendingName, setPendingName] = useState("");
 
   if (isLoading) {
     return (
@@ -274,14 +232,12 @@ export default function Lecturer() {
   return (
     <div>
       <Nav />
-
       <div className="pageHeader" style={{ padding: "1rem 2rem" }}>
         <h1>Dashboard</h1>
         <p>
           Logged in as <strong>{user?.name}</strong>
         </p>
       </div>
-
       {/* Filter Bar */}
       <div
         className="filterBar"
@@ -292,21 +248,28 @@ export default function Lecturer() {
           <input
             type="text"
             placeholder="Input Name..."
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
+            value={pendingName}
+            onChange={(e) => setPendingName(e.target.value)}
           />
         </div>
-
         <div className="filterItem">
           <p>Search By Skills</p>
           <input
             type="text"
             placeholder="Input Skills..."
-            value={searchSkills}
-            onChange={(e) => setSearchSkills(e.target.value)}
+            value={pendingSkills}
+            onChange={(e) => setPendingSkills(e.target.value)}
           />
         </div>
-
+        <button
+          style={{ marginLeft: "1rem", height: "2.2rem" }}
+          onClick={() => {
+            setSearchName(pendingName);
+            setSearchSkills(pendingSkills);
+          }}
+        >
+          Search
+        </button>
         <details className="dropdown">
           <summary style={{ color: "#003366" }}>Filter by course</summary>
           <div className="dropdownContent">
@@ -431,10 +394,10 @@ export default function Lecturer() {
               Sort by Availability {sortBy === "availability" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
             </button>
           </div>
-          {getSortedAppCoursePairs().length === 0 ? (
+          {getAppCoursePairs().length === 0 ? (
             <p></p>
           ) : (
-            getSortedAppCoursePairs().map(({ app, courseObj }) => {
+            getAppCoursePairs().map(({ app, courseObj }) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
               return (
                 <ApplicationListCard

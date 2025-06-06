@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import { userApi } from "../services/api";
 import { UserInformation } from "../types/loginCreds";
 
-export default function Lecturer() {
+export default function Candidate() {
   //useState of type applicationInfo to store all values in one state and then store in localStorage.
   const [applicantProfile, setApplicantProfile] = useState<ApplicationInfo>({
     applicationID: Math.floor(Math.random() * 1000000),
@@ -52,6 +52,7 @@ export default function Lecturer() {
   //Store filteredCourses according to filter option usage in lecturer page.
   const [courses, setCourses] = useState<course[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<course[]>([]);
+  const [userApplications, setUserApplications] = useState<ApplicationInfo[]>([]);
 
   useEffect(() => {
     userApi.getAllCourses().then((courseArray) => {
@@ -78,23 +79,58 @@ export default function Lecturer() {
     // setFilteredCourses(filtered);
   }, []);
 
+  // Fetch all applications for the current user on mount
+  useEffect(() => {
+    const id = localStorage.getItem("loggedIn");
+    const userId = id ? JSON.parse(id).id : null;
+    if (!userId) return;
+
+    // Fetch all applications for this user
+    userApi.getAllApplications({ applicant: userId }).then(async (apps) => {
+      // For each application, fetch its courses and academics if missing
+      const fullApps: ApplicationInfo[] = await Promise.all(
+        apps.map(async (app) => {
+          // Fetch coursesApplied (array of courseIDs)
+          let coursesApplied: number[] = [];
+          try {
+            const courseRows = await userApi.getApplicationCoursesByAppID(app.applicationID);
+            coursesApplied = courseRows.map((cr: any) => cr.course.courseID);
+          } catch {}
+          // Fetch academics
+          let academics: qualification[] = [];
+          try {
+            academics = await userApi.getAcademicsByApplicationId(app.applicationID);
+          } catch {}
+          return {
+            ...app,
+            coursesApplied,
+            academics,
+            experience: (app as any).experience || [],
+            skills: app.skills || [],
+          };
+        })
+      );
+      setUserApplications(fullApps);
+    });
+  }, []);
+
+  // Update filteredCourses whenever position or userApplications change
+  useEffect(() => {
+    setFilteredCourses(courses);
+  }, [applicantProfile.position, userApplications, courses]);
+
   /*This function handles ticking checkboxes to select from available courses.
     The function looks updates the state from its previous value of empty array.
     If the course already exists in the array, get rid of the course (checkbox functionality)*/
+  // Fix: handleCourseApplied should use courseID, not courseName
   const handleCourseApplied = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const courseName = e.target.value;
-    const courseObj = courses.find((c) => c.courseName === courseName);
+    const courseID = Number(e.target.value);
+    const courseObj = courses.find((c) => c.courseID === courseID);
     if (!courseObj) return;
-
-    setApplicantProfile((prev) => {
-      const alreadySelected = prev.coursesApplied.includes(courseObj.courseID);
-      return {
-        ...prev,
-        coursesApplied: alreadySelected
-          ? prev.coursesApplied.filter((id) => id !== courseObj.courseID)
-          : [...prev.coursesApplied, courseObj.courseID],
-      };
-    });
+    setApplicantProfile((prev) => ({
+      ...prev,
+      coursesApplied: [courseID],
+    }));
   };
 
   /*This function handles the radio buttons to choose availability.
@@ -182,6 +218,25 @@ export default function Lecturer() {
 
   /*Finally after storing all the application information, the submission button can be clicked to store the applicantInfo object in localStorage.*/
   const handleSubmit = async () => {
+    // Check for duplicate application before submitting
+    const selectedCourseId = applicantProfile.coursesApplied[0];
+    const selectedPosition = (applicantProfile.position || "").trim().toLowerCase();
+    const duplicate = userApplications.some(
+      (app) =>
+        (app.position || "").trim().toLowerCase() === selectedPosition &&
+        (Array.isArray(app.coursesApplied) ? app.coursesApplied.includes(selectedCourseId) : false)
+    );
+    if (duplicate) {
+      setError((prev) => ({
+        ...prev,
+        applicationCannotSubmit: "You have already applied for this course and position!",
+      }));
+      setTimeout(() => {
+        setError((prev) => ({ ...prev, applicationCannotSubmit: "" }));
+        window.location.reload();
+      }, 3000); // Show error for 3 seconds, then reload
+      return;
+    }
     try {
       alert(
         "Submitting application: " + JSON.stringify(applicantProfile, null, 2)
@@ -190,11 +245,10 @@ export default function Lecturer() {
         localStorage.getItem("loggedIn") || "{}"
       ).id;
       await userApi.saveApplication(applicantProfile);
+      window.location.reload(); // Only reload after successful submission
     } catch (error) {
       console.error("Error saving application:", error);
     }
-
-    window.location.reload();
   };
 
   return (
@@ -506,6 +560,9 @@ export default function Lecturer() {
 
           <br />
           <br />
+          {error.applicationCannotSubmit && (
+            <p className="fieldsNotPopulated">{error.applicationCannotSubmit}</p>
+          )}
           <input
             data-testid="applyButton"
             type="button"
@@ -517,11 +574,7 @@ export default function Lecturer() {
               applicantProfile.skills.length == 0 ||
               applicantProfile.academics.length == 0
             }
-            onClick={() => {
-              //Call handleSubmit function, then reload the page.
-              handleSubmit();
-              window.location.reload();
-            }}
+            onClick={handleSubmit}
           />
         </div>
       </div>

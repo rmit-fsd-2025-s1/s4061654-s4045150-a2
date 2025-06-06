@@ -21,10 +21,10 @@ export class LecturerCourses {
   courseId: number;
 
   @ManyToOne(() => UserInformation)
-  @JoinColumn({ name: "lecturerId" })
+  @JoinColumn({ name: "lecturer_id" })
   lecturer: UserInformation;
 
   @ManyToOne(() => Courses)
-  @JoinColumn({ name: "courseId" })
+  @JoinColumn({ name: "course_id" })
   course: Courses;
 }
