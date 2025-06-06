@@ -226,6 +226,33 @@ export default function Lecturer() {
   const [selected, setSelected] = useState<{ [key: string]: boolean }>({});
   const [ranked, setRanked] = useState<{ [key: string]: boolean }>({});
 
+  // Sorting state
+  const [sortBy, setSortBy] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Helper to sort application-course pairs
+  const getSortedAppCoursePairs = () => {
+    // Flatten filteredTutors to [{ app, courseObj }]
+    const pairs = filteredTutors.flatMap((app) => {
+      const appliedCourses = normalizeCoursesApplied(app);
+      return appliedCourses.map((courseObj) => ({ app, courseObj }));
+    });
+    if (sortBy === "courseName") {
+      pairs.sort((a, b) => {
+        const cmp = a.courseObj.courseName.localeCompare(b.courseObj.courseName);
+        return sortOrder === "asc" ? cmp : -cmp;
+      });
+    } else if (sortBy === "availability") {
+      pairs.sort((a, b) => {
+        const availA = (a.app.availability || "").toLowerCase();
+        const availB = (b.app.availability || "").toLowerCase();
+        const cmp = availA.localeCompare(availB);
+        return sortOrder === "asc" ? cmp : -cmp;
+      });
+    }
+    return pairs;
+  };
+
   // Flattened structure for displaying in the dashboard
   const flattenedApps = tutorsList.flatMap((app) => {
     // Normalize to array of course objects
@@ -375,28 +402,54 @@ export default function Lecturer() {
       {/* Content Section */}
       <div className="dashboardContainer" style={{ padding: "0 2rem" }}>
         <div className="pageContentCenter">
-          {filteredTutors.length === 0 ? (
+          {/* Sort Buttons */}
+          <div style={{ marginBottom: "1rem", display: "flex", gap: "1rem", justifyContent: "center", alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => {
+                if (sortBy === "courseName") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("courseName");
+                  setSortOrder("asc");
+                }
+              }}
+            >
+              Sort by Course Name {sortBy === "courseName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (sortBy === "availability") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("availability");
+                  setSortOrder("asc");
+                }
+              }}
+            >
+              Sort by Availability {sortBy === "availability" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+            </button>
+          </div>
+          {getSortedAppCoursePairs().length === 0 ? (
             <p></p>
           ) : (
-            filteredTutors.flatMap((app) => {
-              const appliedCourses = normalizeCoursesApplied(app);
-              return appliedCourses.map((courseObj) => {
-          const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
-          return (
-            <ApplicationListCard
-              key={`${app.applicationID}-${courseObj.courseID}`}
-              name={fullName}
-              course={courseObj}
-              applicantId={app.applicant.userid}
-              position={app.position}
-              isSelected={false}
-              isRanked={false}
-              onToggleSelect={() => {}}
-              onToggleRank={() => {}}
-              handleShowInfo={handleShowInfo}
-            />
-          );
-              });
+            getSortedAppCoursePairs().map(({ app, courseObj }) => {
+              const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
+              return (
+                <ApplicationListCard
+                  key={`${app.applicationID}-${courseObj.courseID}`}
+                  name={fullName}
+                  course={courseObj}
+                  applicantId={app.applicant.userid}
+                  position={app.position}
+                  isSelected={false}
+                  isRanked={false}
+                  onToggleSelect={() => {}}
+                  onToggleRank={() => {}}
+                  handleShowInfo={handleShowInfo}
+                />
+              );
             })
           )}
         </div>
