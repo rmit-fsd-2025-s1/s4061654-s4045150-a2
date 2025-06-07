@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { client } from "./apollo-client";
 import { get } from "http";
+import BlockCandidate from "@/components/BlockCandidate";
 
 // GraphQL Queries
 
@@ -122,5 +123,76 @@ export const userApi = {
       variables: { username, password },
     });
     return data.adminLogin;
+  },
+
+  getAllLecturers: async (): Promise<any[]> => {
+    const { data } = await client.query({
+      query: gql`
+        query GetAllLecturers {
+          userInformation {
+            userid
+            firstName
+            lastName
+            role
+          }
+        }
+      `,
+    });
+    return data.userInformation.filter((user: any) => user.role == "Lecturer");
+  },
+
+  assignLecturerCourse: async (
+    lecturerId: number,
+    courseId: number
+  ): Promise<any> => {
+    const { data } = await client.mutate({
+      mutation: gql`
+        mutation AssignLecturerCourse($lecturerId: ID!, $courseId: ID!) {
+          assignLecturerCourse(lecturerId: $lecturerId, courseId: $courseId) {
+            rowId
+            lecturer {
+              userid
+            }
+            course {
+              courseID
+            }
+          }
+        }
+      `,
+      variables: { lecturerId, courseId },
+    });
+  },
+
+  getAllCandidates: async (): Promise<any[]> => {
+    const { data } = await client.query({
+      query: gql`
+        query GetAllCandidates {
+          userInformation {
+            userid
+            firstName
+            lastName
+            role
+            isBlocked
+          }
+        }
+      `,
+    });
+    return data.userInformation.filter(
+      (user: any) => user.role === "Candidate"
+    );
+  },
+
+  blockCandidate: async (userid: number, isBlocked: boolean): Promise<any> => {
+    const { data } = await client.mutate({
+      mutation: gql`
+        mutation BlockCandidate($userid: ID!, $isBlocked: Boolean!) {
+          blockCandidate(userid: $userid, isBlocked: $isBlocked) {
+            userid
+            isBlocked
+          }
+        }
+      `,
+      variables: { userid, isBlocked },
+    });
   },
 };

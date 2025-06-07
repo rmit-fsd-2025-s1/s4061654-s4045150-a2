@@ -1,64 +1,135 @@
-import React, { useEffect, useState } from "react";
 import { userApi } from "../services/api";
+import { useEffect, useState } from "react";
 
 export default function AddLecturerCourse() {
-  type LecturerCourses = {
-    rowId: number;
-    lecturer: {
-      userid: number;
-      firstName: string;
-      lastName: string;
-    };
-    course: {
-      courseID: number;
-      courseName: string;
-    };
+  type AllLecturers = {
+    userid: number;
+    firstName: string;
+    lastName: string;
+    role: string;
   };
 
-  const [lecturerCourses, setLecturerCourses] = useState<LecturerCourses[]>([]);
+  type AllCourses = {
+    courseID: number;
+    courseName: string;
+  };
+
+  const [allLecturers, setAllLecturers] = useState<AllLecturers[]>([]);
+  const [selectedLecturer, setSelectedLecturer] = useState<string>();
+  const [selectedCourse, setSelectedCourse] = useState<string>();
+  const [availableCourses, setAvailableCourses] = useState<AllCourses[]>();
+  // Add this state to store all lecturer-course assignments
+  const [lecturerCourses, setLecturerCourses] = useState<any[]>([]);
 
   useEffect(() => {
-    userApi.getLecturerCourses().then((data: LecturerCourses[]) => {
-      setLecturerCourses(data);
-    });
+    fetchLecturersAndCourses();
+    // Fetch all lecturer-course assignments
+    userApi.getLecturerCourses().then(setLecturerCourses);
   }, []);
 
-  return (
-    <div>
-      <div className="bg-white shadow rounded-lg p-6 w-full max-w-md h-full flex flex-col items-center justify-center min-h-screen">
-        <h2 className="text-xl font-semibold mb-4 text-black">
-          Lecturer Dashboard
-        </h2>
+  const fetchLecturersAndCourses = async () => {
+    try {
+      const response = await userApi.getAllLecturers();
+      setAllLecturers(response);
+    } catch (error) {
+      console.error("Error fetching lecturers:", error);
+    }
+    try {
+      const response = await userApi.getAllCourses();
+      setAvailableCourses(response);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
 
-        {lecturerCourses.length > 0 ? (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">
-                  Lecturer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-black">
-                  Course
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {lecturerCourses.map((lc) => (
-                <tr key={lc.rowId}>
-                  <td className="px-6 py-4 whitespace-nowrap text-black">
-                    {lc.lecturer.firstName} {lc.lecturer.lastName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-black">
-                    {lc.course.courseName}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-600">No courses assigned to lecturers.</p>
-        )}
-      </div>
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedLecturer) {
+      alert("Please select a lecturer.");
+      return;
+    }
+    if (!selectedCourse) {
+      alert("Please select a course.");
+      return;
+    }
+    // Validation: Check if this course is already assigned to this lecturer
+    const alreadyAssigned = lecturerCourses.some(
+      (lc) =>
+        lc.lecturer.userid.toString() === selectedLecturer &&
+        lc.course.courseID.toString() === selectedCourse
+    );
+    if (alreadyAssigned) {
+      alert("This course is already assigned to the selected lecturer.");
+      return;
+    }
+    try {
+      await userApi.assignLecturerCourse(
+        Number(selectedLecturer),
+        Number(selectedCourse)
+      );
+      alert("Course assigned to lecturer!");
+      window.location.reload();
+    } catch (error) {
+      alert("Error assigning course: " + error);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray display-inline-block">
+      <h1 className="text-2xl font-bold mb-4">Assign Lecturers to Courses</h1>
+      <form
+        className="w-full max-w-md bg-white p-6 rounded-lg shadow-md"
+        onSubmit={handleSubmit}
+      >
+        <div className="mb-4">
+          <label
+            className="block text-sm font-medium text-black mb-2"
+            htmlFor="lecturerName"
+          >
+            Lecturer
+          </label>
+          <select
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black"
+            id="lecturerName"
+            value={selectedLecturer}
+            onChange={(e) => setSelectedLecturer(e.target.value)}
+          >
+            <option value="">Select Lecturer</option>
+            {allLecturers.map((lecturer) => (
+              <option key={lecturer.userid} value={lecturer.userid.toString()}>
+                {lecturer.firstName} {lecturer.lastName}
+              </option>
+            ))}
+          </select>
+
+          <label
+            className="block text-sm font-medium text-black mb-2"
+            htmlFor="courseName"
+          >
+            Course
+          </label>
+          <select
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black"
+            id="courseName"
+            value={selectedCourse}
+            onChange={(e) => setSelectedCourse(e.target.value)}
+          >
+            <option value="">Select Courses</option>
+            {(availableCourses ?? []).map((course) => (
+              <option key={course.courseID} value={course.courseID.toString()}>
+                {course.courseName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-4"></div>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+        >
+          Add Course
+        </button>
+      </form>
     </div>
   );
 }

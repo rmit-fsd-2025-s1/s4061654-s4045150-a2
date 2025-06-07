@@ -33,5 +33,7 @@ export const typeDefs = gql`
     removeCourse(courseID: ID!): Boolean!
     editCourse(courseID: ID!, courseName: String!): Courses!
     adminLogin(username: String!, password: String!): Boolean!
+    assignLecturerCourse(lecturerId: ID!, courseId: ID!): LecturerCourse!
+    blockCandidate(userid: ID!, isBlocked: Boolean!): UserInformation!
   }
 `;

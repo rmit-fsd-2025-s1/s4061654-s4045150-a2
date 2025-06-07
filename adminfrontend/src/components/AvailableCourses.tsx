@@ -34,7 +34,7 @@ export default function AvailableCourses() {
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6 w-full max-w-md h-full flex flex-col items-center justify-center min-h-screen ">
+    <div className="bg-white shadow rounded-lg p-6 w-full max-w-md h-full flex flex-col items-center justify-center min-h-screen display-inline-block">
       <h2 className="text-xl font-semibold mb-4 text-black">
         Available Courses
       </h2>

@@ -94,6 +94,48 @@ export const resolvers = {
         return false;
       }
     },
+
+    assignLecturerCourse: async (
+      _: any,
+      { lecturerId, courseId }: { lecturerId: string; courseId: string }
+    ) => {
+      const lecturer = await userInformationRepository.findOne({
+        where: { userid: parseInt(lecturerId) },
+      });
+      const course = await coursesRepository.findOne({
+        where: { courseID: parseInt(courseId) },
+      });
+
+      if (!lecturer || !course) {
+        throw new Error("Lecturer or Course not found");
+      }
+
+      const lecturerCourse = lecturerCoursesRepository.create({
+        lecturer,
+        course,
+      });
+      return await lecturerCoursesRepository.save(lecturerCourse);
+    },
+
+    blockCandidate: async (
+      _: any,
+      { userid, isBlocked }: { userid: string; isBlocked: boolean }
+    ) => {
+      const userId = parseInt(userid);
+      let user = await userInformationRepository.findOne({
+        where: { userid: userId },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      user.isBlocked = isBlocked;
+      await userInformationRepository.save(user);
+
+      user = await userInformationRepository.findOne({
+        where: { userid: userId },
+      });
+      return user;
+    },
   },
 
   //   updateProfile: async (
