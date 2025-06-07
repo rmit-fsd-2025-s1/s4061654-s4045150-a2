@@ -94,6 +94,28 @@ export const resolvers = {
         return false;
       }
     },
+
+    assignLecturerCourse: async (
+      _: any,
+      { lecturerId, courseId }: { lecturerId: string; courseId: string }
+    ) => {
+      const lecturer = await userInformationRepository.findOne({
+        where: { userid: parseInt(lecturerId) },
+      });
+      const course = await coursesRepository.findOne({
+        where: { courseID: parseInt(courseId) },
+      });
+
+      if (!lecturer || !course) {
+        throw new Error("Lecturer or Course not found");
+      }
+
+      const lecturerCourse = lecturerCoursesRepository.create({
+        lecturer,
+        course,
+      });
+      return await lecturerCoursesRepository.save(lecturerCourse);
+    },
   },
 
   //   updateProfile: async (

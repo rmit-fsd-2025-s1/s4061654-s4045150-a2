@@ -16,7 +16,7 @@ export default function AddCourses() {
     window.location.reload();
   };
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray display-inline-block">
       <h1 className="text-2xl font-bold mb-4">Add Courses</h1>
       <form className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <div className="mb-4">

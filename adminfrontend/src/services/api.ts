@@ -123,4 +123,42 @@ export const userApi = {
     });
     return data.adminLogin;
   },
+
+  getAllLecturers: async (): Promise<any[]> => {
+    const { data } = await client.query({
+      query: gql`
+        query GetAllLecturers {
+          userInformation {
+            userid
+            firstName
+            lastName
+            role
+          }
+        }
+      `,
+    });
+    return data.userInformation.filter((user: any) => user.role == "Lecturer");
+  },
+
+  assignLecturerCourse: async (
+    lecturerId: number,
+    courseId: number
+  ): Promise<any> => {
+    const { data } = await client.mutate({
+      mutation: gql`
+        mutation AssignLecturerCourse($lecturerId: ID!, $courseId: ID!) {
+          assignLecturerCourse(lecturerId: $lecturerId, courseId: $courseId) {
+            rowId
+            lecturer {
+              userid
+            }
+            course {
+              courseID
+            }
+          }
+        }
+      `,
+      variables: { lecturerId, courseId },
+    });
+  },
 };
