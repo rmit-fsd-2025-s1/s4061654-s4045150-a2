@@ -1,21 +1,31 @@
-import React, { useEffect, useState } from "react";
-
 import ShowLecturerCourses from "../components/ShowLecturerCourses";
 import AddCourses from "../components/AddCourses";
 import AvailableCourses from "../components/AvailableCourses";
 import AddLecturerCourse from "../components/AddLecturerCourse";
 import BlockCandidate from "../components/BlockCandidate";
 import ShowBlockedCandidates from "../components/ShowBlockedCandidates";
-
+import ChosenEach from "../components/ChosenCandidatesEach";
+import MoreThanThreeChosen from "../components/MoreThanThreeChosen";
+import NeverChosen from "../components/NeverChosen";
 export default function Lecturer() {
   return (
-    <div>
-      <AddCourses />
-      <AvailableCourses />
-      <ShowLecturerCourses />
-      <AddLecturerCourse />
+    <div className="flex flex-row min-h-screen bg-gray-100">
+      {/* Left Column */}
+      <div className="w-1/3 p-4 space-y-6">
+        <AddCourses />
+        <AvailableCourses />
+        <AddLecturerCourse />
+      </div>
+      {/* Center Column */}
+      <div className="w-2/3 p-4 flex justify-center items-start">
+        <ShowLecturerCourses />
+      </div>
+
       <BlockCandidate />
       <ShowBlockedCandidates />
+      <ChosenEach />
+      <MoreThanThreeChosen />
+      <NeverChosen />
     </div>
   );
 }

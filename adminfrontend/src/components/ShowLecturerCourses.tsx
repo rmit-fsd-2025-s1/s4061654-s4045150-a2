@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { userApi } from "../services/api";
-import Lecturer from "@/pages/lecturer";
 
 export default function AddLecturerCourse() {
   type LecturerCourses = {

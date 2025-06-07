@@ -34,61 +34,71 @@ export default function AvailableCourses() {
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6 w-full max-w-md h-full flex flex-col items-center justify-center min-h-screen display-inline-block">
-      <h2 className="text-xl font-semibold mb-4 text-black">
-        Available Courses
-      </h2>
-      <p className="text-gray-600">List of courses available for applicants.</p>
-
-      {courses.map((c) =>
-        editingCourseId === c.courseID ? (
-          <div key={c.courseID}>
-            <input
-              type="text"
-              value={editCourseName}
-              onChange={(e) => setEditCourseName(e.target.value)}
-              className="border p-2 mt-2 w-full text-black"
-            />
-            <button
-              className="text-black border p-2"
-              onClick={() => handleRemoveCourse(c.courseID)}
+    <div className="min-h-screen bg-gray-100 flex items-start justify-start px-10 py-10">
+      <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-2 text-black">
+          Available Courses
+        </h2>
+        <p className="text-gray-600 mb-4">
+          List of courses available for applicants.
+        </p>
+        {courses.map((c) =>
+          editingCourseId === c.courseID ? (
+            <div key={c.courseID} className="mb-4">
+              <input
+                type="text"
+                value={editCourseName}
+                onChange={(e) => setEditCourseName(e.target.value)}
+                className="border p-2 w-full text-black mb-2"
+              />
+              <div className="flex gap-2">
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  onClick={() => handleRemoveCourse(c.courseID)}
+                >
+                  Remove
+                </button>
+                <button
+                  className="bg-green-500 text-white px-3 py-1 rounded"
+                  onClick={() => saveEditCourse(c.courseID)}
+                >
+                  Save
+                </button>
+                <button
+                  className="bg-gray-400 text-white px-3 py-1 rounded"
+                  onClick={() => {
+                    setEditingCourseId(null);
+                    setEditCourseName("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              key={c.courseID}
+              className="mb-4 border-b border-gray-200 pb-2"
             >
-              Remove
-            </button>
-            <button
-              className="text-black border p-2"
-              onClick={() => saveEditCourse(c.courseID)}
-            >
-              Save
-            </button>
-            <button
-              className="text-black border p-2"
-              onClick={() => {
-                setEditingCourseId(null);
-                setEditCourseName("");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <div key={c.courseID} className="border-b border-gray-200 py-4">
-            <h3 className="text-lg font-medium text-black">{c.courseName}</h3>
-            <button
-              className="text-black border p-2"
-              onClick={() => handleRemoveCourse(c.courseID)}
-            >
-              Remove
-            </button>
-            <button
-              className="text-black border p-2"
-              onClick={() => startEditCourse(c.courseID)}
-            >
-              Edit
-            </button>
-          </div>
-        )
-      )}
+              <h3 className="text-lg font-medium text-black">{c.courseName}</h3>
+              <div className="flex gap-2 mt-2">
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  onClick={() => handleRemoveCourse(c.courseID)}
+                >
+                  Remove
+                </button>
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded"
+                  onClick={() => startEditCourse(c.courseID)}
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+          )
+        )}
+      </div>
     </div>
   );
 }

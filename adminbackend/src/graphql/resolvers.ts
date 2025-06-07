@@ -9,6 +9,11 @@ import { Selections } from "../entity/Selections";
 import { Rankings } from "../entity/Rankings";
 import { Comments } from "../entity/Comments";
 import { course } from "../types/course";
+import { get } from "http";
+
+// import { PubSub } from "graphql-subscriptions";
+// const pubsub = new PubSub();
+// const CANDIDATE_UNAVAILABLE = "CANDIDATE_UNAVAILABLE";
 
 const userInformationRepository = AppDataSource.getRepository(UserInformation);
 const applicationsRepository = AppDataSource.getRepository(Applications);
@@ -36,6 +41,47 @@ export const resolvers = {
       return await lecturerCoursesRepository.find({
         relations: ["lecturer", "course"],
       });
+    },
+
+    getChosenCandidatesByCourse: async () => {
+      const selections = await selectionsRepository.find({
+        relations: [
+          "application",
+          "application.applicant",
+          "application.applicantCourses",
+          "application.applicantCourses.course",
+        ],
+      });
+
+      const coursesWithCandidates: {
+        courseID: number;
+        courseName: string;
+        candidates: string[];
+      }[] = [];
+
+      selections.forEach((s) => {
+        s.application.applicantCourses.forEach((applicationCourse) => {
+          const course = applicationCourse.course;
+          let courseEntry = coursesWithCandidates.find(
+            (c) => c.courseID === course.courseID
+          );
+          if (!courseEntry) {
+            courseEntry = {
+              courseID: course.courseID,
+              courseName: course.courseName,
+              candidates: [],
+            };
+            coursesWithCandidates.push(courseEntry);
+          }
+
+          const fullName = `${s.application.applicant.firstName} ${s.application.applicant.lastName}`;
+          if (!courseEntry.candidates.includes(fullName)) {
+            courseEntry.candidates.push(fullName);
+          }
+        });
+      });
+
+      return coursesWithCandidates;
     },
   },
 
@@ -138,6 +184,12 @@ export const resolvers = {
     },
   },
 
+  // Subscription: {
+  //   candidateUnavailable: {
+  //     subscribe: () => pubsub.asyncIterator([CANDIDATE_UNAVAILABLE]),
+  //   },
+  // },
+
   //   updateProfile: async (
   //     _: any,
   //     { id, ...args }: { id: string } & Partial<Profile>
@@ -196,5 +248,17 @@ export const resolvers = {
   //     );
   //     return await profileRepository.save(profile);
   //   },
-  // },
+  // };
+
+  // When a candidate becomes unavailable, publish the event:
+  //   export const notifyCandidateUnavailable = (candidate) => {
+  //     pubsub.publish(CANDIDATE_UNAVAILABLE, {
+  //       candidateUnavailable: {
+  //         candidateId: candidate.userid,
+  //         name: `${candidate.firstName} ${candidate.lastName}`,
+  //         reason: "Candidate is unavailable for hiring at the start of the semester.",
+  //       },
+  //     });
+  //   };
+  // };
 };

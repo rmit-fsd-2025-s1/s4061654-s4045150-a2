@@ -1,7 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import AddCourses from "../components/AddCourses";
-import AvailableCourses from "../components/AvailableCourses";
+
 import AdminLogin from "../components/AdminLogin";
 
 type UserInformation = {
