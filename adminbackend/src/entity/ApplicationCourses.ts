@@ -7,11 +7,15 @@ export class ApplicationCourses {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Courses, (course) => course.applicantCourses, { onDelete: "CASCADE" })
+  @ManyToOne(() => Courses, (course) => course.applicantCourses, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "courseID" })
   course: Courses;
 
-  @ManyToOne(() => Applications, (app) => app.applicantCourses, { onDelete: "CASCADE" })
+  @ManyToOne(() => Applications, (app) => app.applicantCourses, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "applicationID" })
   application: Applications;
 }

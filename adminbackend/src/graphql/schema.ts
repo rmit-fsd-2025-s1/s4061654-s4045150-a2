@@ -21,11 +21,28 @@ export const typeDefs = gql`
     courseName: String!
   }
 
+  type CourseWithCandidates {
+    courseID: ID!
+    courseName: String!
+    candidates: [String!]!
+  }
+
+  type Subscription {
+    candidateUnavailable: CandidateUnavailablePayload!
+  }
+
+  type CandidateUnavailablePayload {
+    candidateId: ID!
+    name: String!
+    reason: String
+  }
+
   type Query {
     lecturerCourses: [LecturerCourse!]!
     userInformation: [UserInformation!]!
     getAllCourses: [Courses!]!
     getLecturerCourses: [LecturerCourse!]!
+    getChosenCandidatesByCourse: [CourseWithCandidates!]!
   }
 
   type Mutation {

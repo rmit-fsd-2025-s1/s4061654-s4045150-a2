@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
 import { client } from "./apollo-client";
-import { get } from "http";
-import BlockCandidate from "@/components/BlockCandidate";
 
 // GraphQL Queries
 
@@ -194,5 +192,20 @@ export const userApi = {
       `,
       variables: { userid, isBlocked },
     });
+  },
+
+  getChosenCandidatesByCourse: async (): Promise<any[]> => {
+    const { data } = await client.query({
+      query: gql`
+        query GetChosenCandidatesByCourse {
+          getChosenCandidatesByCourse {
+            courseID
+            courseName
+            candidates
+          }
+        }
+      `,
+    });
+    return data.getChosenCandidatesByCourse;
   },
 };

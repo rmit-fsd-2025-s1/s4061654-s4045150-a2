@@ -2,6 +2,19 @@ import { userApi } from "../services/api";
 import { useEffect, useState } from "react";
 
 export default function AddLecturerCourse() {
+  type LecturerCourses = {
+    rowId: number;
+    lecturer: {
+      userid: number;
+      firstName: string;
+      lastName: string;
+      role: string;
+    };
+    course: {
+      courseID: number;
+      courseName: string;
+    };
+  };
   type AllLecturers = {
     userid: number;
     firstName: string;
@@ -19,7 +32,7 @@ export default function AddLecturerCourse() {
   const [selectedCourse, setSelectedCourse] = useState<string>();
   const [availableCourses, setAvailableCourses] = useState<AllCourses[]>();
   // Add this state to store all lecturer-course assignments
-  const [lecturerCourses, setLecturerCourses] = useState<any[]>([]);
+  const [lecturerCourses, setLecturerCourses] = useState<LecturerCourses[]>([]);
 
   useEffect(() => {
     fetchLecturersAndCourses();
