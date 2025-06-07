@@ -121,11 +121,18 @@ export class UserController {
         .status(401)
         .json({ message: "Invalid credentials provided" });
     }
+
     const passwordMatches = compareSync(password, user.password);
     if (!passwordMatches) {
       return response
         .status(401)
         .json({ message: "Invalid credentials provided" });
+    }
+
+    if (user.isBlocked) {
+      return response
+        .status(403)
+        .json({ message: "User is blocked. Access denied." });
     }
 
     return response.json({

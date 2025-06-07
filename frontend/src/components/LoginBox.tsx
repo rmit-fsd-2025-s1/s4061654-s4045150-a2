@@ -53,22 +53,24 @@ export default function login() {
 
       if (validateEmail(loginData.email)) {
         const successLogin = await login(loginData.email, loginData.password);
+
         if (!successLogin) {
           setErrors((prev) => ({
             ...prev,
             email: "Incorrect email or password.",
           }));
+          return;
+        }
+
+        // Get user info from context or localStorage
+        const loggedInUser = JSON.parse(
+          localStorage.getItem("loggedIn") || "{}"
+        );
+        setSuccess(`Welcome ${loggedInUser.name}! Redirecting...`);
+        if (loggedInUser.role === "Candidate") {
+          router.push("/candidate");
         } else {
-          // Get user info from context or localStorage
-          const loggedInUser = JSON.parse(
-            localStorage.getItem("loggedIn") || "{}"
-          );
-          setSuccess(`Welcome ${loggedInUser.name}! Redirecting...`);
-          if (loggedInUser.role === "Candidate") {
-            router.push("/candidate");
-          } else {
-            router.push("/lecturer");
-          }
+          router.push("/lecturer");
         }
       } else {
         setErrors((prev) => ({

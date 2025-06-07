@@ -15,12 +15,16 @@ export default function AddLecturerCourse() {
   };
 
   const [allLecturers, setAllLecturers] = useState<AllLecturers[]>([]);
-  const [selectedLecturer, setSelectedLecturer] = useState<number>();
-  const [selectedCourse, setSelectedCourse] = useState<number>();
+  const [selectedLecturer, setSelectedLecturer] = useState<string>();
+  const [selectedCourse, setSelectedCourse] = useState<string>();
   const [availableCourses, setAvailableCourses] = useState<AllCourses[]>();
+  // Add this state to store all lecturer-course assignments
+  const [lecturerCourses, setLecturerCourses] = useState<any[]>([]);
 
   useEffect(() => {
     fetchLecturersAndCourses();
+    // Fetch all lecturer-course assignments
+    userApi.getLecturerCourses().then(setLecturerCourses);
   }, []);
 
   const fetchLecturersAndCourses = async () => {
@@ -48,8 +52,21 @@ export default function AddLecturerCourse() {
       alert("Please select a course.");
       return;
     }
+    // Validation: Check if this course is already assigned to this lecturer
+    const alreadyAssigned = lecturerCourses.some(
+      (lc) =>
+        lc.lecturer.userid.toString() === selectedLecturer &&
+        lc.course.courseID.toString() === selectedCourse
+    );
+    if (alreadyAssigned) {
+      alert("This course is already assigned to the selected lecturer.");
+      return;
+    }
     try {
-      await userApi.assignLecturerCourse(selectedLecturer, selectedCourse);
+      await userApi.assignLecturerCourse(
+        Number(selectedLecturer),
+        Number(selectedCourse)
+      );
       alert("Course assigned to lecturer!");
       window.location.reload();
     } catch (error) {
@@ -74,12 +91,12 @@ export default function AddLecturerCourse() {
           <select
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black"
             id="lecturerName"
-            value={selectedLecturer?.toString() || ""}
-            onChange={(e) => setSelectedLecturer(Number(e.target.value))}
+            value={selectedLecturer}
+            onChange={(e) => setSelectedLecturer(e.target.value)}
           >
             <option value="">Select Lecturer</option>
             {allLecturers.map((lecturer) => (
-              <option key={lecturer.userid} value={lecturer.userid}>
+              <option key={lecturer.userid} value={lecturer.userid.toString()}>
                 {lecturer.firstName} {lecturer.lastName}
               </option>
             ))}
@@ -94,12 +111,12 @@ export default function AddLecturerCourse() {
           <select
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black"
             id="courseName"
-            value={selectedCourse?.toString() || ""}
-            onChange={(e) => setSelectedCourse(Number(e.target.value))}
+            value={selectedCourse}
+            onChange={(e) => setSelectedCourse(e.target.value)}
           >
             <option value="">Select Courses</option>
             {(availableCourses ?? []).map((course) => (
-              <option key={course.courseID} value={course.courseID}>
+              <option key={course.courseID} value={course.courseID.toString()}>
                 {course.courseName}
               </option>
             ))}

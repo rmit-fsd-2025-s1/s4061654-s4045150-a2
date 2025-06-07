@@ -116,6 +116,26 @@ export const resolvers = {
       });
       return await lecturerCoursesRepository.save(lecturerCourse);
     },
+
+    blockCandidate: async (
+      _: any,
+      { userid, isBlocked }: { userid: string; isBlocked: boolean }
+    ) => {
+      const userId = parseInt(userid);
+      let user = await userInformationRepository.findOne({
+        where: { userid: userId },
+      });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      user.isBlocked = isBlocked;
+      await userInformationRepository.save(user);
+
+      user = await userInformationRepository.findOne({
+        where: { userid: userId },
+      });
+      return user;
+    },
   },
 
   //   updateProfile: async (
