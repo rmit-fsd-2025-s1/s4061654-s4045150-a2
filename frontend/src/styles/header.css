@@ -30,11 +30,19 @@
 .background-container h2 {
   color: white;
   outline: black;
-  text-shadow: 1px;
   font-size: 4rem;
   text-shadow:
     2px 2px 4px rgba(0, 0, 0, 0.6),
     -2px -2px 4px rgba(0, 0, 0, 0.6);
+  background: none !important;
+  border-radius: 0;
+  padding: 0;
+}
+
+.aim-testimonials h2 {
+  background: none !important;
+  border-radius: 0;
+  padding: 0;
 }
 
 .header {
@@ -46,9 +54,10 @@
 
 .header h1, .header h2 {
   color: #222;
-  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
+  background: none;
   border-radius: 6px;
   padding: 0.2em 0.5em;
+  text-decoration: none;
 }
 
 .header-text {

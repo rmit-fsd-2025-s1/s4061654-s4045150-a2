@@ -9,7 +9,7 @@
 }
 
 .navbar a, .navbar button {
-  color: #bfa600;
+  color: #111;
   background: transparent;
   border: none;
   font-weight: bold;
@@ -36,8 +36,14 @@
 
 .leftLinks a,
 .rightLinks a {
-  color: white;
+  color: #111;
   text-decoration: none;
+  margin-right: 18px;
+}
+
+.leftLinks a:last-child,
+.rightLinks a:last-child {
+  margin-right: 0;
 }
 
 .leftLinks a:hover,
@@ -78,4 +84,39 @@
   align-items: center;
   gap: 10px;
   font-size: 1.2rem;
+}
+
+.userWelcome button {
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  background-color: #f7e9b0; /* slightly different from navbar background */
+  border: 2px solid #bfa600;
+  border-radius: 5px;
+  color: #111;
+  font-weight: bold;
+  transition: background 0.2s, color 0.2s;
+  margin-left: 6px;
+}
+
+.userWelcome button:hover {
+  background-color: #fffbe6;
+  color: #222;
+}
+
+.signoutBox {
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  background-color: #f7e9b0;
+  border: 2px solid #bfa600;
+  border-radius: 5px;
+  color: #111;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s, color 0.2s;
+  margin-left: 6px;
+}
+
+.signoutBox:hover {
+  background-color: #fffbe6;
+  color: #222;
 }

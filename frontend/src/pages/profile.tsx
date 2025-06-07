@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import { userApi } from "@/services/api";
 import { UserInformation } from "../types/loginCreds";
 import { useEffect } from "react";
+import "../styles/profile.css"; // Import the CSS file for styling
 
 export default function profile() {
   const [user, setUser] = React.useState<UserInformation | null>(null);
@@ -25,12 +26,28 @@ export default function profile() {
   }, []);
 
   return (
-    <div>
-      <Nav />;<h1>Profile</h1>
-      <p>Name: {user?.firstName}</p>
-      <p>Email: {user?.email}</p>
-      <p>About: {user?.about}</p>
-      <Footer />;
+    <div className="profile-page-bg">
+      <Nav />
+      <div className="profile-center">
+        <div className="profile-card">
+          <h1 className="profile-title">Profile</h1>
+          <div className="profile-info">
+            <strong>Name:</strong>{" "}
+            <span>
+              {user?.firstName} {user?.lastName}
+            </span>
+          </div>
+          <div className="profile-info">
+            <strong>Email:</strong>{" "}
+            <span>{user?.email}</span>
+          </div>
+          <div className="profile-info">
+            <strong>About:</strong>{" "}
+            <span>{user?.about || "—"}</span>
+          </div>
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 }
