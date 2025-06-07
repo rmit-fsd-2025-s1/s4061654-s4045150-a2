@@ -32,7 +32,7 @@ export class UserInformation {
   @Column()
   about: string;
 
-  @Column()
+  @Column({ default: false })
   isBlocked: boolean;
 
   @CreateDateColumn()
@@ -41,9 +41,6 @@ export class UserInformation {
   @OneToMany(() => Applications, (app) => app.applicant)
   applications: Applications[];
 
-  @OneToMany(
-    () => LecturerCourses,
-    (lecturerCourse) => lecturerCourse.lecturer
-  )
+  @OneToMany(() => LecturerCourses, (lecturerCourse) => lecturerCourse.lecturer)
   lecturerCourses: LecturerCourses[];
 }

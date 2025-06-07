@@ -111,4 +111,16 @@ export const userApi = {
     });
     return data.getLecturerCourses;
   },
+
+  adminLogin: async (username: string, password: string): Promise<any> => {
+    const { data } = await client.mutate({
+      mutation: gql`
+        mutation AdminLogin($username: String!, $password: String!) {
+          adminLogin(username: $username, password: $password)
+        }
+      `,
+      variables: { username, password },
+    });
+    return data.adminLogin;
+  },
 };

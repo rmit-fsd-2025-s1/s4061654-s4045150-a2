@@ -15,8 +15,7 @@ export default function Home() {
     <div>
       <Header />
       <div className="flex gap-6 w-full max-w-6xl mx-auto">
-        <AddCourses />
-        <AvailableCourses />
+        <AdminLogin />
       </div>
 
       <Footer />
