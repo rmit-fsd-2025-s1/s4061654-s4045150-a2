@@ -1,14 +1,21 @@
 .footer {
-    background-color: #0d1e31;
-    color: white;
+    background: #fffbe6;
+    color: #222;
+    border-top: 2px solid #f7e9b0;
+    padding: 16px 0;
     text-align: center;
-    padding: 10px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
   }
   
   .footer p {
     margin: 0;
     font-size: 14px;
+  }
+  
+  .footer a {
+    color: #bfa600;
+  }
+  
+  .footer a:hover {
+    color: #222;
+    background: #f7e9b0;
   }

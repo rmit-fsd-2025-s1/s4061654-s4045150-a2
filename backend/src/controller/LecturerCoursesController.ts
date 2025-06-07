@@ -19,7 +19,9 @@ export const LecturerController = {
   // Get courses for one lecturer (with course name)
   getLecturerCoursesById: async (req: Request, res: Response) => {
     const lecturerId = parseInt(req.params.lecturerId);
-
+    if (isNaN(lecturerId)) {
+      return res.status(400).json({ message: "Invalid lecturerId" });
+    }
     try {
       const lecturerCourses = await lecturerRepo.find({
         where: { lecturerId: lecturerId },

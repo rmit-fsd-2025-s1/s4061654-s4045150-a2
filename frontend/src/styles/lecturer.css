@@ -1,15 +1,19 @@
 .pageHeader {
-  background: #66a3ff;
+  background: #f5f5f5;
   padding: 10px;
   text-align: center;
+  border-bottom: 2px solid #e0e0e0;
 }
 
 h1 {
   font-size: 2rem;
-  color: #002244;
+  color: #222;
   margin-bottom: 20px;
   text-decoration: underline;
   font-weight: bold;
+  background: linear-gradient(90deg, #f5f5f5 60%, #e0e0e0 100%);
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
 }
 
 .filterBar {
@@ -19,7 +23,8 @@ h1 {
   align-items: stretch;
   justify-content: flex-start;
   padding: 16px 24px;
-  background: #66a3ff;
+  background: #f8fafc;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .filterRow {
@@ -30,29 +35,19 @@ h1 {
   margin-bottom: 0;
 }
 
-.filterItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .filterItem p {
   margin: 0;
   font-weight: bold;
   color: #003366;
 }
 
-.filterItem select {
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-width: 160px;
-}
-
+.filterItem select,
 .filterItem input[type="text"] {
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid #bdbdbd;
+  background: #fff;
+  color: #222;
 }
 
 .filterItem label {
@@ -60,18 +55,20 @@ h1 {
   display: flex;
   align-items: center;
   gap: 4px;
+  color: #003366;
 }
 
 .dropdown summary {
   cursor: pointer;
   font-weight: bold;
+  color: #003366;
 }
 
 .dropdownContent {
   display: flex;
   flex-direction: column;
-  background-color: #66a3ff;
-  border: 2px solid #002244;
+  background-color: #e3f2fd;
+  border: 2px solid #90caf9;
   padding: 8px;
   max-height: 200px;
   overflow-y: auto;
@@ -85,26 +82,29 @@ h1 {
   justify-content: space-between;
   padding: 20px;
   gap: 20px;
+  background: #fafafa;
 }
 
 .pageContentCenter {
   width: 60%;
-  background: linear-gradient(135deg, #59a2d0, #2f4058);
+  background: #fff;
   border-radius: 10px;
+  box-shadow: 0 2px 8px #0001;
 }
 
 .pageContentRight {
   width: 40%;
   padding: 10px;
   text-align: center;
-  background-color: #0f0f0f;
-  border-left: 1px solid #002244;
+  background-color: #222c36;
+  border-left: 1px solid #bdbdbd;
   max-height: 525px;
   min-height: 500px;
   overflow: auto;
   word-wrap: break-word;
   word-break: break-word;
   border-radius: 10px;
+  color: #fff;
 }
 
 .tutorApplications {
@@ -119,16 +119,16 @@ h1 {
 }
 
 .tutorCard {
-  border: 1px solid #002244;
+  border: 1px solid #90caf9;
   border-radius: 10px;
   min-width: 444px;
-  box-shadow: 5px 5px 5px hsla(0, 0%, 0%, 0.1);
+  box-shadow: 5px 5px 5px #0001;
   padding: 10px;
   margin: 5px;
   display: inline-block;
   box-sizing: border-box;
-  /* background: linear-gradient(135deg, #080d10, #142127); */
-  background-color: #1e293b;
+  background-color: #e3f2fd;
+  color: #003366;
 }
 
 .selectedCandidates {
@@ -137,10 +137,11 @@ h1 {
 }
 
 .credSkills {
-  background-color: hsla(207, 67%, 49%, 0.1);
+  background-color: #f0f4c3;
   padding: 10px;
   border-radius: 10px;
   display: inline-block;
+  color: #222;
 }
 
 .inline-name {
@@ -149,7 +150,7 @@ h1 {
 }
 
 .availabilityLabel {
-  color: #003366;
+  color: #388e3c;
   font-weight: bold;
 }
 
@@ -164,30 +165,31 @@ h1 {
   justify-content: space-between;
   gap: 20px;
   padding: 20px;
-  background-color: #b9e2e9;
+  background-color: #fffde7;
 }
 
 .candidate-box {
   flex: 1;
-  border: 1px solid #ccc;
+  border: 1px solid #bdbdbd;
   border-radius: 8px;
   padding: 15px;
-  background-color: #bda5a5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  box-shadow: 0 2px 8px #0001;
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  color: #222;
 }
 
 .candidate-box h3 {
   text-align: center;
   font-size: 1.2rem;
-  color: #333;
+  color: #388e3c;
 }
 
 .candidate-box p {
   text-align: center;
-  color: #666;
+  color: #444;
   font-size: 1rem;
 }
 
@@ -196,7 +198,7 @@ h1 {
   list-style-position: inside;
   padding-left: 20px;
   text-align: center;
-  color: #666;
+  color: #444;
   padding-left: 37;
   margin-left: 0;
 }
@@ -205,37 +207,38 @@ h1 {
   list-style-position: inside;
   padding-left: 20px;
   text-align: center;
-  color: #666;
+  color: #444;
   padding-right: 70;
   margin-left: 0;
 }
 
 .ranking {
-  background-color: #e1f5fe;
-  min-height: 120px;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
-.most-selected {
-  background-color: #c8e6c9;
-  min-height: 120px;
-  max-height: 120px;
-  color: #666;
-}
-
-.least-selected {
-  background-color: #ffecb3;
-  min-height: 120px;
-  max-height: 120px;
-  color: #666;
-}
-
-.not-chosen {
   background-color: #f0f4c3;
   min-height: 120px;
   max-height: 120px;
-  color: #666;
+  overflow-y: auto;
+  color: #222;
+}
+
+.most-selected {
+  background-color: #fff9c4;
+  min-height: 120px;
+  max-height: 120px;
+  color: #222;
+}
+
+.least-selected {
+  background-color: #e3f2fd;
+  min-height: 120px;
+  max-height: 120px;
+  color: #003366;
+}
+
+.not-chosen {
+  background-color: #f8bbd0;
+  min-height: 120px;
+  max-height: 120px;
+  color: #880e4f;
   overflow-y: auto;
   text-align: center;
 }
@@ -250,16 +253,17 @@ h1 {
 
 .sortButton {
   padding: 6px 10px;
-  border: 1px solid #003366;
-  background-color: white;
+  border: 1px solid #bdbdbd;
+  background-color: #fff;
   color: #003366;
   cursor: pointer;
   border-radius: 4px;
+  font-weight: bold;
 }
 
 .sortButton:hover {
-  background-color: #003366;
-  color: white;
+  background-color: #e3f2fd;
+  color: #222;
 }
 
 ul {
@@ -271,10 +275,12 @@ ul {
 .analyticsSection {
   max-width: 700px;
   margin: 2rem auto;
-  background: #f8fafd;
+  background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 8px #00336622;
+  box-shadow: 0 2px 8px #0001;
   padding: 24px;
+  color: #222;
+  border: 1px solid #e0e0e0;
 }
 
 .analyticsSummary {
@@ -288,6 +294,7 @@ ul {
 
 .rankingsSection h3 {
   text-align: center;
+  color: #388e3c;
 }
 
 .rankingsSection ol {

@@ -1,15 +1,17 @@
 button {
   padding: 6px 10px;
-  border: 1px solid #003366;
-  background-color: white;
-  color: #003366;
+  border: 1px solid #e6dca7;
+  background-color: #fffbe6;
+  color: #bfa600;
   cursor: pointer;
   border-radius: 4px;
+  font-weight: bold;
+  transition: background 0.2s, color 0.2s;
 }
 
 button:hover {
-  background-color: #003366;
-  color: white;
+  background-color: #f7e9b0;
+  color: #222;
 }
 
 .rankButton:disabled {

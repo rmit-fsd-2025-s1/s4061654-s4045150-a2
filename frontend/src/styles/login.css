@@ -21,6 +21,14 @@ body {
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.loginContainer {
+  background: #fffbe6;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 32px;
+  color: #222;
+}
   
 .login-container {
     display: flex;
@@ -38,7 +46,7 @@ body {
     font-weight: bold;
     display: block;
     margin-top: 10px;
-    color: black;
+    color: #bfa600;
 }
 
 .loginprot input[type="text"],
@@ -46,24 +54,27 @@ body {
     width: 90%;  
     padding: 10px;
     margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #e6dca7;
+    border-radius: 4px;
+    background: #fff;
+    color: #222;
 }
 
 .loginprot input[type="submit"] {
     width: 100%;
     padding: 12px;
     margin-top: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #0d1e31;
-    color: white;
+    border: 1px solid #e6dca7;
+    border-radius: 4px;
+    background-color: #fffbe6;
+    color: #bfa600;
     font-size: 16px;
     cursor: pointer;
 }
 
 .loginprot input[type="submit"]:hover {
-    background-color: #142d4c;
+    background: #f7e9b0;
+    color: #222;
 }
 
 .error {
@@ -77,4 +88,10 @@ body {
     font-size: 16px;
     margin-top: 10px;
 }
-  
+
+h1, h2, h3 {
+  color: #222;
+  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
+}

@@ -37,6 +37,20 @@
     -2px -2px 4px rgba(0, 0, 0, 0.6);
 }
 
+.header {
+  background: #fffbe6;
+  border-bottom: 2px solid #f7e9b0;
+  color: #222;
+  padding: 16px 0;
+}
+
+.header h1, .header h2 {
+  color: #222;
+  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
+}
+
 .header-text {
   font-size: 1rem;
   color: white;

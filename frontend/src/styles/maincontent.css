@@ -1,11 +1,11 @@
 .aim-testimonials {
   background: linear-gradient(
     135deg,
-    #e6f7ff,
-    #b3d9ff,
-    #99c2ff,
-    #80b3ff,
-    #66a3ff
+    #f7f7f7,
+    #e6e6e6,
+    #d9d9d9,
+    #cccccc,
+    #bfbfbf
   );
   padding: 40px 20px;
   border-radius: 8px;
@@ -15,14 +15,17 @@
 
 .aim-testimonials h2 {
   font-size: 2rem;
-  color: #002244;
+  color: #222;
   margin-bottom: 20px;
+  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
 }
 
 .aim-testimonials p,
 .aim-testimonials ul {
   font-size: 1.2rem;
-  color: #003366;
+  color: #222;
   line-height: 1.6;
   max-width: 800px;
   margin: 0 auto 30px;
@@ -30,7 +33,7 @@
 }
 
 .testimonial {
-  color: #003366;
+  color: #222;
   font-style: italic;
   margin-bottom: 30px;
   text-align: center;
@@ -39,7 +42,7 @@
 .section-divider {
   border: 0;
   height: 2px;
-  background: #002244;
+  background: #222;
   margin: 50px auto;
   width: 70%;
 }
@@ -74,4 +77,21 @@
 
 li {
   list-style: none;
+}
+
+.mainContent {
+  background: #fff;
+  color: #222;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 24px;
+}
+
+h1,
+h2,
+h3 {
+  color: #222;
+  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
 }

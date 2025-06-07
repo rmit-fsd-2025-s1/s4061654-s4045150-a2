@@ -152,7 +152,16 @@ export default function Lecturer() {
           (typeof c === "number" ? c : c.courseID) === course.courseID
       );
     });
-    setShowInfoTutor(matched.length > 0 ? matched : undefined);
+    // Toggle: if already showing this info, hide it
+    if (
+      showInfoTutor &&
+      matched.length === showInfoTutor.length &&
+      matched.every((m, i) => m.applicationID === showInfoTutor[i].applicationID)
+    ) {
+      setShowInfoTutor(undefined);
+    } else {
+      setShowInfoTutor(matched.length > 0 ? matched : undefined);
+    }
   };
 
   // Sorting state
@@ -228,7 +237,7 @@ export default function Lecturer() {
 
   // Fetch selected applications for this lecturer
   useEffect(() => {
-    if (!user) return;
+    if (!user || typeof user.id !== 'number' || isNaN(user.id)) return;
     userApi.getSelectionsByLecturer(user.id).then((selections) => {
       // selections: [{ applicationId }]
       const selectedMap: { [key: string]: boolean } = {};
@@ -273,6 +282,8 @@ export default function Lecturer() {
           [key]: true,
         }));
       }
+      // Refresh analytics after select/deselect
+      fetchGlobalAnalytics();
     } catch (err) {
       alert("Failed to update selection.");
       console.error(err);
@@ -321,27 +332,57 @@ export default function Lecturer() {
     })));
   };
 
-  // Compute analytics for applicant selections
+  // Fetch all selections globally for analytics
+  const [allSelections, setAllSelections] = useState<any[]>([]);
+  const fetchGlobalAnalytics = () => {
+    userApi.getGlobalApplicantSelectionCounts().then((data) => {
+      setAllSelections(data);
+    });
+  };
+  useEffect(() => {
+    fetchGlobalAnalytics();
+  }, []);
+
+  // Compute analytics for applicant selections (global)
   const applicantSelectionCounts: { [applicantId: number]: { name: string; count: number } } = {};
-  tutorsList.forEach((app) => {
-    const applicantId = app.applicant.userid;
-    const name = `${app.applicant.firstName} ${app.applicant.lastName}`;
-    if (!applicantSelectionCounts[applicantId]) {
-      applicantSelectionCounts[applicantId] = { name, count: 0 };
-    }
-    // Count how many times this applicant's applications are selected (across all their applications)
-    if (selected[`${app.applicationID}`]) {
-      applicantSelectionCounts[applicantId].count += 1;
-    }
-  });
+  if (Array.isArray(allSelections) && allSelections.length > 0 && allSelections[0].applicantId !== undefined) {
+    allSelections.forEach((sel: any) => {
+      applicantSelectionCounts[sel.applicantId] = { name: sel.name, count: Number(sel.count) };
+    });
+    // Ensure every applicant in tutorsList is present in applicantSelectionCounts
+    tutorsList.forEach((app) => {
+      const applicantId = app.applicant.userid;
+      const name = `${app.applicant.firstName} ${app.applicant.lastName}`;
+      if (!applicantSelectionCounts[applicantId]) {
+        applicantSelectionCounts[applicantId] = { name, count: 0 };
+      }
+    });
+  } else {
+    tutorsList.forEach((app) => {
+      const applicantId = app.applicant.userid;
+      const name = `${app.applicant.firstName} ${app.applicant.lastName}`;
+      if (!applicantSelectionCounts[applicantId]) {
+        applicantSelectionCounts[applicantId] = { name, count: 0 };
+      }
+    });
+  }
   // Prepare data for bar chart
   const barChartData = Object.values(applicantSelectionCounts);
   // Find most and least chosen applicants
   const maxCount = Math.max(...barChartData.map((d) => d.count), 0);
-  const minCount = Math.min(...barChartData.map((d) => d.count), 0);
+  // Find the minimum count among all applicants (including 0)
+  const minCount = barChartData.length > 0 ? Math.min(...barChartData.map((d) => d.count)) : 0;
+  // Most chosen: all with maxCount > 0
   const mostChosen = barChartData.filter((d) => d.count === maxCount && maxCount > 0);
-  const leastChosen = barChartData.filter((d) => d.count === minCount && minCount > 0);
-  const unselected = barChartData.filter((d) => d.count === 0);
+  // Least chosen: show only those users whose applications have never been selected (count === 0)
+  // If all users have at least one selection, show those with the minimum count
+  let showLeastChosen: typeof barChartData = [];
+  const neverSelected = barChartData.filter((d) => d.count === 0);
+  if (neverSelected.length > 0) {
+    showLeastChosen = neverSelected;
+  } else {
+    showLeastChosen = barChartData.filter((d) => d.count === minCount);
+  }
 
   if (isLoading) {
     return (
@@ -486,8 +527,8 @@ export default function Lecturer() {
       </div>
 
       {/* Content Section */}
-      <div className="dashboardContainer">
-        <div className="pageContentCenter">
+      <div className="dashboardContainer" style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+        <div className="pageContentCenter" style={{ maxHeight: '670px', overflowY: 'auto', flex: '2 1 0%', width: '66.66%' }}>
           {/* Sort Buttons */}
           <div className="sortButtons">
             <button
@@ -546,7 +587,7 @@ export default function Lecturer() {
             })
           )}
         </div>
-        <div className="pageContentRight">
+        <div className="pageContentRight" style={{ height: '670px', minHeight: '670px', maxHeight: '670px', overflowY: 'auto', flex: '1 1 0%', width: '33.33%' }}>
           <InfoDetailsCard showInfoTut={showInfoTutor} />
         </div>
       </div>
@@ -556,27 +597,40 @@ export default function Lecturer() {
         <ApplicantBarChart data={barChartData} title="Applicant Selection Counts" />
         <div className="analyticsSummary">
           {mostChosen.length > 0 && (
-            <div><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")} ({maxCount})</div>
+            <div style={{ marginBottom: '0.5rem' }}><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")} ({maxCount})</div>
           )}
-          {leastChosen.length > 0 && (
-            <div><b>Least Chosen:</b> {leastChosen.map((a) => a.name).join(", ")} ({minCount})</div>
-          )}
-          {unselected.length > 0 && (
-            <div><b>Unselected Applicants:</b> {unselected.map((a) => a.name).join(", ")}</div>
+          {showLeastChosen.length > 0 && (
+            <div style={{ marginBottom: '0.5rem', color: '#b36b00', fontWeight: 500, background: '#fffbe6', borderRadius: 4, padding: '0.5rem 0.75rem' }}>
+              <b>Least Chosen:</b> {showLeastChosen.map((a) => a.name).join(", ")} ({minCount})
+            </div>
           )}
         </div>
-        {/* Rankings for current lecturer */}
-        <div className="rankingsSection">
-          <h3>Your Rankings</h3>
-          <ol>
-            {[1,2,3].map(rank => {
-              const ranking = rankings.find(r => r.rank === rank);
-              if (!ranking) return <li key={rank}><b>{rank}:</b> <span className="notSet">Not set</span></li>;
+      </div>
+
+      {/* Rankings for current lecturer in a pyramid card */}
+      <div className="rankingsSectionCard" style={{ margin: '2rem auto', maxWidth: 400, background: '#f8f9fa', borderRadius: 8, boxShadow: '0 2px 8px #0001', padding: '1.5rem', textAlign: 'center' }}>
+        <h3 style={{ marginBottom: '1rem', color: '#003366' }}>Your Rankings</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          {/* Top of pyramid: Rank 1 */}
+          <div style={{ fontWeight: 700, fontSize: '1.1rem', minHeight: 32 }}>
+            {(() => {
+              const ranking = rankings.find(r => r.rank === 1);
+              if (!ranking) return <span className="notSet">1: Not set</span>;
               const app = tutorsList.find(a => a.applicationID === ranking.applicationId);
               const name = app ? `${app.applicant.firstName} ${app.applicant.lastName}` : 'Unknown';
-              return <li key={rank}><b>{rank}:</b> {name}</li>;
+              return <span>1: {name}</span>;
+            })()}
+          </div>
+          {/* Bottom of pyramid: Ranks 2 and 3 */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', width: '100%' }}>
+            {[2, 3].map(rank => {
+              const ranking = rankings.find(r => r.rank === rank);
+              if (!ranking) return <div key={rank} style={{ minWidth: 100 }}><span className="notSet">{rank}: Not set</span></div>;
+              const app = tutorsList.find(a => a.applicationID === ranking.applicationId);
+              const name = app ? `${app.applicant.firstName} ${app.applicant.lastName}` : 'Unknown';
+              return <div key={rank} style={{ minWidth: 100 }}>{rank}: {name}</div>;
             })}
-          </ol>
+          </div>
         </div>
       </div>
 

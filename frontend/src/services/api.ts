@@ -142,6 +142,10 @@ export const userApi = {
 
   // ─────────────────────────────────────────────────────────────────────────────
   // SELECTION‐related endpoints (select/deselect an applicant)
+  getAllSelections: async (): Promise<{ applicationId: number; lecturerId: number }[]> => {
+    const res = await api.get<{ applicationId: number; lecturerId: number }[]>("/selections");
+    return res.data;
+  },
 
   getSelectionsByLecturer: async (lecturerId: number): Promise<{ applicationId: number }[]> => {
     const res = await api.get<{ applicationId: number }[]>(`/selections/${lecturerId}`);
@@ -250,5 +254,12 @@ export const userApi = {
       year: number;
       // plus any other fields from your Academics entity
     }>;
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // GLOBAL ANALYTICS ENDPOINT
+  getGlobalApplicantSelectionCounts: async (): Promise<any[]> => {
+    const response = await api.get("/selections/analytics/global");
+    return response.data as any[];
   },
 };
