@@ -8,7 +8,7 @@ import "../components/LoginBox";
 
 export default function HomePage() {
   return (
-    <div>
+    <div style={{ overflowX: 'hidden' }}>
       <Nav />
       <Header />
       <MainContent />

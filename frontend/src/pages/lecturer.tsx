@@ -370,19 +370,12 @@ export default function Lecturer() {
   const barChartData = Object.values(applicantSelectionCounts);
   // Find most and least chosen applicants
   const maxCount = Math.max(...barChartData.map((d) => d.count), 0);
-  // Find the minimum count among all applicants (including 0)
-  const minCount = barChartData.length > 0 ? Math.min(...barChartData.map((d) => d.count)) : 0;
-  // Most chosen: all with maxCount > 0
+  const minCount = barChartData.length > 0 ? Math.min(...barChartData.filter((d) => d.count > 0).map((d) => d.count)) : 0;
   const mostChosen = barChartData.filter((d) => d.count === maxCount && maxCount > 0);
-  // Least chosen: show only those users whose applications have never been selected (count === 0)
-  // If all users have at least one selection, show those with the minimum count
-  let showLeastChosen: typeof barChartData = [];
-  const neverSelected = barChartData.filter((d) => d.count === 0);
-  if (neverSelected.length > 0) {
-    showLeastChosen = neverSelected;
-  } else {
-    showLeastChosen = barChartData.filter((d) => d.count === minCount);
-  }
+  // Least chosen: only those with at least 1 selection and the minimum count
+  const leastChosen = barChartData.filter((d) => d.count === minCount && d.count > 0);
+  // Unselected applicants (count === 0)
+  const unselectedCandidates = barChartData.filter((d) => d.count === 0);
 
   if (isLoading) {
     return (
@@ -395,11 +388,18 @@ export default function Lecturer() {
   return (
     <div>
       <Nav />
-      <div className="pageHeader" style={{ padding: "1rem 2rem" }}>
-        <h1>Dashboard</h1>
-        <p>
-          Logged in as <strong>{user?.name}</strong>
-        </p>
+      <div className="pageHeader">
+        <h1 className="dashboard-title">Dashboard</h1>
+        <div className="dashboard-desc dashboard-desc-wide">
+          <ul>
+            <li>📋 View and filter all tutor applications for your assigned courses</li>
+            <li>🔍 Search by name or skills</li>
+            <li>🗂️ Filter by course, availability, or position</li>
+            <li>✅ Select and rank candidates</li>
+            <li>📊 See analytics on candidate selections and your current rankings</li>
+            <li>ℹ️ Click "Show Info" on any candidate to view detailed application information</li>
+          </ul>
+        </div>
       </div>
       {/* Filter Bar */}
       <div className="filterBar">
@@ -591,23 +591,26 @@ export default function Lecturer() {
           <InfoDetailsCard showInfoTut={showInfoTutor} />
         </div>
       </div>
-
-      {/* Analytics Bar Chart and Rankings Section */}
-      <div className="analyticsSection">
+      {/* Analytics Bar Chart: full width below main content */}
+      <div className="analyticsSection" style={{ maxWidth: 900, margin: '2rem auto' }}>
         <ApplicantBarChart data={barChartData} title="Applicant Selection Counts" />
         <div className="analyticsSummary">
           {mostChosen.length > 0 && (
-            <div style={{ marginBottom: '0.5rem' }}><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")} ({maxCount})</div>
+            <div style={{ marginBottom: '0.5rem' }}><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}</div>
           )}
-          {showLeastChosen.length > 0 && (
+          {leastChosen.length > 0 && (
             <div style={{ marginBottom: '0.5rem', color: '#b36b00', fontWeight: 500, background: '#fffbe6', borderRadius: 4, padding: '0.5rem 0.75rem' }}>
-              <b>Least Chosen:</b> {showLeastChosen.map((a) => a.name).join(", ")} ({minCount})
+              <b>Least Chosen:</b> {leastChosen.map((a) => a.name).join(", ")}
+            </div>
+          )}
+          {unselectedCandidates.length > 0 && (
+            <div style={{ marginBottom: '0.5rem', color: '#b30000', fontWeight: 500, background: '#fff0f0', borderRadius: 4, padding: '0.5rem 0.75rem' }}>
+              <b>Candidates who have not been selected:</b> {unselectedCandidates.map((a) => a.name).join(", ")}
             </div>
           )}
         </div>
       </div>
-
-      {/* Rankings for current lecturer in a pyramid card */}
+      {/* Rankings Card: full width below analytics */}
       <div className="rankingsSectionCard" style={{ margin: '2rem auto', maxWidth: 400, background: '#f8f9fa', borderRadius: 8, boxShadow: '0 2px 8px #0001', padding: '1.5rem', textAlign: 'center' }}>
         <h3 style={{ marginBottom: '1rem', color: '#003366' }}>Your Rankings</h3>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
@@ -633,7 +636,7 @@ export default function Lecturer() {
           </div>
         </div>
       </div>
-
+      {/* Footer remains at the bottom */}
       <Footer />
     </div>
   );
