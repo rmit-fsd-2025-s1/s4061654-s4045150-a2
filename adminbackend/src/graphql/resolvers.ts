@@ -84,7 +84,18 @@ export const resolvers = {
       course.courseName = courseName;
       return await coursesRepository.save(course);
     },
+    adminLogin: async (
+      _: any,
+      { username, password }: { username: string; password: string }
+    ) => {
+      if (username == "admin" && password == "admin") {
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
+
   //   updateProfile: async (
   //     _: any,
   //     { id, ...args }: { id: string } & Partial<Profile>
