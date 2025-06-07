@@ -14,7 +14,6 @@ export default function BlockCandidate() {
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
 
   useEffect(() => {
-    typeof window !== "undefined";
     const fetchCandidates = async () => {
       try {
         userApi.getAllCandidates().then((candidates) => {

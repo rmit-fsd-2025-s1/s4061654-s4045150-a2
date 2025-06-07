@@ -16,7 +16,7 @@ export default function AdminLogin() {
           alert("Login successful!");
           router.push("/lecturer");
         } else {
-          console.error("Login failed:", response.message);
+          console.error("Login failed:", response);
         }
       })
       .catch((error) => {

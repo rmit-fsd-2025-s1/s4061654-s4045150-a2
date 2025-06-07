@@ -3,12 +3,6 @@ import Footer from "../components/Footer";
 
 import AdminLogin from "../components/AdminLogin";
 
-type UserInformation = {
-  userid: number;
-  firstName: string;
-  email: string;
-};
-
 export default function Home() {
   return (
     <div>

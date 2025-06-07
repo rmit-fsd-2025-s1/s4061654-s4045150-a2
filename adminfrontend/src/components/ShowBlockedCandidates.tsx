@@ -12,7 +12,6 @@ export default function ShowBlockedCandidates() {
   const [blockedCandidates, setBlockedCandidates] = useState<Candidate[]>([]);
 
   useEffect(() => {
-    typeof window !== "undefined";
     const fetchBlockedCandidates = async () => {
       try {
         userApi.getAllCandidates().then((candidates: Candidate[]) => {

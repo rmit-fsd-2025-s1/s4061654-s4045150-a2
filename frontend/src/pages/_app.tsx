@@ -12,6 +12,7 @@ import "../styles/lecturer.css";
 import "../styles/signup.css";
 import "../styles/tutor.css";
 import "../styles/globals.css";
+import "../styles/profile.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

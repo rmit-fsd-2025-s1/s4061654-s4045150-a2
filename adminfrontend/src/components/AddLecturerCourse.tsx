@@ -8,7 +8,6 @@ export default function AddLecturerCourse() {
       userid: number;
       firstName: string;
       lastName: string;
-      role: string;
     };
     course: {
       courseID: number;
@@ -31,12 +30,12 @@ export default function AddLecturerCourse() {
   const [selectedLecturer, setSelectedLecturer] = useState<string>();
   const [selectedCourse, setSelectedCourse] = useState<string>();
   const [availableCourses, setAvailableCourses] = useState<AllCourses[]>();
-  // Add this state to store all lecturer-course assignments
+
   const [lecturerCourses, setLecturerCourses] = useState<LecturerCourses[]>([]);
 
   useEffect(() => {
     fetchLecturersAndCourses();
-    // Fetch all lecturer-course assignments
+
     userApi.getLecturerCourses().then(setLecturerCourses);
   }, []);
 

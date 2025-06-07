@@ -3,9 +3,7 @@ import ShowLecturerCourses from "../components/ShowLecturerCourses";
 import AddLecturerCourse from "../components/AddLecturerCourse";
 import BlockCandidate from "../components/BlockCandidate";
 import ShowBlockedCandidates from "../components/ShowBlockedCandidates";
-import ChosenEach from "../components/ChosenCandidatesEach";
-import MoreThanThreeChosen from "../components/MoreThanThreeChosen";
-import NeverChosen from "../components/NeverChosen";
+
 import Navbar from "../components/Navbar";
 export default function Lecturer() {
   return (

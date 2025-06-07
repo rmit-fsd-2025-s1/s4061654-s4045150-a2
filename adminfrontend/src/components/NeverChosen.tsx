@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { userApi } from "../services/api";
-import { useEffect, useState } from "react";
 
 type Candidate = {
   userid: number;
@@ -10,24 +9,18 @@ type Candidate = {
   isBlocked: boolean;
 };
 
-type Courses = {
-  courseID: string;
-  courseName: string;
-};
-
 type ChosenCandidates = {
-  courseID: string;
+  courseID: number;
   courseName: string;
   candidates: string[];
 };
 
-export default function MoreThanThreeChosen() {
+export default function NeverChosen() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [chosenCandidates, setChosenCandidates] = useState<ChosenCandidates[]>(
     []
   );
-  const [NeverChosen, setNeverChosen] = useState<String[]>([]);
-  const [MoreThanThreeChosen, setMoreThanThreeChosen] = useState<String[]>([]);
+  const [NeverChosen, setNeverChosen] = useState<string[]>([]);
 
   const fetchAllCandidates = async () => {
     try {
@@ -53,62 +46,28 @@ export default function MoreThanThreeChosen() {
     }
   };
 
-  const checkMoreThanThreeChosen = () => {
-    const allNeverChosen: string[] = [];
-
-    // Collect all candidate names from all courses
-    for (let i = 0; i < chosenCandidates.length; i++) {
-      const course = chosenCandidates[i];
-      for (let j = 0; j < course.candidates.length; j++) {
-        allNeverChosen.push(course.candidates[j]);
-      }
-    }
-
-    // Count occurrences
-    const countMap: { [name: string]: number } = {};
-    allNeverChosen.forEach((name) => {
-      countMap[name] = (countMap[name] || 0) + 1;
-    });
-
-    const overChosen = Object.keys(countMap).filter(
-      (name) => countMap[name] > 3
-    );
-
-    setMoreThanThreeChosen(overChosen);
-  };
-  const checkNeverChosen = () => {
-    const allChosen: string[] = [];
-    for (let i = 0; i < chosenCandidates.length; i++) {
-      const course = chosenCandidates[i];
-      for (let j = 0; j < course.candidates.length; j++) {
-        allChosen.push(course.candidates[j]);
-      }
-    }
-
-    const chosenSet = new Set(allChosen);
-
-    const neverChosen = candidates
-      .map((c) => `${c.firstName} ${c.lastName}`)
-      .filter((fullName) => !chosenSet.has(fullName));
-
-    setNeverChosen(neverChosen);
-  };
-
   useEffect(() => {
-    typeof window !== "undefined";
     fetchAllCandidates();
     fetchChosenCandidates();
   }, []);
 
   useEffect(() => {
-    if (chosenCandidates.length > 0) {
-      checkMoreThanThreeChosen();
-    }
-  }, [chosenCandidates]);
-
-  useEffect(() => {
     if (candidates.length > 0 && chosenCandidates.length > 0) {
-      checkNeverChosen();
+      const allChosen: string[] = [];
+      for (let i = 0; i < chosenCandidates.length; i++) {
+        const course = chosenCandidates[i];
+        for (let j = 0; j < course.candidates.length; j++) {
+          allChosen.push(course.candidates[j]);
+        }
+      }
+
+      const chosenSet = new Set(allChosen);
+
+      const neverChosen = candidates
+        .map((c) => `${c.firstName} ${c.lastName}`)
+        .filter((fullName) => !chosenSet.has(fullName));
+
+      setNeverChosen(neverChosen);
     }
   }, [candidates, chosenCandidates]);
 

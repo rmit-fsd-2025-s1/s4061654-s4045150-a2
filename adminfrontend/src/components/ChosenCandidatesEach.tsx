@@ -3,12 +3,12 @@ import { userApi } from "../services/api";
 
 export default function ChosenCandidatesEach({}) {
   type Courses = {
-    courseID: string;
+    courseID: number;
     courseName: string;
   };
 
   type ChosenCandidates = {
-    courseID: string;
+    courseID: number;
     courseName: string;
     candidates: string[];
   };
