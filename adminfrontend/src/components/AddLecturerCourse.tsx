@@ -88,12 +88,11 @@ export default function AddLecturerCourse() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray display-inline-block">
-      <h1 className="text-2xl font-bold mb-4">Assign Lecturers to Courses</h1>
-      <form
-        className="w-full max-w-md bg-white p-6 rounded-lg shadow-md"
-        onSubmit={handleSubmit}
-      >
+    <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-4 text-blue-700">
+        Assign Lecturer to Course
+      </h1>
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
             className="block text-sm font-medium text-black mb-2"
@@ -114,7 +113,8 @@ export default function AddLecturerCourse() {
               </option>
             ))}
           </select>
-
+        </div>
+        <div className="mb-4">
           <label
             className="block text-sm font-medium text-black mb-2"
             htmlFor="courseName"
@@ -127,7 +127,7 @@ export default function AddLecturerCourse() {
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
           >
-            <option value="">Select Courses</option>
+            <option value="">Select Course</option>
             {(availableCourses ?? []).map((course) => (
               <option key={course.courseID} value={course.courseID.toString()}>
                 {course.courseName}
@@ -135,12 +135,11 @@ export default function AddLecturerCourse() {
             ))}
           </select>
         </div>
-        <div className="mb-4"></div>
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200 font-semibold"
         >
-          Add Course
+          Assign Course
         </button>
       </form>
     </div>

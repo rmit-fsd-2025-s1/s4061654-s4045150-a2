@@ -48,11 +48,14 @@ export default function ChosenCandidatesEach({}) {
   };
 
   return (
-    <div className="flex items-center justify-between p-2 border-b">
-      <div>
-        <h1 className="text-2xl font-bold mb-4 text-black">
-          Chosen Candidates for Each Course
-        </h1>
+    <div className="w-full bg-white p-6 rounded-lg shadow-md mb-4">
+      <h1 className="text-2xl font-bold mb-4 text-blue-700">
+        Chosen Candidates for Each Course
+      </h1>
+      <div
+        className="overflow-x-auto"
+        style={{ maxHeight: "350px", overflowY: "auto" }}
+      >
         <table className="min-w-full bg-white">
           <thead>
             <tr>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { userApi } from "../services/api";
 
-export default function AddLecturerCourse() {
+export default function ShowLecturerCourses() {
   type LecturerCourses = {
     rowId: number;
     lecturer: {
@@ -36,12 +36,14 @@ export default function AddLecturerCourse() {
   }, []);
 
   return (
-    <div>
-      <div className="bg-white shadow rounded-lg p-6 w-full max-w-md h-full flex flex-col items-center justify-center min-h-screen float-right display-inline-block">
-        <h2 className="text-xl font-semibold mb-4 text-black">
-          Courses Assigned to Lecturers
-        </h2>
-
+    <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4 text-blue-700">
+        Courses Assigned to Lecturers
+      </h2>
+      <div
+        className="overflow-x-auto"
+        style={{ maxHeight: "400px", overflowY: "auto" }}
+      >
         {lecturerCourses.length > 0 ? (
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -57,7 +59,6 @@ export default function AddLecturerCourse() {
             <tbody className="bg-white divide-y divide-gray-200">
               {allLecturers.length > 0 ? (
                 allLecturers.map((l) => {
-                  // Find all courses for this lecturer
                   const courses = lecturerCourses
                     .filter(
                       (lc: LecturerCourses) => lc.lecturer.userid === l.userid

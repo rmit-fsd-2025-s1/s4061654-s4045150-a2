@@ -70,7 +70,6 @@ export default function MoreThanThreeChosen() {
       countMap[name] = (countMap[name] || 0) + 1;
     });
 
-    // Find names chosen more than 3 times
     const overChosen = Object.keys(countMap).filter(
       (name) => countMap[name] > 3
     );
@@ -78,7 +77,6 @@ export default function MoreThanThreeChosen() {
     setMoreThanThreeChosen(overChosen);
   };
   const checkNeverChosen = () => {
-    // Collect all chosen candidate names from all courses
     const allChosen: string[] = [];
     for (let i = 0; i < chosenCandidates.length; i++) {
       const course = chosenCandidates[i];
@@ -87,10 +85,8 @@ export default function MoreThanThreeChosen() {
       }
     }
 
-    // Remove duplicates
     const chosenSet = new Set(allChosen);
 
-    // Find candidates who are never chosen
     const neverChosen = candidates
       .map((c) => `${c.firstName} ${c.lastName}`)
       .filter((fullName) => !chosenSet.has(fullName));
@@ -99,6 +95,7 @@ export default function MoreThanThreeChosen() {
   };
 
   useEffect(() => {
+    typeof window !== "undefined";
     fetchAllCandidates();
     fetchChosenCandidates();
   }, []);
@@ -116,25 +113,25 @@ export default function MoreThanThreeChosen() {
   }, [candidates, chosenCandidates]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-xl font-semibold mb-4 text-red-600">
-          Candidates who have never been chosen
-        </h2>
-        {NeverChosen.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {NeverChosen.map((candidate, index) => (
-              <li key={index} className="text-black">
-                {candidate}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">
-            No candidates chosen more than three times.
-          </p>
-        )}
-      </div>
+    <div className="w-full bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4 text-blue-700">
+        Candidates Who Have Never Been Chosen
+      </h2>
+      {candidates.length === 0 || chosenCandidates.length === 0 ? (
+        <p className="text-gray-500">Loading...</p>
+      ) : NeverChosen.length > 0 ? (
+        <ul className="list-disc pl-5">
+          {NeverChosen.map((candidate, index) => (
+            <li key={index} className="text-black">
+              {candidate}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500">
+          All candidates have been chosen at least once.
+        </p>
+      )}
     </div>
   );
 }

@@ -55,7 +55,6 @@ export default function MoreThanThreeChosen() {
   const checkMoreThanThreeChosen = () => {
     const allChosen: string[] = [];
 
-    // Collect all candidate names from all courses
     for (let i = 0; i < chosenCandidates.length; i++) {
       const course = chosenCandidates[i];
       for (let j = 0; j < course.candidates.length; j++) {
@@ -63,13 +62,11 @@ export default function MoreThanThreeChosen() {
       }
     }
 
-    // Count occurrences
     const countMap: { [name: string]: number } = {};
     allChosen.forEach((name) => {
       countMap[name] = (countMap[name] || 0) + 1;
     });
 
-    // Find names chosen more than 3 times
     const overChosen = Object.keys(countMap).filter(
       (name) => countMap[name] > 3
     );
@@ -88,25 +85,23 @@ export default function MoreThanThreeChosen() {
   }, [chosenCandidates]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-xl font-semibold mb-4 text-red-600">
-          Candidates chosen more than three times
-        </h2>
-        {MoreThanThreeChosen.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {MoreThanThreeChosen.map((candidate, index) => (
-              <li key={index} className="text-black">
-                {candidate}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">
-            No candidates chosen more than three times.
-          </p>
-        )}
-      </div>
+    <div className="w-full bg-white p-6 rounded-lg shadow-md mb-4">
+      <h2 className="text-xl font-semibold mb-4 text-blue-700">
+        Candidates Chosen More Than Three Times
+      </h2>
+      {MoreThanThreeChosen.length > 0 ? (
+        <ul className="list-disc pl-5">
+          {MoreThanThreeChosen.map((candidate, index) => (
+            <li key={index} className="text-black">
+              {candidate}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-500">
+          No candidates chosen more than three times.
+        </p>
+      )}
     </div>
   );
 }
