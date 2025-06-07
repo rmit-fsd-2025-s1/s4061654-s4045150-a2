@@ -16,7 +16,8 @@
     "bcrypt-ts": "^7.0.0",
     "next": "15.2.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "recharts": "^2.15.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

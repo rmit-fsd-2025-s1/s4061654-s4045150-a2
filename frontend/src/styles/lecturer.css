@@ -14,12 +14,20 @@ h1 {
 
 .filterBar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
   justify-content: flex-start;
   padding: 16px 24px;
   background: #66a3ff;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 0;
 }
 
 .filterItem {
@@ -258,4 +266,36 @@ ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+}
+
+.analyticsSection {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #f8fafd;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #00336622;
+  padding: 24px;
+}
+
+.analyticsSummary {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.rankingsSection {
+  margin-top: 24px;
+}
+
+.rankingsSection h3 {
+  text-align: center;
+}
+
+.rankingsSection ol {
+  text-align: center;
+  list-style: none;
+  padding: 0;
+}
+
+.notSet {
+  color: #aaa;
 }

@@ -10,6 +10,7 @@ import { ApplicationInfo } from "../types/application";
 import { course } from "../types/course";
 import { User } from "../types/user";
 import { Ranking } from "../types/rankings";
+import ApplicantBarChart from "../components/ApplicantBarChart";
 
 export default function Lecturer() {
   const [tutorsList, setTutorsList] = useState<ApplicationInfo[]>([]);
@@ -320,6 +321,28 @@ export default function Lecturer() {
     })));
   };
 
+  // Compute analytics for applicant selections
+  const applicantSelectionCounts: { [applicantId: number]: { name: string; count: number } } = {};
+  tutorsList.forEach((app) => {
+    const applicantId = app.applicant.userid;
+    const name = `${app.applicant.firstName} ${app.applicant.lastName}`;
+    if (!applicantSelectionCounts[applicantId]) {
+      applicantSelectionCounts[applicantId] = { name, count: 0 };
+    }
+    // Count how many times this applicant's applications are selected (across all their applications)
+    if (selected[`${app.applicationID}`]) {
+      applicantSelectionCounts[applicantId].count += 1;
+    }
+  });
+  // Prepare data for bar chart
+  const barChartData = Object.values(applicantSelectionCounts);
+  // Find most and least chosen applicants
+  const maxCount = Math.max(...barChartData.map((d) => d.count), 0);
+  const minCount = Math.min(...barChartData.map((d) => d.count), 0);
+  const mostChosen = barChartData.filter((d) => d.count === maxCount && maxCount > 0);
+  const leastChosen = barChartData.filter((d) => d.count === minCount && minCount > 0);
+  const unselected = barChartData.filter((d) => d.count === 0);
+
   if (isLoading) {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -338,134 +361,135 @@ export default function Lecturer() {
         </p>
       </div>
       {/* Filter Bar */}
-      <div
-        className="filterBar"
-        style={{ padding: "0 2rem", marginBottom: "1rem" }}
-      >
-        <div className="filterItem">
-          <p>Search By Name</p>
-          <input
-            type="text"
-            placeholder="Input Name..."
-            value={pendingName}
-            onChange={(e) => setPendingName(e.target.value)}
-          />
-        </div>
-        <div className="filterItem">
-          <p>Search By Skills</p>
-          <input
-            type="text"
-            placeholder="Input Skills..."
-            value={pendingSkills}
-            onChange={(e) => setPendingSkills(e.target.value)}
-          />
-        </div>
-        <button
-          style={{ marginLeft: "1rem", height: "2.2rem" }}
-          onClick={() => {
-            setSearchName(pendingName);
-            setSearchSkills(pendingSkills);
-          }}
-        >
-          Search
-        </button>
-        <details className="dropdown">
-          <summary style={{ color: "#003366" }}>Filter by course</summary>
-          <div className="dropdownContent">
-            <form>
-              <ol>
-                {courses.map((c, idx) => (
-                  <li key={idx}>
-                    <input
-                      type="checkbox"
-                      name={c.courseName}
-                      value={c.courseName}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setCourseFilter((prev) =>
-                          e.target.checked
-                            ? [...prev, value]
-                            : prev.filter((item) => item !== value)
-                        );
-                      }}
-                    />
-                    <label htmlFor={c.courseName}>{c.courseName}</label>
-                  </li>
-                ))}
-              </ol>
-            </form>
+      <div className="filterBar">
+        <div className="filterRow">
+          <div className="filterItem">
+            <p>Search By Name</p>
+            <input
+              type="text"
+              placeholder="Input Name..."
+              value={pendingName}
+              onChange={(e) => setPendingName(e.target.value)}
+            />
           </div>
-        </details>
+          <div className="filterItem">
+            <p>Search By Skills</p>
+            <input
+              type="text"
+              placeholder="Input Skills..."
+              value={pendingSkills}
+              onChange={(e) => setPendingSkills(e.target.value)}
+            />
+          </div>
+          <button
+            style={{ marginLeft: "1rem", height: "2.2rem" }}
+            onClick={() => {
+              setSearchName(pendingName);
+              setSearchSkills(pendingSkills);
+            }}
+          >
+            Search
+          </button>
+        </div>
+        <div className="filterRow">
+          <details className="dropdown">
+            <summary style={{ color: "#003366" }}>Filter by course</summary>
+            <div className="dropdownContent">
+              <form>
+                <ol>
+                  {courses.map((c, idx) => (
+                    <li key={idx}>
+                      <input
+                        type="checkbox"
+                        name={c.courseName}
+                        value={c.courseName}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setCourseFilter((prev) =>
+                            e.target.checked
+                              ? [...prev, value]
+                              : prev.filter((item) => item !== value)
+                          );
+                        }}
+                      />
+                      <label htmlFor={c.courseName}>{c.courseName}</label>
+                    </li>
+                  ))}
+                </ol>
+              </form>
+            </div>
+          </details>
 
-        <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
-          <input
-            type="checkbox"
-            value="full-time"
-            onChange={(e) => {
-              const val = e.target.value;
-              setAvailFilter((prev) =>
-                e.target.checked
-                  ? [...prev, val]
-                  : prev.filter((v) => v !== val)
-              );
-            }}
-          />
-          Full-Time
-        </label>
+          <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              value="full-time"
+              onChange={(e) => {
+                const val = e.target.value;
+                setAvailFilter((prev) =>
+                  e.target.checked
+                    ? [...prev, val]
+                    : prev.filter((v) => v !== val)
+                );
+              }}
+            />
+            Full-Time
+          </label>
 
-        <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
-          <input
-            type="checkbox"
-            value="part-time"
-            onChange={(e) => {
-              const val = e.target.value;
-              setAvailFilter((prev) =>
-                e.target.checked
-                  ? [...prev, val]
-                  : prev.filter((v) => v !== val)
-              );
-            }}
-          />
-          Part-Time
-        </label>
+          <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              value="part-time"
+              onChange={(e) => {
+                const val = e.target.value;
+                setAvailFilter((prev) =>
+                  e.target.checked
+                    ? [...prev, val]
+                    : prev.filter((v) => v !== val)
+                );
+              }}
+            />
+            Part-Time
+          </label>
 
-        <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
-          <input
-            type="checkbox"
-            value="Tutor"
-            onChange={(e) => {
-              const val = e.target.value;
-              setPositionFilter((prev) =>
-                e.target.checked
-                  ? [...prev, val]
-                  : prev.filter((v) => v !== val)
-              );
-            }}
-          />
-          Tutor
-        </label>
-        <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
-          <input
-            type="checkbox"
-            value="Lab Assistant"
-            onChange={(e) => {
-              const val = e.target.value;
-              setPositionFilter((prev) =>
-                e.target.checked
-                  ? [...prev, val]
-                  : prev.filter((v) => v !== val)
-              );
-            }}
-          />
-          Lab Assistant
-        </label>
+          <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              value="Tutor"
+              onChange={(e) => {
+                const val = e.target.value;
+                setPositionFilter((prev) =>
+                  e.target.checked
+                    ? [...prev, val]
+                    : prev.filter((v) => v !== val)
+                );
+              }}
+            />
+            Tutor
+          </label>
+          <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
+            <input
+              type="checkbox"
+              value="Lab Assistant"
+              onChange={(e) => {
+                const val = e.target.value;
+                setPositionFilter((prev) =>
+                  e.target.checked
+                    ? [...prev, val]
+                    : prev.filter((v) => v !== val)
+                );
+              }}
+            />
+            Lab Assistant
+          </label>
+        </div>
       </div>
 
       {/* Content Section */}
-      <div className="dashboardContainer" style={{ padding: "0 2rem" }}>
+      <div className="dashboardContainer">
         <div className="pageContentCenter">
           {/* Sort Buttons */}
-          <div style={{ marginBottom: "1rem", display: "flex", gap: "1rem", justifyContent: "center", alignItems: "center" }}>
+          <div className="sortButtons">
             <button
               type="button"
               onClick={() => {
@@ -522,9 +546,37 @@ export default function Lecturer() {
             })
           )}
         </div>
-
         <div className="pageContentRight">
           <InfoDetailsCard showInfoTut={showInfoTutor} />
+        </div>
+      </div>
+
+      {/* Analytics Bar Chart and Rankings Section */}
+      <div className="analyticsSection">
+        <ApplicantBarChart data={barChartData} title="Applicant Selection Counts" />
+        <div className="analyticsSummary">
+          {mostChosen.length > 0 && (
+            <div><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")} ({maxCount})</div>
+          )}
+          {leastChosen.length > 0 && (
+            <div><b>Least Chosen:</b> {leastChosen.map((a) => a.name).join(", ")} ({minCount})</div>
+          )}
+          {unselected.length > 0 && (
+            <div><b>Unselected Applicants:</b> {unselected.map((a) => a.name).join(", ")}</div>
+          )}
+        </div>
+        {/* Rankings for current lecturer */}
+        <div className="rankingsSection">
+          <h3>Your Rankings</h3>
+          <ol>
+            {[1,2,3].map(rank => {
+              const ranking = rankings.find(r => r.rank === rank);
+              if (!ranking) return <li key={rank}><b>{rank}:</b> <span className="notSet">Not set</span></li>;
+              const app = tutorsList.find(a => a.applicationID === ranking.applicationId);
+              const name = app ? `${app.applicant.firstName} ${app.applicant.lastName}` : 'Unknown';
+              return <li key={rank}><b>{rank}:</b> {name}</li>;
+            })}
+          </ol>
         </div>
       </div>
 
