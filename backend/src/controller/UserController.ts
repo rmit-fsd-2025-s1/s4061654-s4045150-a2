@@ -142,24 +142,9 @@ export class UserController {
     });
   }
 
-  /**
-   * Updates an existing user's information
-   * @param request - Express request object containing user ID in params and updated details in body
-   * @param response - Express response object
-   * @returns JSON response containing the updated user or error message
-   */
   async update(request: Request, response: Response) {
     const id = parseInt(request.params.id);
-    const {
-      userid,
-      firstName,
-      lastName,
-      email,
-      password,
-      role,
-      createdAt,
-      about,
-    } = request.body;
+    const updateFields = request.body;
 
     let userToUpdate = await this.userRepository.findOne({
       where: { userid: id },
@@ -169,15 +154,11 @@ export class UserController {
       return response.status(404).json({ message: "User not found" });
     }
 
-    userToUpdate = Object.assign(userToUpdate, {
-      userid,
-      firstName,
-      lastName,
-      email,
-      password,
-      role,
-      createdAt,
-      about,
+    // Only update fields that are present in the request body and exist on the entity
+    Object.keys(updateFields).forEach((key) => {
+      if (updateFields[key] !== undefined && key in userToUpdate) {
+        (userToUpdate as any)[key] = updateFields[key];
+      }
     });
 
     try {
