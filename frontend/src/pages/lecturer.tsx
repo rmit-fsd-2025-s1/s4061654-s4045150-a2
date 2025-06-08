@@ -36,7 +36,7 @@ export default function Lecturer() {
 
   useEffect(() => {
     // Redirect if not logged in or not a lecturer
-    if (typeof window === "undefined") return; // Only run on client
+    if (typeof window === "undefined") return;
     const loggedIn = localStorage.getItem("loggedIn");
     if (!loggedIn) {
       router.replace("/");
@@ -405,6 +405,7 @@ export default function Lecturer() {
         count: Number(sel.count),
       };
     });
+
     // Ensure every applicant in tutorsList is present in applicantSelectionCounts
     tutorsList.forEach((app) => {
       const applicantId = app.applicant.userid;
@@ -422,6 +423,7 @@ export default function Lecturer() {
       }
     });
   }
+
   // Prepare data for bar chart
   const barChartData = Object.values(applicantSelectionCounts);
   // Find most and least chosen applicants
@@ -672,57 +674,36 @@ export default function Lecturer() {
           <InfoDetailsCard showInfoTut={showInfoTutor} />
         </div>
       </div>
-      <div className="analyticsSection">
-        <ApplicantBarChart
-          data={barChartData}
-          title="Applicant Selection Counts"
-        />
-        <div className="analyticsSummary">
-          {mostChosen.length > 0 && (
-            <div className="mostChosen">
-              <b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}
-            </div>
-          )}
-          {leastChosen.length > 0 && (
-            <div className="leastChosen">
-              <b>Least Chosen:</b> {leastChosen.map((a) => a.name).join(", ")}
-            </div>
-          )}
-          {unselectedCandidates.length > 0 && (
-            <div className="unselectedCandidates">
-              <b>Candidates who have not been selected:</b>{" "}
-              {unselectedCandidates.map((a) => a.name).join(", ")}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="rankingsSectionCard">
-        <h3>Your Rankings</h3>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-          }}
-        >
-          {/* Top of pyramid: Rank 1 */}
-          <div className="pyramidTop">
-            {(() => {
-              const ranking = rankings.find((r) => r.rank === 1);
-              if (!ranking) return <span className="notSet">1: Not set</span>;
-              const app = tutorsList.find(
-                (a) => a.applicationID === ranking.applicationId
-              );
-              const name = app
-                ? `${app.applicant.firstName} ${app.applicant.lastName}`
-                : "Unknown";
-              return <span>1: {name}</span>;
-            })()}
+      {/* Analytics and Rankings Section*/}
+      <div className="analyticsRankingsRow">
+        <div className="analyticsSection analyticsSectionWide">
+          <ApplicantBarChart
+            data={barChartData}
+            title="Selected Applicants Graph"
+          />
+          <div className="analyticsSummary">
+            {mostChosen.length > 0 && (
+              <div className="mostChosen">
+                <b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}
+              </div>
+            )}
+            {leastChosen.length > 0 && (
+              <div className="leastChosen">
+                <b>Least Chosen:</b> {leastChosen.map((a) => a.name).join(", ")}
+              </div>
+            )}
+            {unselectedCandidates.length > 0 && (
+              <div className="unselectedCandidates">
+                <b>Candidates who have not been selected:</b>{" "}
+                {unselectedCandidates.map((a) => a.name).join(", ")}
+              </div>
+            )}
           </div>
-          {/* Bottom of pyramid: Ranks 2 and 3 */}
-          <div className="pyramidBottom">
-            {[2, 3].map((rank) => {
+        </div>
+        <div className="rankingsSectionCard rankingsSectionWide">
+          <h3>Your Rankings</h3>
+          <div className="rankingsList">
+            {[1, 2, 3].map((rank) => {
               const ranking = rankings.find((r) => r.rank === rank);
               if (!ranking)
                 return (
@@ -733,19 +714,20 @@ export default function Lecturer() {
               const app = tutorsList.find(
                 (a) => a.applicationID === ranking.applicationId
               );
-              const name = app
-                ? `${app.applicant.firstName} ${app.applicant.lastName}`
-                : "Unknown";
+              if (!app) return <div key={rank}>{rank}: Unknown</div>;
+              const name = `${app.applicant.firstName} ${app.applicant.lastName}`;
+              const courseNames = (app.coursesAppliedObj && app.coursesAppliedObj.length > 0)
+                ? app.coursesAppliedObj.map((c: course) => c.courseName).join(", ")
+                : "No course";
               return (
                 <div key={rank}>
-                  {rank}: {name}
+                  {rank}: {name} ({courseNames})
                 </div>
               );
             })}
           </div>
         </div>
       </div>
-      {/* Footer remains at the bottom */}
       <Footer />
     </div>
   );

@@ -31,6 +31,12 @@ body {
     text-align: center;
 }
 
+/* Make all text in the signup box black for readability */
+.signup-form,
+.signup-form * {
+  color: #111 !important;
+}
+
 .signup-form h2 {
     color: #222;
     background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
@@ -39,10 +45,10 @@ body {
 }
 
 .signup-form label {
-    color: #bfa600;
     font-weight: bold;
     display: block;
     margin-top: 10px;
+    /* color will be overridden to black above */
 }
 
 .signup-form input[type="text"],
@@ -77,6 +83,18 @@ body {
     color: #222;
 }
 
+/* Make radio buttons for Tutor and Lecturer side by side */
+.signup-form .role-radio-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+.signup-form .role-radio-group label {
+  margin: 0 0.25rem 0 0.5rem;
+  font-weight: normal;
+}
 
 .whoami button{
     background-color: inherit;

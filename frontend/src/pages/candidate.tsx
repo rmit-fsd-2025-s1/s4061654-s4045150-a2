@@ -231,8 +231,11 @@ export default function Candidate() {
     const selectedPosition = (applicantProfile.position || "")
       .trim()
       .toLowerCase();
+    const id = localStorage.getItem("loggedIn");
+    const userId = id ? JSON.parse(id).id : null;
     const duplicate = userApplications.some(
       (app) =>
+        app.applicant === userId &&
         (app.position || "").trim().toLowerCase() === selectedPosition &&
         (Array.isArray(app.coursesApplied)
           ? app.coursesApplied.includes(selectedCourseId)

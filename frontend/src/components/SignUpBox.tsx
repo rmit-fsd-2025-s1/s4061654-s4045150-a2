@@ -78,23 +78,26 @@ export default function SignUpBox() {
           />
 
           <label>I'm signing up as a</label>
-
-          <input
-            type="radio"
-            value="Candidate"
-            checked={userCredentials.role == "Candidate"}
-            onChange={handleChange}
-            name="role"
-          />
-          <label>Tutor</label>
-          <input
-            type="radio"
-            value="Lecturer"
-            checked={userCredentials.role == "Lecturer"}
-            onChange={handleChange}
-            name="role"
-          />
-          <label>Lecturer</label>
+          <div className="role-radio-group">
+            <input
+              type="radio"
+              value="Candidate"
+              checked={userCredentials.role == "Candidate"}
+              onChange={handleChange}
+              name="role"
+              id="role-candidate"
+            />
+            <label htmlFor="role-candidate">Tutor</label>
+            <input
+              type="radio"
+              value="Lecturer"
+              checked={userCredentials.role == "Lecturer"}
+              onChange={handleChange}
+              name="role"
+              id="role-lecturer"
+            />
+            <label htmlFor="role-lecturer">Lecturer</label>
+          </div>
 
           <label>Email</label>
           <input

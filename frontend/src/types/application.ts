@@ -10,6 +10,7 @@ export type ApplicationInfo = {
   position: string;
   applicant: UserInformation;
   coursesApplied: number[];
+  coursesAppliedObj?: course[];
   availability: string | null;
   experience?: experience[];
   skills: string[];

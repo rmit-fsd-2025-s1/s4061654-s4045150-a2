@@ -95,3 +95,9 @@ h1, h2, h3 {
   border-radius: 6px;
   padding: 0.2em 0.5em;
 }
+
+/* Make all text in the login box black for better readability */
+.loginprot,
+.loginprot * {
+  color: black !important;
+}

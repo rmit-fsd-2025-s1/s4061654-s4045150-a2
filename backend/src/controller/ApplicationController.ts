@@ -45,19 +45,29 @@ export class ApplicationController {
           { name: `%${name.toLowerCase()}%` }
         );
       }
-      // Skills filter (case-insensitive, partial match, any skill)
+      // Skills filter (case-insensitive, partial match, any skill) for comma-separated string
       if (skills && typeof skills === "string" && skills.trim() !== "") {
-        // Defensive: Only run this filter if app.skills is not null and array is not empty
         const skillArr = skills
           .split(",")
           .map((s) => s.trim().toLowerCase())
           .filter(Boolean);
         if (skillArr.length > 0) {
           qb = qb.andWhere(
-            `array_length(app.skills, 1) > 0 AND EXISTS (SELECT 1 FROM unnest(app.skills) AS skill WHERE ` +
-              skillArr.map((_, i) => `LOWER(skill) LIKE :skill${i}`).join(" OR ") +
+            "(" +
+              skillArr
+                .map(
+                  (_, i) =>
+                    `FIND_IN_SET(:skill${i}, LOWER(app.skills)) > 0 OR LOWER(app.skills) LIKE :likeSkill${i}`
+                )
+                .join(" OR ") +
               ")",
-            Object.fromEntries(skillArr.map((s, i) => ["skill" + i, `%${s}%`]))
+            Object.assign(
+              {},
+              ...skillArr.map((s, i) => ({
+                [`skill${i}`]: s,
+                [`likeSkill${i}`]: `%${s}%`,
+              }))
+            )
           );
         }
       }
@@ -93,6 +103,8 @@ export class ApplicationController {
           qb = qb.orderBy(orderField, sortOrder === "desc" ? "DESC" : "ASC");
         }
       }
+      // Debug: log the generated SQL and parameters
+      console.log('Generated SQL:', qb.getQueryAndParameters());
       const results = await qb.getMany();
       return response.json(results);
     } catch (err) {
