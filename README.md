@@ -15,6 +15,7 @@ References:
    Link: https://www.npmjs.com/package/recharts
 4. For the Entity Relation Diagram, Figma was used.
    Link: https://www.figma.com/
+5. TypeORM, and backend folder structures were taken from Week 8 lab code.
 
 README: Unit testing
 
