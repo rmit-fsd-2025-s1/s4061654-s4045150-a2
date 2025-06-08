@@ -15,6 +15,6 @@ export class Experience {
   @Column()
   description: string;
 
-  @ManyToOne(() => Applications, (app) => app.applicantCourses)
+  @ManyToOne(() => Applications, (app) => app.experiences)
   application: Applications;
 }
