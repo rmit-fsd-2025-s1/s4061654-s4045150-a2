@@ -3,6 +3,7 @@ import { userApi } from "../services/api";
 import Router from "next/router";
 
 export default function SignUpBox() {
+  // State to manage user credentials to be registered
   const [userCredentials, setuserCredentials] = useState({
     firstName: "",
     lastName: "",
@@ -11,20 +12,29 @@ export default function SignUpBox() {
     password: "",
     confirmPassword: "",
   });
+  // State to manage errors and success messages
+  // Errors include email, password, empty fields, and backend errors
   const [errors, setErrors] = useState({
     email: "",
     password: "",
     empty: "",
+    backend: "",
   });
+  // State to manage success message after registration
+  const [success, setSuccess] = useState("");
 
+  // Function to handle changes in input fields
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setuserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
-    setErrors({ email: "", password: "", empty: "" });
+    setErrors({ email: "", password: "", empty: "", backend: "" });
   };
 
+  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
+    //Prevent defaults
     e.preventDefault();
 
+    //store all the values that have been saved in the userCredentials state to a user object for registration
     const user = {
       userid: Math.floor(Math.random() * 1000000),
       firstName: userCredentials.firstName,
@@ -35,12 +45,49 @@ export default function SignUpBox() {
       createdAt: new Date(),
       about: "",
     };
+
+    //If first name contains numbers or special characters, we set the error
+    if (!validateName(userCredentials.firstName)) {
+      setErrors({
+        ...errors,
+        empty:
+          "Firstname must be at least 2 characters long and contain only letters",
+      });
+      return;
+    }
+    //If last name contains numbers or special characters, we set the error
+    //Helper functions are at the bottom of the file
+    if (!validateName(userCredentials.lastName)) {
+      setErrors({
+        ...errors,
+        empty:
+          "Lastname must be at least 2 characters long and contain only letters",
+      });
+      return;
+    }
+    //If the email entered is not valid (email@example.com), we set the error
     if (validateEmail(userCredentials.email)) {
       if (validatePassword(userCredentials.password)) {
-        await userApi.createUser(user);
-        alert("User registered!");
-        Router.push("/login");
+        try {
+          //If valid email and password, we proceed to register the user
+          await userApi.createUser(user);
+        } catch (err: any) {
+          //If there is an error sent from the backend, we set the backend error
+          setErrors((prev) => ({
+            ...prev,
+            backend:
+              err?.response?.data?.message ||
+              err?.message ||
+              "Registration failed. Please try again later.",
+          }));
+          return;
+        }
+        //If registration is successful, show success message
+        setTimeout(() => {
+          Router.push("/login");
+        }, 1000);
       } else {
+        //If password is not valid (less than 8 characters, no uppercase, no lowercase, no number), we set the password error
         setErrors({
           ...errors,
           password:
@@ -48,10 +95,16 @@ export default function SignUpBox() {
         });
       }
     } else {
+      //If email is not valid, we set the email error
       setErrors({
         ...errors,
         email: "Please enter a valid email",
       });
+    }
+    //If there are no errors, we set the success message
+    if (!errors.empty || !errors.email || !errors.password) {
+      setSuccess("You've been registered successfully!");
+      return;
     }
   };
 
@@ -68,6 +121,8 @@ export default function SignUpBox() {
             value={userCredentials.firstName}
             onChange={handleChange}
           />
+          {/*Shows name related errors */}
+          {errors.empty && <p className="error">{errors.empty}</p>}
 
           <label>Last Name</label>
           <input
@@ -76,9 +131,10 @@ export default function SignUpBox() {
             value={userCredentials.lastName}
             onChange={handleChange}
           />
+          {errors.empty && <p className="error">{errors.empty}</p>}
 
           <label>I'm signing up as a</label>
-
+          {/*Radio buttons for selecting user role*/}
           <input
             type="radio"
             value="Candidate"
@@ -86,7 +142,7 @@ export default function SignUpBox() {
             onChange={handleChange}
             name="role"
           />
-          <label>Tutor</label>
+          <label>Candidate</label>
           <input
             type="radio"
             value="Lecturer"
@@ -125,7 +181,7 @@ export default function SignUpBox() {
           {userCredentials.password !== userCredentials.confirmPassword && (
             <p className="error">Passwords do not match</p>
           )}
-
+          {/*The Sign Up button will stay disabled if all input fields are not filled in */}
           <input
             type="submit"
             value="Register"
@@ -139,6 +195,8 @@ export default function SignUpBox() {
               userCredentials.password !== userCredentials.confirmPassword
             }
           />
+          {errors.backend && <p className="error">{errors.backend}</p>}
+          {success && <p className="affirmative-prompt">{success}</p>}
         </form>
       </div>
     </div>
@@ -158,4 +216,8 @@ const validatePassword = (password: string) => {
 const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
+};
+
+const validateName = (name: string) => {
+  return /^[A-Za-z]{2,}$/.test(name);
 };

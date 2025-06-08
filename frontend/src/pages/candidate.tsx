@@ -24,19 +24,19 @@ export default function Candidate() {
     skills: [],
     academics: [],
   });
-
+  //useState of type experience to store previous experience in an object
   const [experience, setExperience] = useState<experience>({
     position: "",
     company: "",
     description: "",
   });
-
+  //useState of type qualification to store academic qualifications in an object
   const [academics, setAcademics] = useState<qualification>({
     degree: "",
     year: 0,
     university: "",
   });
-
+  //useState to store skills in a string
   const [skill, setSkill] = useState("");
   // For success messages and error messages
   const [affirmation, setAffirmation] = useState({
@@ -44,11 +44,17 @@ export default function Candidate() {
     academicsAffirm: "",
     applicationSubmitted: "",
   });
-
+  // Error messages for various fields
   const [error, setError] = useState({
     experienceError: "",
     academicsError: "",
     applicationCannotSubmit: "",
+    positionError: "",
+    courseError: "",
+    availabilityError: "",
+    skillError: "",
+    yearError: "",
+    apiError: "",
   });
 
   //Store filteredCourses according to filter option usage in lecturer page.
@@ -59,11 +65,13 @@ export default function Candidate() {
   );
 
   useEffect(() => {
+    // Fetch all courses on mount
+    // This will populate the courses state with all available courses
     userApi.getAllCourses().then((courseArray) => {
       setCourses(courseArray as course[]);
       setFilteredCourses(courseArray as course[]);
     });
-
+    // Set the applicant ID from localStorage
     const id = localStorage.getItem("loggedIn");
     if (id) {
       setApplicantProfile((prev) => ({
@@ -71,16 +79,6 @@ export default function Candidate() {
         applicant: JSON.parse(id).id,
       }));
     }
-
-    // Filter out the courses already applied for
-    // const alreadyApplied = allApplicants
-    //   .filter((app: ApplicationInfo) => app.name === applicantName)
-    //   .map((app: ApplicationInfo) => app.coursesApplied);
-
-    // const filtered = courses.filter(
-    //   (course) => !alreadyApplied.includes(course)
-    // );
-    // setFilteredCourses(filtered);
   }, []);
 
   // Fetch all applications for the current user on mount
@@ -97,6 +95,7 @@ export default function Candidate() {
           // Fetch coursesApplied (array of courseIDs)
           let coursesApplied: number[] = [];
           try {
+            // Fetch courses applied for this application
             const courseRows = await userApi.getApplicationCoursesByAppID(
               app.applicationID
             );
@@ -105,6 +104,7 @@ export default function Candidate() {
           // Fetch academics
           let academics: qualification[] = [];
           try {
+            // Fetch academics for this application
             academics = await userApi.getAcademicsByApplicationId(
               app.applicationID
             );
@@ -118,6 +118,7 @@ export default function Candidate() {
           };
         })
       );
+      // Set the userApplications state with the full applications
       setUserApplications(fullApps);
     });
   }, []);
@@ -127,10 +128,10 @@ export default function Candidate() {
     setFilteredCourses(courses);
   }, [applicantProfile.position, userApplications, courses]);
 
-  /*This function handles ticking checkboxes to select from available courses.
-    The function looks updates the state from its previous value of empty array.
-    If the course already exists in the array, get rid of the course (checkbox functionality)*/
-  // Fix: handleCourseApplied should use courseID, not courseName
+  /*This function handles ticking radio boxes to select from available courses.
+    The function looks updates the state from its previous value of empty.
+   */
+
   const handleCourseApplied = (e: React.ChangeEvent<HTMLInputElement>) => {
     const courseID = Number(e.target.value);
     const courseObj = courses.find((c) => c.courseID === courseID);
@@ -226,6 +227,30 @@ export default function Candidate() {
 
   /*Finally after storing all the application information, the submission button can be clicked to store the applicantInfo object in localStorage.*/
   const handleSubmit = async () => {
+    if (!applicantProfile.position) {
+      setError((prev) => ({
+        ...prev,
+        positionError: "Please select a position (Tutor or Lab Assistant).",
+      }));
+    }
+    if (applicantProfile.coursesApplied.length === 0) {
+      setError((prev) => ({
+        ...prev,
+        courseError: "Please select a course.",
+      }));
+    }
+    if (!applicantProfile.availability) {
+      setError((prev) => ({
+        ...prev,
+        availabilityError: "Please select your availability.",
+      }));
+    }
+    if (applicantProfile.skills.length === 0) {
+      setError((prev) => ({
+        ...prev,
+        skillError: "Please add at least one skill.",
+      }));
+    }
     // Check for duplicate application before submitting
     const selectedCourseId = applicantProfile.coursesApplied[0];
     const selectedPosition = (applicantProfile.position || "")
@@ -247,7 +272,7 @@ export default function Candidate() {
       setTimeout(() => {
         setError((prev) => ({ ...prev, applicationCannotSubmit: "" }));
         window.location.reload();
-      }, 3000); // Show error for 3 seconds, then reload
+      }, 2000);
       return;
     }
     try {
@@ -449,7 +474,7 @@ export default function Candidate() {
           <input
             className="inputBox"
             type="text"
-            placeholder="Press enter to add skills"
+            placeholder="Add skills"
             size={50}
             value={skill}
             onChange={(e) => setSkill(e.target.value)}
@@ -460,6 +485,17 @@ export default function Candidate() {
               }
             }}
           />
+          <button
+            className="addButton"
+            type="button"
+            style={{ marginLeft: "8px" }}
+            onClick={handleSkills}
+          >
+            Add
+          </button>
+          {error.skillError && (
+            <p className="fieldsNotPopulated">{error.skillError}</p>
+          )}
           {/*Qualifications portion of the form*/}
           <h2>Your Academic Qualifications</h2>
           <input
@@ -501,6 +537,11 @@ export default function Candidate() {
           {error.academicsError && (
             <p className="fieldsNotPopulated">{error.academicsError}</p>
           )}
+          {error.yearError && (
+            <p className="fieldsNotPopulated">{error.yearError}</p>
+          )}
+          {/*This button will add the academics to the applicant profile*/}
+          {/*If the academics is added, it will show a success message. Error message otherwise.*/}
         </div>
         <div className="applicantBox">
           <h1>

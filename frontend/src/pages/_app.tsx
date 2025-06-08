@@ -14,6 +14,9 @@ import "../styles/tutor.css";
 import "../styles/globals.css";
 import "../styles/profile.css";
 
+//All style files are imported here to ensure they are applied globally across the application.
+//Next.js doesn't allow importing CSS files directly in components, so we imported them in _app.tsx.
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
