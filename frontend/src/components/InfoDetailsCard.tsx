@@ -109,7 +109,15 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
 
   return (
     <div className="infoCard2">
-      <h2 style={{ fontSize: "2.1rem" }}>
+      <h2
+        style={{
+          fontSize: "2.1rem",
+          maxWidth: "90%",
+          margin: "0 auto",
+          wordBreak: "break-word",
+          whiteSpace: "normal",
+        }}
+      >
         {application.applicant.firstName} {application.applicant.lastName}
       </h2>
 

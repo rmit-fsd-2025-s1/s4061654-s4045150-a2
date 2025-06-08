@@ -29,7 +29,7 @@ h1 {
   gap: 24px;
   align-items: flex-start;
   justify-content: space-between;
-  background: #f8fafc;
+  background: #e3f2fd !important;
   padding: 16px 24px;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -37,7 +37,7 @@ h1 {
 .filterSearchSection {
   flex: 1 1 320px;
   min-width: 280px;
-  background: #fff;
+  background: #e3f2fd !important;
   border-radius: 8px;
   box-shadow: 0 1px 6px #0001;
   padding: 1rem 1.5rem;
@@ -50,7 +50,7 @@ h1 {
 .filterOptionsSection {
   flex: 2 1 400px;
   min-width: 320px;
-  background: #f5f5f5;
+  background-color: #e3f2fd !important;
   border-radius: 8px;
   box-shadow: 0 1px 6px #0001;
   padding: 1rem 1.5rem;
@@ -63,6 +63,7 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  background-color: #e3f2fd !important;
   align-items: center;
   margin-bottom: 0;
 }
@@ -89,6 +90,12 @@ h1 {
   color: #222;
 }
 
+.filterBar input[type="text"] {
+  background: #e3f2fd !important;
+  color: black !important;
+  border: 1px solid #2196f3 !important;
+}
+
 .filterItem label {
   margin-right: 10px;
   display: flex;
@@ -98,9 +105,58 @@ h1 {
 }
 
 .dropdown summary {
-  cursor: pointer;
-  font-weight: bold;
-  color: #003366;
+  background: #e3f2fd !important;
+  color: #003366 !important;
+  border: 1px solid #2196f3 !important;
+  border-radius: 4px;
+  padding: 6px 12px;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: none !important;
+  /* Remove inherited button styles */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  z-index: 1;
+  position: relative;
+}
+
+.dropdown[open] summary {
+  background: #bbdefb !important;
+  color: #003366 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: none !important;
+  background-image: none !important;
+  background-clip: border-box !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  z-index: 1;
+  position: relative;
+}
+
+.dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.dropdown summary:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove yellow background from details element itself */
+.dropdown {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.dropdown[open] {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .dropdownContent {
@@ -156,7 +212,7 @@ h1 {
   width: 33.33%;
   padding: 10px;
   text-align: center;
-  background-color: #222c36;
+  background-color: #fffde7 !important; /* cream */
   border-left: 1px solid #bdbdbd;
   border-radius: 10px;
   color: #ffffff;
@@ -309,16 +365,26 @@ h1 {
 .sortButton {
   padding: 6px 10px;
   border: 1px solid #bdbdbd;
-  background-color: #fff;
-  color: #003366;
+  background-color: #fff !important;
+  color: #000 !important;
   cursor: pointer;
   border-radius: 4px;
   font-weight: bold;
 }
 
 .sortButton:hover {
-  background-color: #e3f2fd;
-  color: #222;
+  background-color: #e3f2fd !important;
+  color: #000 !important;
+}
+
+.sortButtons button {
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
+.sortButtons button:hover {
+  color: #000 !important;
+  background-color: #e3f2fd !important;
 }
 
 ul {
@@ -617,4 +683,66 @@ ul {
 .filterItem input[type="text"]::placeholder {
   color: #000 !important;
   opacity: 1;
+}
+
+/* Transferred from globals.css for lecturer page */
+
+button {
+  background: #fffbe6;
+  color: #000 !important;
+  border: 1px solid #e6dca7;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #f7e9b0;
+  color: #000 !important;
+}
+
+input, select, textarea {
+  background: #fff;
+  color: #000 !important;
+  border: 1px solid #e6dca7;
+  border-radius: 4px;
+}
+
+h1, h2, h3 {
+  color: #000 !important;
+  border-radius: 6px;
+  padding: 0.2em 0.5em;
+}
+
+a {
+  color: #000 !important;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #000 !important;
+  background: #fffbe6;
+}
+
+.filterBar button {
+  background: #e3f2fd !important;
+  color: #003366 !important;
+  border: 1px solid #2196f3 !important;
+  border-radius: 4px;
+  font-weight: bold;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: none !important;
+  background-image: none !important;
+  background-clip: border-box !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  z-index: 1;
+  position: relative;
+  transition: background 0.2s, color 0.2s;
+}
+
+.filterBar button:hover {
+  background: #bbdefb !important;
+  color: #003366 !important;
 }

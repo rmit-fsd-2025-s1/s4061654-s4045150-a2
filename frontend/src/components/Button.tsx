@@ -4,5 +4,5 @@ type buttonName = {
   func: any;
 };
 export default function Button({ name, func }: buttonName) {
-  return <button onClick={func}>{name}</button>;
+  return <button onClick={func} style={{ color: '#000' }}>{name}</button>;
 }

@@ -18,43 +18,6 @@ body {
   font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-a {
-  color: #bfa600;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #222;
-  background: #fffbe6;
-}
-
-button {
-  background: #fffbe6;
-  color: #bfa600;
-  border: 1px solid #e6dca7;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-button:hover {
-  background: #f7e9b0;
-  color: #222;
-}
-
-input, select, textarea {
-  background: #fff;
-  color: #222;
-  border: 1px solid #e6dca7;
-  border-radius: 4px;
-}
-
-h1, h2, h3 {
-  color: #222;
-  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
-  border-radius: 6px;
-  padding: 0.2em 0.5em;
-}
-
 .loginprot{
     text-align: center;
     padding:20px;

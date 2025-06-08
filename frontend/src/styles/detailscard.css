@@ -3,12 +3,13 @@
   justify-content: center;
   align-items: center;
   text-align: center;
+  background: #fffde7 !important; /* cream */
 }
 
 .pStyle {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #4fc3f7;
+  color: #222;
   text-decoration: underline;
 }
 
@@ -38,8 +39,6 @@
 }
 
 .detailsCard h2, .detailsCard h3 {
-  color: #bfa600;
-  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
   border-radius: 6px;
   padding: 0.2em 0.5em;
 }

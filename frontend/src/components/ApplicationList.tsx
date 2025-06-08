@@ -48,6 +48,7 @@ function ApplicationListCard({
 
       <button
         data-testid="Select"
+        style={{ color: "#000" }}
         onClick={() => onToggleSelect(applicantId, course.courseID)}
       >
         {isSelected ? "Deselect this candidate" : "Select this candidate"}
@@ -61,6 +62,7 @@ function ApplicationListCard({
             key={rank}
             disabled={!isSelected || (isRanked && currentRank !== rank)}
             style={{
+              color: "#000",
               fontWeight: currentRank === rank ? "bold" : undefined,
               marginRight: 4,
             }}
