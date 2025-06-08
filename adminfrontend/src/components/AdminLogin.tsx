@@ -1,4 +1,3 @@
-import { userApi } from "../services/api";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/adminAuth";

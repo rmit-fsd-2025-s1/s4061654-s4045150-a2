@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useAuth } from "@/context/adminAuth";
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   return (
     <header className="w-full bg-white shadow-md px-8 py-4 flex items-center justify-between">
       <div className="text-2xl font-bold text-blue-600">Admin Panel</div>

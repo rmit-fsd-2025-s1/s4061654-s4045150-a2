@@ -11,7 +11,6 @@ export default function ShowBlockedCandidates() {
   };
   const [blockedCandidates, setBlockedCandidates] = useState<Candidate[]>([]);
 
-  const [success, setSuccess] = useState<string>("");
   useEffect(() => {
     // Fetching all candidates on mount
     const fetchBlockedCandidates = async () => {
