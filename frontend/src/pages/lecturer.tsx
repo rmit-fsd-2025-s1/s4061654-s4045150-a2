@@ -1,3 +1,7 @@
+// lecturer.tsx
+// Main dashboard page for lecturers to view, filter, sort, select, and rank tutor applications.
+// Includes analytics and detailed info for each candidate.
+
 import Nav from "../components/NavBar";
 import Footer from "../components/Footer";
 
@@ -14,26 +18,31 @@ import ApplicantBarChart from "../components/ApplicantBarChart";
 import { useRouter } from "next/router";
 
 export default function Lecturer() {
+  // Router for navigation
   const router = useRouter();
+  // State for all tutor applications
   const [tutorsList, setTutorsList] = useState<ApplicationInfo[]>([]);
+  // State for search/filter inputs
   const [searchName, setSearchName] = useState("");
   const [searchSkills, setSearchSkills] = useState("");
   const [courseFilter, setCourseFilter] = useState<string[]>([]);
   const [availFilter, setAvailFilter] = useState<string[]>([]);
   const [positionFilter, setPositionFilter] = useState<string[]>([]);
+  // State for showing detailed info for a selected tutor
   const [showInfoTutor, setShowInfoTutor] = useState<
     ApplicationInfo[] | undefined
   >(undefined);
+  // Auth context for current user
   const { user } = useAuth();
 
-  // All courses from backend as { courseID, courseName }
+  // State for courses and lecturer's assigned courses
   const [courses, setCourses] = useState<course[]>([]);
-  // Which courseIDs this lecturer is assigned to
   const [lecturerCourseIDs, setLecturerCourseIDs] = useState<number[]>([]);
-  // Once courses, applications, and lecturerCourseIDs are loaded, we can stop loading
+  // Loading and rankings state
   const [isLoading, setIsLoading] = useState(true);
   const [rankings, setRankings] = useState<Ranking[]>([]);
 
+  // Redirect if not logged in or not a lecturer
   useEffect(() => {
     // Redirect if not logged in or not a lecturer
     if (typeof window === "undefined") return;
@@ -267,6 +276,7 @@ export default function Lecturer() {
     });
   };
 
+  // State and logic for selected applications and rankings
   const [pendingSkills, setPendingSkills] = useState("");
   const [pendingName, setPendingName] = useState("");
 
@@ -443,6 +453,7 @@ export default function Lecturer() {
   const unselectedCandidates = barChartData.filter((d) => d.count === 0);
 
   if (isLoading) {
+    // Show loading spinner while data is loading
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
         <p>Loading applications...</p>
@@ -452,7 +463,9 @@ export default function Lecturer() {
 
   return (
     <div>
+      {/* Navigation bar */}
       <Nav />
+      {/* Dashboard header and description */}
       <div className="pageHeader">
         <h1 className="dashboard-title">Dashboard</h1>
         <div className="dashboard-desc dashboard-desc-wide">
@@ -474,9 +487,10 @@ export default function Lecturer() {
           </ul>
         </div>
       </div>
-      {/* Filter Bar */}
+      {/* Filter Bar for searching and filtering applications */}
       <div className="filterBar">
         <div className="filterRow">
+          {/* Name and skills search inputs */}
           <div className="filterItem">
             <p>Search By Name</p>
             <input
@@ -495,6 +509,7 @@ export default function Lecturer() {
               onChange={(e) => setPendingSkills(e.target.value)}
             />
           </div>
+          {/* Search button */}
           <button
             style={{ marginLeft: "1rem", height: "2.2rem" }}
             onClick={() => {
@@ -506,6 +521,7 @@ export default function Lecturer() {
           </button>
         </div>
         <div className="filterRow">
+          {/* Course, availability, and position filters */}
           <details className="dropdown">
             <summary style={{ color: "#003366" }}>Filter by course</summary>
             <div className="dropdownContent">
@@ -534,6 +550,7 @@ export default function Lecturer() {
             </div>
           </details>
 
+          {/* Availability and position checkboxes */}
           <label className="availabilityLabel" style={{ marginLeft: "1rem" }}>
             <input
               type="checkbox"
@@ -599,10 +616,10 @@ export default function Lecturer() {
         </div>
       </div>
 
-      {/* Content Section */}
+      {/* Content Section: Application cards and info panel */}
       <div className="dashboardContainer">
         <div className="pageContentCenter">
-          {/* Sort Buttons */}
+          {/* Sort Buttons for sorting applications */}
           <div className="sortButtons">
             <button
               type="button"
@@ -637,10 +654,12 @@ export default function Lecturer() {
                 : ""}
             </button>
           </div>
+          {/* List of application cards */}
           {getAppCoursePairs().length === 0 ? (
             <p></p>
           ) : (
             getAppCoursePairs().map(({ app, courseObj }) => {
+              // Prepare props for ApplicationListCard
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
               const isSelected = !!selected[`${app.applicationID}`];
               const rankingObj = rankings.find(
@@ -670,18 +689,21 @@ export default function Lecturer() {
             })
           )}
         </div>
+        {/* Info panel for selected candidate */}
         <div className="pageContentRight">
           <InfoDetailsCard showInfoTut={showInfoTutor} />
         </div>
       </div>
-      {/* Analytics and Rankings Section*/}
+      {/* Analytics and Rankings Section */}
       <div className="analyticsRankingsRow">
         <div className="analyticsSection analyticsSectionWide">
+          {/* Bar chart of applicant selection counts */}
           <ApplicantBarChart
             data={barChartData}
             title="Selected Applicants Graph"
           />
           <div className="analyticsSummary">
+            {/* Most, least, and unselected candidates analytics */}
             {mostChosen.length > 0 && (
               <div className="mostChosen">
                 <b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}
@@ -700,6 +722,7 @@ export default function Lecturer() {
             )}
           </div>
         </div>
+        {/* Rankings section for lecturer's top 3 candidates */}
         <div className="rankingsSectionCard rankingsSectionWide">
           <h3>Your Rankings</h3>
           <div className="rankingsList">
