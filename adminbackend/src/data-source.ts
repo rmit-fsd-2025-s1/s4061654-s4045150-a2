@@ -39,3 +39,14 @@ export const AppDataSource = new DataSource({
   migrations: [],
   subscribers: [],
 });
+
+export const coursesRepository = AppDataSource.getRepository(Courses);
+export const userInformationRepository =
+  AppDataSource.getRepository(UserInformation);
+export const applicationsRepository = AppDataSource.getRepository(Applications);
+export const applicationCoursesRepository =
+  AppDataSource.getRepository(ApplicationCourses);
+export const lecturerCoursesRepository =
+  AppDataSource.getRepository(LecturerCourses);
+export const selectionsRepository = AppDataSource.getRepository(Selections);
+export const rankingsRepository = AppDataSource.getRepository(Rankings);

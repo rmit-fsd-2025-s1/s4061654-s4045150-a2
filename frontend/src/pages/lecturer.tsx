@@ -11,7 +11,7 @@ import { course } from "../types/course";
 import { User } from "../types/user";
 import { Ranking } from "../types/rankings";
 import ApplicantBarChart from "../components/ApplicantBarChart";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 export default function Lecturer() {
   const router = useRouter();
@@ -33,6 +33,26 @@ export default function Lecturer() {
   // Once courses, applications, and lecturerCourseIDs are loaded, we can stop loading
   const [isLoading, setIsLoading] = useState(true);
   const [rankings, setRankings] = useState<Ranking[]>([]);
+
+  useEffect(() => {
+    // Redirect if not logged in or not a lecturer
+    if (typeof window === "undefined") return; // Only run on client
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (!loggedIn) {
+      router.replace("/");
+      return;
+    }
+    let parsedUser;
+    try {
+      parsedUser = JSON.parse(loggedIn);
+    } catch (e) {
+      router.replace("/");
+      return;
+    }
+    if (!parsedUser.role || parsedUser.role !== "Lecturer") {
+      router.replace("/");
+    }
+  }, [router]);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // 1. Fetch course list on mount
@@ -73,7 +93,9 @@ export default function Lecturer() {
         // b) Turn each raw row into a full ApplicationInfo
         const fullApps: ApplicationInfo[] = await Promise.all(
           rawApps.map(async (r) => {
-            const courseRows = await userApi.getApplicationCoursesByAppID(r.applicationID);
+            const courseRows = await userApi.getApplicationCoursesByAppID(
+              r.applicationID
+            );
             const courseIds = courseRows.map((cr) => cr.course.courseID);
             const coursesAppliedObj = courseRows.map((cr) => cr.course);
             return {
@@ -158,7 +180,9 @@ export default function Lecturer() {
     if (
       showInfoTutor &&
       matched.length === showInfoTutor.length &&
-      matched.every((m, i) => m.applicationID === showInfoTutor[i].applicationID)
+      matched.every(
+        (m, i) => m.applicationID === showInfoTutor[i].applicationID
+      )
     ) {
       setShowInfoTutor(undefined);
     } else {
@@ -196,7 +220,9 @@ export default function Lecturer() {
         // For each application, fetch its courses and academics if missing
         const fullApps: ApplicationInfo[] = await Promise.all(
           rawApps.map(async (r) => {
-            const courseRows = await userApi.getApplicationCoursesByAppID(r.applicationID);
+            const courseRows = await userApi.getApplicationCoursesByAppID(
+              r.applicationID
+            );
             const courseIds = courseRows.map((cr) => cr.course.courseID);
             const coursesAppliedObj = courseRows.map((cr) => cr.course);
             return {
@@ -218,7 +244,16 @@ export default function Lecturer() {
       }
     };
     fetchApplications();
-  }, [searchName, searchSkills, courseFilter, availFilter, positionFilter, sortBy, sortOrder, lecturerCourseIDs]);
+  }, [
+    searchName,
+    searchSkills,
+    courseFilter,
+    availFilter,
+    positionFilter,
+    sortBy,
+    sortOrder,
+    lecturerCourseIDs,
+  ]);
 
   // Replace filteredTutors and getSortedAppCoursePairs usage with tutorsList
   // For displaying, flatten tutorsList to [{ app, courseObj }]
@@ -239,11 +274,11 @@ export default function Lecturer() {
 
   // Fetch selected applications for this lecturer
   useEffect(() => {
-    if (!user || typeof user.id !== 'number' || isNaN(user.id)) return;
+    if (!user || typeof user.id !== "number" || isNaN(user.id)) return;
     userApi.getSelectionsByLecturer(user.id).then((selections) => {
       // selections: [{ applicationId }]
       const selectedMap: { [key: string]: boolean } = {};
-      selections.forEach(sel => {
+      selections.forEach((sel) => {
         selectedMap[`${sel.applicationId}`] = true;
       });
       setSelected(selectedMap);
@@ -258,28 +293,32 @@ export default function Lecturer() {
       if (selected[key]) {
         // Deselect: call backend to remove selection
         await userApi.deselectApplicant(user.id, applicationId);
-        setSelected(prev => {
+        setSelected((prev) => {
           const newSelected = { ...prev };
           delete newSelected[key];
           return newSelected;
         });
         // Also remove from rankings if present
-        const rankingObj = rankings.find(r => r.applicationId === applicationId);
+        const rankingObj = rankings.find(
+          (r) => r.applicationId === applicationId
+        );
         if (rankingObj) {
           await userApi.deleteRanking(user.id, rankingObj.rank);
           // Refresh rankings
           const data = (await userApi.getRankingsByLecturer(user.id)) as any[];
-          setRankings(data.map((r: any) => ({
-            rowId: r.rowId ?? 0,
-            lecturerId: user.id,
-            applicationId: r.applicationId,
-            rank: r.rank
-          })));
+          setRankings(
+            data.map((r: any) => ({
+              rowId: r.rowId ?? 0,
+              lecturerId: user.id,
+              applicationId: r.applicationId,
+              rank: r.rank,
+            }))
+          );
         }
       } else {
         // Select: call backend to add selection
         await userApi.selectApplicant(user.id, applicationId);
-        setSelected(prev => ({
+        setSelected((prev) => ({
           ...prev,
           [key]: true,
         }));
@@ -297,12 +336,14 @@ export default function Lecturer() {
     if (!user) return;
     userApi.getRankingsByLecturer(user.id).then((data: unknown) => {
       const arr = Array.isArray(data) ? data : [];
-      setRankings(arr.map((r: any) => ({
-        rowId: r.rowId ?? 0,
-        lecturerId: user.id,
-        applicationId: r.applicationId,
-        rank: r.rank
-      })));
+      setRankings(
+        arr.map((r: any) => ({
+          rowId: r.rowId ?? 0,
+          lecturerId: user.id,
+          applicationId: r.applicationId,
+          rank: r.rank,
+        }))
+      );
     });
   }, [user, selected]);
 
@@ -312,12 +353,14 @@ export default function Lecturer() {
     await userApi.setRanking(user.id, applicationId, rank);
     // Refresh rankings
     const data = (await userApi.getRankingsByLecturer(user.id)) as any[];
-    setRankings(data.map((r: any) => ({
-      rowId: r.rowId ?? 0,
-      lecturerId: user.id,
-      applicationId: r.applicationId,
-      rank: r.rank
-    })));
+    setRankings(
+      data.map((r: any) => ({
+        rowId: r.rowId ?? 0,
+        lecturerId: user.id,
+        applicationId: r.applicationId,
+        rank: r.rank,
+      }))
+    );
   };
 
   // Handler to delete a rank
@@ -326,12 +369,14 @@ export default function Lecturer() {
     await userApi.deleteRanking(user.id, rank);
     // Refresh rankings
     const data = (await userApi.getRankingsByLecturer(user.id)) as any[];
-    setRankings(data.map((r: any) => ({
-      rowId: r.rowId ?? 0,
-      lecturerId: user.id,
-      applicationId: r.applicationId,
-      rank: r.rank
-    })));
+    setRankings(
+      data.map((r: any) => ({
+        rowId: r.rowId ?? 0,
+        lecturerId: user.id,
+        applicationId: r.applicationId,
+        rank: r.rank,
+      }))
+    );
   };
 
   // Fetch all selections globally for analytics
@@ -346,10 +391,19 @@ export default function Lecturer() {
   }, []);
 
   // Compute analytics for applicant selections (global)
-  const applicantSelectionCounts: { [applicantId: number]: { name: string; count: number } } = {};
-  if (Array.isArray(allSelections) && allSelections.length > 0 && allSelections[0].applicantId !== undefined) {
+  const applicantSelectionCounts: {
+    [applicantId: number]: { name: string; count: number };
+  } = {};
+  if (
+    Array.isArray(allSelections) &&
+    allSelections.length > 0 &&
+    allSelections[0].applicantId !== undefined
+  ) {
     allSelections.forEach((sel: any) => {
-      applicantSelectionCounts[sel.applicantId] = { name: sel.name, count: Number(sel.count) };
+      applicantSelectionCounts[sel.applicantId] = {
+        name: sel.name,
+        count: Number(sel.count),
+      };
     });
     // Ensure every applicant in tutorsList is present in applicantSelectionCounts
     tutorsList.forEach((app) => {
@@ -372,32 +426,19 @@ export default function Lecturer() {
   const barChartData = Object.values(applicantSelectionCounts);
   // Find most and least chosen applicants
   const maxCount = Math.max(...barChartData.map((d) => d.count), 0);
-  const minCount = barChartData.length > 0 ? Math.min(...barChartData.filter((d) => d.count > 0).map((d) => d.count)) : 0;
-  const mostChosen = barChartData.filter((d) => d.count === maxCount && maxCount > 0);
+  const minCount =
+    barChartData.length > 0
+      ? Math.min(...barChartData.filter((d) => d.count > 0).map((d) => d.count))
+      : 0;
+  const mostChosen = barChartData.filter(
+    (d) => d.count === maxCount && maxCount > 0
+  );
   // Least chosen: only those with at least 1 selection and the minimum count
-  const leastChosen = barChartData.filter((d) => d.count === minCount && d.count > 0);
+  const leastChosen = barChartData.filter(
+    (d) => d.count === minCount && d.count > 0
+  );
   // Unselected applicants (count === 0)
   const unselectedCandidates = barChartData.filter((d) => d.count === 0);
-
-  useEffect(() => {
-    // Redirect if not logged in or not a lecturer
-    if (typeof window === 'undefined') return; // Only run on client
-    const loggedIn = localStorage.getItem('loggedIn');
-    if (!loggedIn) {
-      router.replace('/');
-      return;
-    }
-    let parsedUser;
-    try {
-      parsedUser = JSON.parse(loggedIn);
-    } catch (e) {
-      router.replace('/');
-      return;
-    }
-    if (!parsedUser.role || parsedUser.role !== 'lecturer') {
-      router.replace('/');
-    }
-  }, [router]);
 
   if (isLoading) {
     return (
@@ -414,12 +455,20 @@ export default function Lecturer() {
         <h1 className="dashboard-title">Dashboard</h1>
         <div className="dashboard-desc dashboard-desc-wide">
           <ul>
-            <li>📋 View and filter all tutor applications for your assigned courses</li>
+            <li>
+              📋 View and filter all tutor applications for your assigned
+              courses
+            </li>
             <li>🔍 Search by name or skills</li>
             <li>🗂️ Filter by course, availability, or position</li>
             <li>✅ Select and rank candidates</li>
-            <li>📊 See analytics on candidate selections and your current rankings</li>
-            <li>ℹ️ Click "Show Info" on any candidate to view detailed application information</li>
+            <li>
+              📊 See analytics on candidate selections and your current rankings
+            </li>
+            <li>
+              ℹ️ Click "Show Info" on any candidate to view detailed application
+              information
+            </li>
           </ul>
         </div>
       </div>
@@ -564,7 +613,8 @@ export default function Lecturer() {
                 }
               }}
             >
-              Sort by Course Name {sortBy === "courseName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+              Sort by Course Name{" "}
+              {sortBy === "courseName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
             </button>
             <button
               type="button"
@@ -577,7 +627,12 @@ export default function Lecturer() {
                 }
               }}
             >
-              Sort by Availability {sortBy === "availability" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+              Sort by Availability{" "}
+              {sortBy === "availability"
+                ? sortOrder === "asc"
+                  ? "↑"
+                  : "↓"
+                : ""}
             </button>
           </div>
           {getAppCoursePairs().length === 0 ? (
@@ -586,7 +641,9 @@ export default function Lecturer() {
             getAppCoursePairs().map(({ app, courseObj }) => {
               const fullName = `${app.applicant.firstName} ${app.applicant.lastName}`;
               const isSelected = !!selected[`${app.applicationID}`];
-              const rankingObj = rankings.find(r => r.applicationId === app.applicationID);
+              const rankingObj = rankings.find(
+                (r) => r.applicationId === app.applicationID
+              );
               const isRanked = !!rankingObj;
               const currentRank = rankingObj?.rank;
               return (
@@ -601,7 +658,9 @@ export default function Lecturer() {
                   currentRank={currentRank}
                   onToggleSelect={() => handleSelect(app.applicationID)}
                   onSetRank={(rank) => handleSetRank(app.applicationID, rank)}
-                  onDeleteRank={() => currentRank && handleDeleteRank(currentRank)}
+                  onDeleteRank={() =>
+                    currentRank && handleDeleteRank(currentRank)
+                  }
                   onToggleRank={() => {}}
                   handleShowInfo={handleShowInfo}
                 />
@@ -614,10 +673,15 @@ export default function Lecturer() {
         </div>
       </div>
       <div className="analyticsSection">
-        <ApplicantBarChart data={barChartData} title="Applicant Selection Counts" />
+        <ApplicantBarChart
+          data={barChartData}
+          title="Applicant Selection Counts"
+        />
         <div className="analyticsSummary">
           {mostChosen.length > 0 && (
-            <div className="mostChosen"><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}</div>
+            <div className="mostChosen">
+              <b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}
+            </div>
           )}
           {leastChosen.length > 0 && (
             <div className="leastChosen">
@@ -626,32 +690,57 @@ export default function Lecturer() {
           )}
           {unselectedCandidates.length > 0 && (
             <div className="unselectedCandidates">
-              <b>Candidates who have not been selected:</b> {unselectedCandidates.map((a) => a.name).join(", ")}
+              <b>Candidates who have not been selected:</b>{" "}
+              {unselectedCandidates.map((a) => a.name).join(", ")}
             </div>
           )}
         </div>
       </div>
       <div className="rankingsSectionCard">
         <h3>Your Rankings</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem",
+          }}
+        >
           {/* Top of pyramid: Rank 1 */}
           <div className="pyramidTop">
             {(() => {
-              const ranking = rankings.find(r => r.rank === 1);
+              const ranking = rankings.find((r) => r.rank === 1);
               if (!ranking) return <span className="notSet">1: Not set</span>;
-              const app = tutorsList.find(a => a.applicationID === ranking.applicationId);
-              const name = app ? `${app.applicant.firstName} ${app.applicant.lastName}` : 'Unknown';
+              const app = tutorsList.find(
+                (a) => a.applicationID === ranking.applicationId
+              );
+              const name = app
+                ? `${app.applicant.firstName} ${app.applicant.lastName}`
+                : "Unknown";
               return <span>1: {name}</span>;
             })()}
           </div>
           {/* Bottom of pyramid: Ranks 2 and 3 */}
           <div className="pyramidBottom">
-            {[2, 3].map(rank => {
-              const ranking = rankings.find(r => r.rank === rank);
-              if (!ranking) return <div key={rank} className="notSet">{rank}: Not set</div>;
-              const app = tutorsList.find(a => a.applicationID === ranking.applicationId);
-              const name = app ? `${app.applicant.firstName} ${app.applicant.lastName}` : 'Unknown';
-              return <div key={rank}>{rank}: {name}</div>;
+            {[2, 3].map((rank) => {
+              const ranking = rankings.find((r) => r.rank === rank);
+              if (!ranking)
+                return (
+                  <div key={rank} className="notSet">
+                    {rank}: Not set
+                  </div>
+                );
+              const app = tutorsList.find(
+                (a) => a.applicationID === ranking.applicationId
+              );
+              const name = app
+                ? `${app.applicant.firstName} ${app.applicant.lastName}`
+                : "Unknown";
+              return (
+                <div key={rank}>
+                  {rank}: {name}
+                </div>
+              );
             })}
           </div>
         </div>
