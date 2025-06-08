@@ -168,6 +168,7 @@ export const resolvers = {
       if (!user) {
         throw new Error("User not found");
       }
+
       user.isBlocked = isBlocked;
       await userInformationRepository.save(user);
 

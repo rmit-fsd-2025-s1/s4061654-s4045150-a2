@@ -4,32 +4,36 @@ import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
 
 export default function login() {
+  //Router declaration to allow for redirection after login
   const router = useRouter();
+  //Login auth context
   const { login } = useAuth();
 
+  //All errors are stored in the error state
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
-
+  //Email and password are stored in the loginData state
+  //This state is updated as the user types into the input fields
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
 
+  //Success message is stored in the success state
   const [success, setSuccess] = useState("");
-
-  /**checkLogin checks whether the login credentials provided already exists in the respective localStorage keys.
-   * Returns a boolean value upon doing so**/
 
   //handleChange function sets the state of loginData as the user types into the textbox.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    //Login data changing as user types
     setLoginData((prev) => ({
       ...prev,
       [name]: value,
     }));
 
+    //As user types, we reset the error messages
     setSuccess("");
     setErrors({ email: "", password: "" });
   };
@@ -40,9 +44,11 @@ export default function login() {
     if (!e.currentTarget.form?.checkValidity()) return;
 
     e.preventDefault();
+
     setErrors({ email: "", password: "" });
 
     try {
+      //If email or password is empty, we set the error message
       if (!loginData.email || !loginData.password) {
         setErrors((prev) => ({
           ...prev,
@@ -50,10 +56,11 @@ export default function login() {
         }));
         return;
       }
-
+      //If email is valid, we call the login function from authContext
       if (validateEmail(loginData.email)) {
         const successLogin = await login(loginData.email, loginData.password);
 
+        // If login fails, we set the error message
         if (!successLogin) {
           setErrors((prev) => ({
             ...prev,
@@ -66,6 +73,8 @@ export default function login() {
         const loggedInUser = JSON.parse(
           localStorage.getItem("loggedIn") || "{}"
         );
+        //Set success message and redirect user to the appropriate page based on their role
+        //Success message contains the name of the user
         setSuccess(`Welcome ${loggedInUser.name}! Redirecting...`);
         if (loggedInUser.role === "Candidate") {
           router.push("/candidate");
@@ -73,6 +82,7 @@ export default function login() {
           router.push("/lecturer");
         }
       } else {
+        //If email is not valid, we set the error message
         setErrors((prev) => ({
           ...prev,
           email: "Please enter a valid email.",
