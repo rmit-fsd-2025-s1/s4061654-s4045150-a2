@@ -10,13 +10,14 @@ type InfoProps = {
 };
 
 function InfoDetailsCard({ showInfoTut }: InfoProps) {
+  // State for comment input, error display, loaded comments, and all courses
   const [comment, setComment] = useState<string>("");
   const [noComment, setNoComment] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [allCourses, setAllCourses] = useState<course[]>([]);
   const { user } = useAuth();
 
-  // Fetch all courses once on mount
+  // Fetch all courses once on mount for mapping course IDs to names
   useEffect(() => {
     userApi.getAllCourses().then((data) => {
       // getAllCourses returns { id, courseID?: number, courseName }
@@ -36,7 +37,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     });
   }, []);
 
-  // Fetch all comments for the application (no course filtering)
+  // Fetch all comments for the selected application whenever it changes
   useEffect(() => {
     const fetchComments = async () => {
       if (showInfoTut && showInfoTut.length > 0) {
@@ -55,6 +56,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     fetchComments();
   }, [showInfoTut]);
 
+  // Handler for submitting a new comment
   const handleSubmitComment = async (application: ApplicationInfo) => {
     if (!comment.trim()) {
       setNoComment(true);
@@ -80,6 +82,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     }
   };
 
+  // If no application is selected, show a prompt
   if (!showInfoTut || showInfoTut.length === 0) {
     return (
       <div
@@ -91,6 +94,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
     );
   }
 
+  // Use the first application in the array (should only be one at a time)
   const application = showInfoTut[0];
 
   // Map course IDs to course objects using allCourses
@@ -109,6 +113,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
 
   return (
     <div className="infoCard2">
+      {/* Applicant Name */}
       <h2
         style={{
           fontSize: "2.1rem",
@@ -121,50 +126,57 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
         {application.applicant.firstName} {application.applicant.lastName}
       </h2>
 
+      {/* Position Applied For */}
       <p className="pStyle">Position Applied For</p>
-      <p>{application.position}</p>
+      <p style={{ color: "#000" }}>{application.position}</p>
 
+      {/* Availability */}
       <div className="margin">
         <p className="pStyle">Availability</p>
-        <p>{application.availability}</p>
+        <p style={{ color: "#000" }}>{application.availability}</p>
       </div>
 
+      {/* Previous Experience */}
       <div className="margin">
         <p className="pStyle">Previous Experience</p>
         {(application.experience ?? []).length > 0 ? (
           <ul>
             {(application.experience ?? []).map((exp, index) => (
               <li key={index} className="listItem">
-                <p className="p2">
+                <p className="p2" style={{ color: "#000" }}>
                   <strong>{exp.position}</strong> at {exp.company}
                 </p>
-                <span style={{ fontSize: "0.9rem" }}>{exp.description}</span>
+                <span style={{ fontSize: "0.9rem", color: "#000" }}>
+                  {exp.description}
+                </span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="p2">No experience</p>
+          <p className="p2" style={{ color: "#000" }}>No experience</p>
         )}
       </div>
 
+      {/* Skills */}
       <div className="margin">
         <p className="pStyle">Skills</p>
-        <p>{application.skills.join(", ")}</p>
+        <p style={{ color: "#000" }}>{application.skills.join(", ")}</p>
       </div>
 
+      {/* Academic Details */}
       <div className="margin">
         <p className="pStyle">Academic Details</p>
         {(application.academics ?? []).length > 0 ? (
           <ul>
             {(application.academics ?? []).map((acad, index) => (
-              <li className="listItem" key={index}>
+              <li className="listItem" key={index} style={{ color: "#000" }}>
                 <strong>{acad.degree}</strong> from{" "}
                 <strong>{acad.university}</strong> ({acad.year})
               </li>
             ))}
           </ul>
         ) : (
-          <p className="p2">No academics added</p>
+          <p className="p2" style={{ color: "#000" }}>No academics added</p>
         )}
       </div>
 
@@ -187,6 +199,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
         <p>No Comments</p>
       )}
       <br />
+      {/* Comment input */}
       <textarea
         placeholder="Add a comment"
         rows={4}
@@ -201,6 +214,7 @@ function InfoDetailsCard({ showInfoTut }: InfoProps) {
         </p>
       )}
       <br />
+      {/* Submit comment button */}
       <button onClick={() => handleSubmitComment(application)}>
         Submit Comment
       </button>

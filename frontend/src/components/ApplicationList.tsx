@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Button from "./Button";
-import { course } from "@/types/course"; // Assuming this is the correct path
+import { course } from "@/types/course";
 
 type CardProps = {
   name: string;
@@ -31,21 +31,26 @@ function ApplicationListCard({
   onDeleteRank,
   handleShowInfo,
 }: CardProps) {
+  // State for toggling the show info button (not used for logic here)
   const [showInfoClicked, setShowInfoClicked] = useState(false);
 
   return (
     <div className="tutorCard">
+      {/* Applicant name */}
       <div className="inline-name">
         <h2>{name}</h2>
       </div>
 
+      {/* Show info button */}
       <Button name="Show info" func={() => handleShowInfo(name, course)} />
       <br />
 
+      {/* Course and position info */}
       <p>Course: {course.courseName}</p>
       {position && <p>Position: {position}</p>}
       <br />
 
+      {/* Select/deselect candidate button */}
       <button
         data-testid="Select"
         style={{ color: "#000" }}

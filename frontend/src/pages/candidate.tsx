@@ -280,7 +280,7 @@ export default function Candidate() {
     }
     try {
       alert(
-        "Submitting application: " + JSON.stringify(applicantProfile, null, 2)
+        "Application Submitted Succesfully!"
       );
       applicantProfile.applicant = JSON.parse(
         localStorage.getItem("loggedIn") || "{}"
