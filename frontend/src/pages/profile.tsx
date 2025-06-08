@@ -68,7 +68,7 @@ export default function profile() {
                 <textarea
                   value={about}
                   onChange={(e) => setAbout(e.target.value)}
-                  className="border rounded p-2 w-full"
+                  className="about-text"
                 />
                 <button
                   onClick={async () => {
@@ -93,7 +93,9 @@ export default function profile() {
               </>
             ) : (
               <>
-                <span>{user?.about || "—"}</span>
+                <span className="about-text">
+                  {user?.about || "Nothing set yet"}
+                </span>
                 <button
                   onClick={() => setEditing(true)}
                   className="btn btn-link ml-2"
