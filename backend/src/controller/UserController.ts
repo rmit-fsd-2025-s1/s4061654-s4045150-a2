@@ -7,24 +7,12 @@ import { compareSync } from "bcrypt";
 export class UserController {
   private userRepository = AppDataSource.getRepository(UserInformation);
 
-  //   /**
-  //    * Retrieves all users from the database
-  //    * @param request - Express request object
-  //    * @param response - Express response object
-  //    * @returns JSON response containing an array of all users
-  //    */
   async all(request: Request, response: Response) {
     const users = await this.userRepository.find();
 
     return response.json(users);
   }
 
-  /**
-   * Retrieves a single user by their ID
-   * @param request - Express request object containing the user ID in params
-   * @param response - Express response object
-   * @returns JSON response containing the user if found, or 404 error if not found
-   */
   async one(request: Request, response: Response) {
     const id = parseInt(request.params.userid);
     const user = await this.userRepository.findOne({
@@ -93,12 +81,6 @@ export class UserController {
     }
   }
 
-  /**
-   * Deletes a user from the database by their ID
-   * @param request - Express request object containing the user ID in params
-   * @param response - Express response object
-   * @returns JSON response with success message or 404 error if user not found
-   */
   async remove(request: Request, response: Response) {
     const id = parseInt(request.params.userid);
     const userToRemove = await this.userRepository.findOne({
