@@ -1,27 +1,25 @@
 import { userApi } from "../services/api";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "../context/adminAuth";
 
 export default function AdminLogin() {
+  const { login } = useAuth();
+
   const [creds, setCreds] = useState({
     username: "",
     password: "",
   });
   const router = useRouter();
-  const handleLogin = (username: string, password: string) => {
-    userApi
-      .adminLogin(username, password)
-      .then((response) => {
-        if (response) {
-          alert("Login successful!");
-          router.push("/course");
-        } else {
-          console.error("Login failed:", response);
-        }
-      })
-      .catch((error) => {
-        console.error("Error during login:", error);
-      });
+  const handleLogin = async (username: string, password: string) => {
+    const log = await login(username, password);
+    if (!log) {
+      alert("Login failed. Please check your credentials.");
+      return;
+    } else {
+      alert("Login successful!");
+      router.push("/course");
+    }
   };
 
   return (
@@ -44,10 +42,9 @@ export default function AdminLogin() {
         <button
           type="submit"
           className="bg-blue-500 text-white p-2 w-full rounded hover:bg-blue-600"
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
-            // Handle login logic here
-            handleLogin(creds.username, creds.password);
+            await handleLogin(creds.username, creds.password);
           }}
         >
           Login

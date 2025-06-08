@@ -1,4 +1,6 @@
 import "reflect-metadata";
+import * as dotenv from "dotenv";
+dotenv.config();
 import { DataSource } from "typeorm";
 import { UserInformation } from "./entity/UserInformation";
 import { Applications } from "./entity/Applications";
@@ -12,16 +14,12 @@ import { Experience } from "./entity/Experience";
 import { Academics } from "./entity/Academics";
 
 export const AppDataSource = new DataSource({
-  type: "mysql",
-  host: "209.38.26.237",
-  port: 3306,
-  /* Change to your own credentials */
-  username: "S4061654",
-  password: "Password4231",
-  database: "S4061654",
-  // synchronize: true will automatically create database tables based on entity definitions
-  // and update them when entity definitions change. This is useful during development
-  // but should be disabled in production to prevent accidental data loss.
+  type: process.env.DB_DIALECT as any,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "3306", 10),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   synchronize: true,
   logging: true,
   entities: [
