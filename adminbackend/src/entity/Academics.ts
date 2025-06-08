@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from "typeorm";
 import { Applications } from "./Applications";
-
+// All application academics information
 @Entity()
 export class Academics {
   @PrimaryGeneratedColumn()

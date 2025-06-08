@@ -2,17 +2,27 @@ import { userApi } from "../services/api";
 import { useState } from "react";
 
 export default function AddCourses() {
+  //Course name state to hold the name
   const [courseName, setCourseName] = useState("");
+  //States to manage error and success messages
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    //Check if course name is empty
     if (!courseName) {
-      alert("Please enter a course name.");
+      setError("Course name cannot be empty.");
       return;
     }
+    //Call the API to add the course
     userApi.addCourse(courseName);
-    alert(courseName + " added successfully!");
-    window.location.reload();
+    if (!userApi.addCourse) {
+      setError("Failed to add course. Please try again.");
+    } else {
+      setSuccess("Course added successfully.");
+      window.location.reload();
+    }
   };
 
   return (
@@ -30,7 +40,10 @@ export default function AddCourses() {
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black mb-4"
         placeholder="Enter course name"
         value={courseName}
-        onChange={(e) => setCourseName(e.target.value)}
+        onChange={(e) => {
+          setError("");
+          setCourseName(e.target.value);
+        }}
         required
       />
       <button
@@ -40,6 +53,8 @@ export default function AddCourses() {
       >
         Add Course
       </button>
+      {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
+      {success && <p className="text-green-600 mt-3 text-center">{success}</p>}
     </div>
   );
 }

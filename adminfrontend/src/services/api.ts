@@ -229,7 +229,6 @@ export const userApi = {
   },
 };
 
-// Candidate type
 export interface Candidate {
   userid: number;
   firstName: string;
@@ -238,20 +237,17 @@ export interface Candidate {
   isBlocked: boolean;
 }
 
-// Course type
 export interface Course {
   courseID: number;
   courseName: string;
 }
 
-// ChosenCandidates type
 export interface ChosenCandidates {
   courseID: number;
   courseName: string;
   candidates: string[];
 }
 
-// Lecturer type
 export interface Lecturer {
   userid: number;
   firstName: string;

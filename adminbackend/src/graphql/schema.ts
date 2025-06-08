@@ -27,10 +27,6 @@ export const typeDefs = gql`
     candidates: [String!]!
   }
 
-  type Subscription {
-    candidateUnavailable: CandidateUnavailablePayload!
-  }
-
   type CandidateUnavailablePayload {
     candidateId: ID!
     name: String!

@@ -20,10 +20,12 @@ export default function NeverChosen() {
   const [chosenCandidates, setChosenCandidates] = useState<ChosenCandidates[]>(
     []
   );
+  // State to hold candidates who have never been chosen
   const [NeverChosen, setNeverChosen] = useState<string[]>([]);
 
   const fetchAllCandidates = async () => {
     try {
+      // Fetching all candidates from the API
       const response = await userApi.getAllCandidates().then((candidates) => {
         setCandidates(candidates);
       });
@@ -35,6 +37,7 @@ export default function NeverChosen() {
 
   const fetchChosenCandidates = async () => {
     try {
+      // Fetching chosen candidates for each course
       const response = await userApi
         .getChosenCandidatesByCourse()
         .then((data) => {
@@ -47,13 +50,16 @@ export default function NeverChosen() {
   };
 
   useEffect(() => {
+    // Fetching all candidates and chosen candidates when the component mounts
     fetchAllCandidates();
     fetchChosenCandidates();
   }, []);
 
   useEffect(() => {
+    // Checking if there are candidates who have never been chosen
     if (candidates.length > 0 && chosenCandidates.length > 0) {
       const allChosen: string[] = [];
+      // Collecting all chosen candidates from each course
       for (let i = 0; i < chosenCandidates.length; i++) {
         const course = chosenCandidates[i];
         for (let j = 0; j < course.candidates.length; j++) {

@@ -9,17 +9,23 @@ export default function BlockCandidate() {
     role: string;
     isBlocked: boolean;
   };
-
+  //Selected candidate to block
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<string>("");
 
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+
   useEffect(() => {
+    //Fetching all candidates on component mount
     const fetchCandidates = async () => {
       try {
+        //Then filtering out the candidates who are already blocked
         userApi.getAllCandidates().then((candidates) => {
           const notYetBlocked = candidates.filter(
             (candidate: Candidate) => !candidate.isBlocked
           );
+          //After filtering, setting the candidates state
           setCandidates(notYetBlocked);
         });
       } catch (error) {
@@ -32,15 +38,19 @@ export default function BlockCandidate() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    //When the form is submitted, check if a candidate is selected
     if (!selectedCandidate) {
-      alert("Please select a candidate.");
+      setError("Please select a candidate to block.");
       return;
     }
+    //If a candidate is selected, call the API to block the candidate
     userApi
       .blockCandidate(Number(selectedCandidate), true)
       .then(() => {
-        alert("Candidate blocked successfully!");
-        window.location.reload();
+        setSuccess("Candidate blocked successfully.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((error) => {
         console.error("Error blocking candidate:", error);
@@ -86,6 +96,10 @@ export default function BlockCandidate() {
         >
           Block Candidate
         </button>
+        {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
+        {success && (
+          <p className="text-green-600 mt-3 text-center">{success}</p>
+        )}
       </form>
     </div>
   );

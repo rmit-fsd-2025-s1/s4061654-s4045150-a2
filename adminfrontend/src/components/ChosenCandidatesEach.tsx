@@ -13,6 +13,7 @@ export default function ChosenCandidatesEach({}) {
     candidates: string[];
   };
   useEffect(() => {
+    //Fetch all courses and chosen candidates when the component mounts
     fetchCourses();
     fetchChosenCandidates();
   }, []);
@@ -22,7 +23,9 @@ export default function ChosenCandidatesEach({}) {
     []
   );
 
+  // Function to fetch all courses from the API
   const fetchCourses = async () => {
+    // Fetching all courses to display in the table
     userApi
       .getAllCourses()
       .then((response) => {
@@ -35,9 +38,11 @@ export default function ChosenCandidatesEach({}) {
 
   const fetchChosenCandidates = async () => {
     try {
+      // Fetching chosen candidates for each course
       const response = await userApi
         .getChosenCandidatesByCourse()
         .then((data) => {
+          // Storing the chosen candidates for each course
           setChosenCandidates(data);
         });
 

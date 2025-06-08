@@ -3,30 +3,39 @@ import React, { useState, useEffect } from "react";
 import { course } from "../types/course";
 
 export default function AvailableCourses() {
+  // States to hold the list of courses, currently editing course ID, and the name for editing
   const [courses, setCourses] = useState<course[]>([]);
   const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
   const [editCourseName, setEditCourseName] = useState<string>("");
 
   useEffect(() => {
+    //On mount, fetch all courses from the API
     userApi.getAllCourses().then((data: course[]) => {
       setCourses(data);
     });
   }, []);
 
   const handleRemoveCourse = (c: number) => {
+    //When remove is clicked, call the API to remove the course
     userApi.removeCourse(c);
-    alert("Course removed successfully");
     window.location.reload();
   };
 
   const startEditCourse = (c: number) => {
+    //When edit is clicked, set the course to be edited
+    //Finding the course by ID for editing
     const courseToEdit = courses.find((course) => course.courseID === c);
-    if (!courseToEdit) return;
+    //If course is not found, return
+    if (!courseToEdit) {
+      return;
+    }
+    //Set the editing course ID and the course name to be edited
     setEditingCourseId(c);
     setEditCourseName(courseToEdit.courseName);
   };
 
   const saveEditCourse = async (c: number) => {
+    //When save is clicked, call the API to edit the course
     await userApi.editCourse(c, editCourseName);
     setEditingCourseId(null);
     setEditCourseName("");

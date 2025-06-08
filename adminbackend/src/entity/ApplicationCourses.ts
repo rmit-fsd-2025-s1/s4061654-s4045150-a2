@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Courses } from "./Courses";
 import { Applications } from "./Applications";
-
+//All application courses information
 @Entity({ name: "application_courses" })
 export class ApplicationCourses {
   @PrimaryGeneratedColumn()

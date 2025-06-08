@@ -37,7 +37,7 @@ export const AppDataSource = new DataSource({
   migrations: [],
   subscribers: [],
 });
-
+//DataSource initialization for unit testing
 export const coursesRepository = AppDataSource.getRepository(Courses);
 export const userInformationRepository =
   AppDataSource.getRepository(UserInformation);

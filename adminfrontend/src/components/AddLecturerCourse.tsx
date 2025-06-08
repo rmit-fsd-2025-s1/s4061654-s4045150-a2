@@ -2,6 +2,8 @@ import { userApi } from "../services/api";
 import { useEffect, useState } from "react";
 
 export default function AddLecturerCourse() {
+  //All the required types for the component
+  // These types are used to define the structure of the data being fetched and manipulated
   type LecturerCourses = {
     rowId: number;
     lecturer: {
@@ -25,13 +27,17 @@ export default function AddLecturerCourse() {
     courseID: number;
     courseName: string;
   };
-
+  // States to hold the fetched data and user selections
   const [allLecturers, setAllLecturers] = useState<AllLecturers[]>([]);
   const [selectedLecturer, setSelectedLecturer] = useState<string>();
   const [selectedCourse, setSelectedCourse] = useState<string>();
   const [availableCourses, setAvailableCourses] = useState<AllCourses[]>();
-
+  // State to hold all the lecturer courses
   const [lecturerCourses, setLecturerCourses] = useState<LecturerCourses[]>([]);
+
+  // States to manage error and success messages
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
 
   useEffect(() => {
     fetchLecturersAndCourses();
@@ -41,12 +47,14 @@ export default function AddLecturerCourse() {
 
   const fetchLecturersAndCourses = async () => {
     try {
+      // Fetching all lecturers and courses from the API to show in dropdown
       const response = await userApi.getAllLecturers();
       setAllLecturers(response);
     } catch (error) {
       console.error("Error fetching lecturers:", error);
     }
     try {
+      // Fetching all courses from the API to show in dropdown
       const response = await userApi.getAllCourses();
       setAvailableCourses(response);
     } catch (error) {
@@ -56,12 +64,13 @@ export default function AddLecturerCourse() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    //If no lecturer or course is selected, show an error
     if (!selectedLecturer) {
-      alert("Please select a lecturer.");
+      setError("Please select a lecturer.");
       return;
     }
     if (!selectedCourse) {
-      alert("Please select a course.");
+      setError("Please select a course.");
       return;
     }
     // Validation: Check if this course is already assigned to this lecturer
@@ -70,19 +79,24 @@ export default function AddLecturerCourse() {
         lc.lecturer.userid.toString() === selectedLecturer &&
         lc.course.courseID.toString() === selectedCourse
     );
+    // If already assigned, show an alert and return
     if (alreadyAssigned) {
-      alert("This course is already assigned to the selected lecturer.");
+      setError("This course is already assigned to the selected lecturer.");
       return;
     }
     try {
+      // Call the API to assign the course to the lecturer
       await userApi.assignLecturerCourse(
         Number(selectedLecturer),
         Number(selectedCourse)
       );
-      alert("Course assigned to lecturer!");
-      window.location.reload();
+      // If the assignment is successful, show a success message and reload the page
+      setSuccess("Course assigned to lecturer!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
-      alert("Error assigning course: " + error);
+      setError("Error assigning course: " + error);
     }
   };
 
@@ -103,7 +117,10 @@ export default function AddLecturerCourse() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black"
             id="lecturerName"
             value={selectedLecturer}
-            onChange={(e) => setSelectedLecturer(e.target.value)}
+            onChange={(e) => {
+              setError("");
+              setSelectedLecturer(e.target.value);
+            }}
           >
             <option value="">Select Lecturer</option>
             {allLecturers.map((lecturer) => (
@@ -124,7 +141,10 @@ export default function AddLecturerCourse() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500 text-black"
             id="courseName"
             value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
+            onChange={(e) => {
+              setError("");
+              setSelectedCourse(e.target.value);
+            }}
           >
             <option value="">Select Course</option>
             {(availableCourses ?? []).map((course) => (
@@ -140,6 +160,10 @@ export default function AddLecturerCourse() {
         >
           Assign Course
         </button>
+        {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
+        {success && (
+          <p className="text-green-600 mt-3 text-center">{success}</p>
+        )}
       </form>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { userApi } from "../services/api";
 
 export default function ShowLecturerCourses() {
+  // These types are used to define the structure of the data being fetched and displayed
   type LecturerCourses = {
     rowId: number;
     lecturer: {
@@ -23,10 +24,10 @@ export default function ShowLecturerCourses() {
   };
 
   const [allLecturers, setAllLecturers] = useState<AllLecturers[]>([]);
-
   const [lecturerCourses, setLecturerCourses] = useState<LecturerCourses[]>([]);
 
   useEffect(() => {
+    // Fetching all lecturers and their assigned courses on component mount
     userApi.getAllLecturers().then((data: AllLecturers[]) => {
       setAllLecturers(data);
     });

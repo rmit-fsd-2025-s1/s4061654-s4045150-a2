@@ -11,13 +11,17 @@ export default function ShowBlockedCandidates() {
   };
   const [blockedCandidates, setBlockedCandidates] = useState<Candidate[]>([]);
 
+  const [success, setSuccess] = useState<string>("");
   useEffect(() => {
+    // Fetching all candidates on mount
     const fetchBlockedCandidates = async () => {
       try {
+        // Fetching all candidates and filtering out the blocked ones
         userApi.getAllCandidates().then((candidates: Candidate[]) => {
           const blocked = candidates.filter(
             (candidate: Candidate) => candidate.isBlocked
           );
+          //Storing all blocked candidates to show
           setBlockedCandidates(blocked);
         });
       } catch (error) {
@@ -30,11 +34,12 @@ export default function ShowBlockedCandidates() {
 
   const handleUnblock = async (userid: number) => {
     try {
+      //If unblock is pressed, call the API to unblock the candidate
       await userApi.blockCandidate(userid, false);
       setBlockedCandidates((prev) =>
         prev.filter((candidate) => candidate.userid !== userid)
       );
-      alert("Candidate unblocked successfully!");
+
       window.location.reload();
     } catch (error) {
       console.error("Error unblocking candidate:", error);

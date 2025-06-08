@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
+//Application entity
 import { UserInformation } from "./UserInformation";
 import { Experience } from "./Experience";
 import { Academics } from "./Academics";
