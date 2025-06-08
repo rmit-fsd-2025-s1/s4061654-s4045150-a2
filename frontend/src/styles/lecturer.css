@@ -127,31 +127,35 @@ h1 {
 
 .dashboardContainer {
   display: flex;
+  gap: 2rem;
+  align-items: flex-start;
   flex-direction: row;
   justify-content: space-between;
   padding: 20px;
-  gap: 20px;
   background: #fafafa;
 }
 
 .pageContentCenter {
-  width: 60%;
+  max-height: 670px;
+  overflow-y: auto;
+  flex: 2 1 0%;
+  width: 66.66%;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 2px 8px #0001;
 }
 
 .pageContentRight {
-  width: 40%;
+  height: 670px;
+  min-height: 670px;
+  max-height: 670px;
+  overflow-y: auto;
+  flex: 1 1 0%;
+  width: 33.33%;
   padding: 10px;
   text-align: center;
   background-color: #222c36;
   border-left: 1px solid #bdbdbd;
-  max-height: 525px;
-  min-height: 500px;
-  overflow: auto;
-  word-wrap: break-word;
-  word-break: break-word;
   border-radius: 10px;
   color: #fff;
 }
@@ -322,7 +326,7 @@ ul {
 }
 
 .analyticsSection {
-  max-width: 700px;
+  max-width: 900px;
   margin: 2rem auto;
   background: #fff;
   border-radius: 8px;
@@ -335,6 +339,28 @@ ul {
 .analyticsSummary {
   text-align: center;
   margin-top: 8px;
+}
+
+.analyticsSummary .mostChosen {
+  margin-bottom: 0.5rem;
+}
+
+.analyticsSummary .leastChosen {
+  margin-bottom: 0.5rem;
+  color: #b36b00;
+  font-weight: 500;
+  background: #fffbe6;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.analyticsSummary .unselectedCandidates {
+  margin-bottom: 0.5rem;
+  color: #b30000;
+  font-weight: 500;
+  background: #fff0f0;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
 }
 
 .rankingsSection {
@@ -350,6 +376,38 @@ ul {
   text-align: center;
   list-style: none;
   padding: 0;
+}
+
+.rankingsSectionCard {
+  margin: 2rem auto;
+  max-width: 400px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #0001;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.rankingsSectionCard h3 {
+  margin-bottom: 1rem;
+  color: #003366;
+}
+
+.rankingsSectionCard .pyramidTop {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-height: 32px;
+}
+
+.rankingsSectionCard .pyramidBottom {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.rankingsSectionCard .notSet {
+  color: #b30000;
 }
 
 .notSet {

@@ -4,9 +4,11 @@ import Footer from "../components/Footer";
 import { userApi } from "@/services/api";
 import { UserInformation } from "../types/loginCreds";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function profile() {
   const [user, setUser] = React.useState<UserInformation | null>(null);
+  const router = useRouter();
 
   const profileData = async () => {
     const allUsers = (await userApi.getAllUsers()) as UserInformation[];
@@ -21,6 +23,12 @@ export default function profile() {
   };
 
   useEffect(() => {
+    // Redirect if not logged in
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (!loggedIn) {
+      router.replace("/");
+      return;
+    }
     profileData();
   }, []);
 

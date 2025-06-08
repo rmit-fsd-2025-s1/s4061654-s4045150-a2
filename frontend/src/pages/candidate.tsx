@@ -9,8 +9,10 @@ import { course } from "../types/course";
 import { useState, useEffect } from "react";
 import { userApi } from "../services/api";
 import { UserInformation } from "../types/loginCreds";
+import { useRouter } from "next/router";
 
 export default function Candidate() {
+  const router = useRouter();
   //useState of type applicationInfo to store all values in one state and then store in localStorage.
   const [applicantProfile, setApplicantProfile] = useState<ApplicationInfo>({
     applicationID: Math.floor(Math.random() * 1000000),
@@ -52,9 +54,7 @@ export default function Candidate() {
   //Store filteredCourses according to filter option usage in lecturer page.
   const [courses, setCourses] = useState<course[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<course[]>([]);
-  const [userApplications, setUserApplications] = useState<ApplicationInfo[]>(
-    []
-  );
+  const [userApplications, setUserApplications] = useState<ApplicationInfo[]>([]);
 
   useEffect(() => {
     userApi.getAllCourses().then((courseArray) => {
@@ -95,17 +95,13 @@ export default function Candidate() {
           // Fetch coursesApplied (array of courseIDs)
           let coursesApplied: number[] = [];
           try {
-            const courseRows = await userApi.getApplicationCoursesByAppID(
-              app.applicationID
-            );
+            const courseRows = await userApi.getApplicationCoursesByAppID(app.applicationID);
             coursesApplied = courseRows.map((cr: any) => cr.course.courseID);
           } catch {}
           // Fetch academics
           let academics: qualification[] = [];
           try {
-            academics = await userApi.getAcademicsByApplicationId(
-              app.applicationID
-            );
+            academics = await userApi.getAcademicsByApplicationId(app.applicationID);
           } catch {}
           return {
             ...app,
@@ -226,21 +222,16 @@ export default function Candidate() {
   const handleSubmit = async () => {
     // Check for duplicate application before submitting
     const selectedCourseId = applicantProfile.coursesApplied[0];
-    const selectedPosition = (applicantProfile.position || "")
-      .trim()
-      .toLowerCase();
+    const selectedPosition = (applicantProfile.position || "").trim().toLowerCase();
     const duplicate = userApplications.some(
       (app) =>
         (app.position || "").trim().toLowerCase() === selectedPosition &&
-        (Array.isArray(app.coursesApplied)
-          ? app.coursesApplied.includes(selectedCourseId)
-          : false)
+        (Array.isArray(app.coursesApplied) ? app.coursesApplied.includes(selectedCourseId) : false)
     );
     if (duplicate) {
       setError((prev) => ({
         ...prev,
-        applicationCannotSubmit:
-          "You have already applied for this course and position!",
+        applicationCannotSubmit: "You have already applied for this course and position!",
       }));
       setTimeout(() => {
         setError((prev) => ({ ...prev, applicationCannotSubmit: "" }));
@@ -261,6 +252,19 @@ export default function Candidate() {
       console.error("Error saving application:", error);
     }
   };
+
+  useEffect(() => {
+    // Redirect if not logged in or not a candidate
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (!loggedIn) {
+      router.replace("/");
+      return;
+    }
+    const user = JSON.parse(loggedIn);
+    if (!user.role || user.role !== "candidate") {
+      router.replace("/");
+    }
+  }, [router]);
 
   return (
     <div>
@@ -572,9 +576,7 @@ export default function Candidate() {
           <br />
           <br />
           {error.applicationCannotSubmit && (
-            <p className="fieldsNotPopulated">
-              {error.applicationCannotSubmit}
-            </p>
+            <p className="fieldsNotPopulated">{error.applicationCannotSubmit}</p>
           )}
           <input
             data-testid="applyButton"

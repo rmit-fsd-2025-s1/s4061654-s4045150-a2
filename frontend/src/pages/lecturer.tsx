@@ -11,8 +11,10 @@ import { course } from "../types/course";
 import { User } from "../types/user";
 import { Ranking } from "../types/rankings";
 import ApplicantBarChart from "../components/ApplicantBarChart";
+import { useRouter } from 'next/router';
 
 export default function Lecturer() {
+  const router = useRouter();
   const [tutorsList, setTutorsList] = useState<ApplicationInfo[]>([]);
   const [searchName, setSearchName] = useState("");
   const [searchSkills, setSearchSkills] = useState("");
@@ -377,6 +379,26 @@ export default function Lecturer() {
   // Unselected applicants (count === 0)
   const unselectedCandidates = barChartData.filter((d) => d.count === 0);
 
+  useEffect(() => {
+    // Redirect if not logged in or not a lecturer
+    if (typeof window === 'undefined') return; // Only run on client
+    const loggedIn = localStorage.getItem('loggedIn');
+    if (!loggedIn) {
+      router.replace('/');
+      return;
+    }
+    let parsedUser;
+    try {
+      parsedUser = JSON.parse(loggedIn);
+    } catch (e) {
+      router.replace('/');
+      return;
+    }
+    if (!parsedUser.role || parsedUser.role !== 'lecturer') {
+      router.replace('/');
+    }
+  }, [router]);
+
   if (isLoading) {
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
@@ -527,8 +549,8 @@ export default function Lecturer() {
       </div>
 
       {/* Content Section */}
-      <div className="dashboardContainer" style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-        <div className="pageContentCenter" style={{ maxHeight: '670px', overflowY: 'auto', flex: '2 1 0%', width: '66.66%' }}>
+      <div className="dashboardContainer">
+        <div className="pageContentCenter">
           {/* Sort Buttons */}
           <div className="sortButtons">
             <button
@@ -587,35 +609,33 @@ export default function Lecturer() {
             })
           )}
         </div>
-        <div className="pageContentRight" style={{ height: '670px', minHeight: '670px', maxHeight: '670px', overflowY: 'auto', flex: '1 1 0%', width: '33.33%' }}>
+        <div className="pageContentRight">
           <InfoDetailsCard showInfoTut={showInfoTutor} />
         </div>
       </div>
-      {/* Analytics Bar Chart: full width below main content */}
-      <div className="analyticsSection" style={{ maxWidth: 900, margin: '2rem auto' }}>
+      <div className="analyticsSection">
         <ApplicantBarChart data={barChartData} title="Applicant Selection Counts" />
         <div className="analyticsSummary">
           {mostChosen.length > 0 && (
-            <div style={{ marginBottom: '0.5rem' }}><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}</div>
+            <div className="mostChosen"><b>Most Chosen:</b> {mostChosen.map((a) => a.name).join(", ")}</div>
           )}
           {leastChosen.length > 0 && (
-            <div style={{ marginBottom: '0.5rem', color: '#b36b00', fontWeight: 500, background: '#fffbe6', borderRadius: 4, padding: '0.5rem 0.75rem' }}>
+            <div className="leastChosen">
               <b>Least Chosen:</b> {leastChosen.map((a) => a.name).join(", ")}
             </div>
           )}
           {unselectedCandidates.length > 0 && (
-            <div style={{ marginBottom: '0.5rem', color: '#b30000', fontWeight: 500, background: '#fff0f0', borderRadius: 4, padding: '0.5rem 0.75rem' }}>
+            <div className="unselectedCandidates">
               <b>Candidates who have not been selected:</b> {unselectedCandidates.map((a) => a.name).join(", ")}
             </div>
           )}
         </div>
       </div>
-      {/* Rankings Card: full width below analytics */}
-      <div className="rankingsSectionCard" style={{ margin: '2rem auto', maxWidth: 400, background: '#f8f9fa', borderRadius: 8, boxShadow: '0 2px 8px #0001', padding: '1.5rem', textAlign: 'center' }}>
-        <h3 style={{ marginBottom: '1rem', color: '#003366' }}>Your Rankings</h3>
+      <div className="rankingsSectionCard">
+        <h3>Your Rankings</h3>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
           {/* Top of pyramid: Rank 1 */}
-          <div style={{ fontWeight: 700, fontSize: '1.1rem', minHeight: 32 }}>
+          <div className="pyramidTop">
             {(() => {
               const ranking = rankings.find(r => r.rank === 1);
               if (!ranking) return <span className="notSet">1: Not set</span>;
@@ -625,13 +645,13 @@ export default function Lecturer() {
             })()}
           </div>
           {/* Bottom of pyramid: Ranks 2 and 3 */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', width: '100%' }}>
+          <div className="pyramidBottom">
             {[2, 3].map(rank => {
               const ranking = rankings.find(r => r.rank === rank);
-              if (!ranking) return <div key={rank} style={{ minWidth: 100 }}><span className="notSet">{rank}: Not set</span></div>;
+              if (!ranking) return <div key={rank} className="notSet">{rank}: Not set</div>;
               const app = tutorsList.find(a => a.applicationID === ranking.applicationId);
               const name = app ? `${app.applicant.firstName} ${app.applicant.lastName}` : 'Unknown';
-              return <div key={rank} style={{ minWidth: 100 }}>{rank}: {name}</div>;
+              return <div key={rank}>{rank}: {name}</div>;
             })}
           </div>
         </div>
