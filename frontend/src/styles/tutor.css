@@ -82,9 +82,11 @@ h2 {
   color: #003366;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   color: #222;
-  background: linear-gradient(90deg, #fffbe6 60%, #f7e9b0 100%);
+  background: none;
   border-radius: 6px;
   padding: 0.2em 0.5em;
 }
@@ -97,7 +99,8 @@ h1, h2, h3 {
   box-shadow: 0 2px 8px #0001;
 }
 
-.filterBar, .filterRow {
+.filterBar,
+.filterRow {
   background: #fffde7;
   border-bottom: 1px solid #f7e9b0;
   color: #222;
